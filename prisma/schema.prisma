@@ -98,6 +98,7 @@ model BlogPost {
   content   String   @db.Text
   excerpt   String?
   image     String?
+  videoUrl  String?
   category  String?
   published Boolean  @default(false)
   authorId  String
@@ -113,6 +114,7 @@ model Project {
   description  String
   content      String   @db.Text
   image        String?
+  videoUrl     String?
   level        String?
   published    Boolean  @default(false)
   tools        String[]
@@ -130,6 +132,7 @@ model Course {
   description String
   level       String
   image       String?
+  duration    String?
   published   Boolean  @default(false)
   lessons     Lesson[]
   createdAt   DateTime @default(now())
@@ -141,6 +144,7 @@ model Lesson {
   slug      String
   title     String
   content   String   @db.Text
+  videoUrl  String?  @db.Text
   order     Int
   courseId  String
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)

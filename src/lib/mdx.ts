@@ -56,6 +56,7 @@ export type Course = {
         image?: string;
     };
     modules?: number;
+    duration?: string;
 };
 
 export const getPostBySlug = async (slug: string): Promise<Post | null> => {
@@ -228,6 +229,7 @@ export const getAllCourses = async (): Promise<Course[]> => {
             image: course.image || undefined,
         },
         modules: course._count.lessons,
+        duration: course.duration || undefined,
     }));
 };
 
@@ -256,6 +258,7 @@ export const getCourseBySlug = async (slug: string): Promise<Course | null> => {
             image: course.image || undefined,
         },
         modules: course._count.lessons,
+        duration: course.duration || undefined,
     };
 };
 

@@ -68,7 +68,7 @@ export default async function CoursePage({ params }: Props) {
                         </span>
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <Clock size={16} className="text-accent-primary" />
-                            4 weeks
+                            Self-paced
                         </span>
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <BookOpen size={16} className="text-accent-primary" />

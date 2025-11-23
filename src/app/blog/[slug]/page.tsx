@@ -5,6 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize';
 import { ArrowLeft, Calendar, Clock, User, Share2, Tag } from 'lucide-react';
 import { getPostBySlug, getAllBlogPosts } from '@/lib/mdx';
 import MDXContent from '@/components/mdx/MDXContent';
+import { calculateReadingTime } from '@/lib/utils';
 
 interface Props {
     params: { slug: string };
@@ -52,6 +53,7 @@ export default async function BlogPost({ params }: Props) {
     }
 
     const mdxSource = await serialize(post.content);
+    const readingTime = calculateReadingTime(post.content);
 
     // Check if user is author or admin
     // @ts-ignore
@@ -87,7 +89,7 @@ export default async function BlogPost({ params }: Props) {
                         </span>
                         <span className="flex items-center gap-2">
                             <Clock size={16} />
-                            5 min read
+                            {readingTime}
                         </span>
                     </div>
 

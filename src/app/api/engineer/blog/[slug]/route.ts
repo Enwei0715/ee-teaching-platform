@@ -31,6 +31,7 @@ export async function GET(
             content: true,
             excerpt: true,
             image: true,
+            videoUrl: true,
             category: true,
             published: true,
             authorId: true,
@@ -63,6 +64,7 @@ export async function GET(
             excerpt: post.excerpt,
             category: post.category,
             image: post.image,
+            videoUrl: post.videoUrl,
             author: post.author.name,
             date: post.createdAt.toISOString().split('T')[0],
             published: post.published
@@ -108,6 +110,7 @@ export async function PATCH(
                 excerpt: meta.excerpt,
                 category: meta.category,
                 image: meta.image,
+                videoUrl: meta.videoUrl,
                 published: meta.published ?? false,
             }
         });

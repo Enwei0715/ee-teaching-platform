@@ -31,6 +31,7 @@ export async function GET(
         title: post.title,
         excerpt: post.excerpt,
         image: post.image,
+        videoUrl: post.videoUrl,
         category: post.category,
         date: post.createdAt.toISOString().split('T')[0],
         author: post.author?.name || 'EE Master Team',
@@ -61,6 +62,7 @@ export async function PATCH(
                 content: content,
                 excerpt: meta.excerpt,
                 image: meta.image,
+                videoUrl: meta.videoUrl,
                 category: meta.category,
             }
         });
