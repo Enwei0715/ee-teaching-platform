@@ -1,0 +1,71 @@
+import Link from "next/link";
+import { Plus, Edit, FileText } from "lucide-react";
+import { getAllBlogPosts } from "@/lib/mdx";
+import DeleteButton from "../components/DeleteButton";
+
+export const dynamic = 'force-dynamic';
+
+export default function AdminBlogPage() {
+    const posts = getAllBlogPosts();
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-white">Blog Management</h1>
+                <Link href="/admin/blog/new" className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors">
+                    <Plus size={18} />
+                    New Post
+                </Link>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl shadow-sm border border-gray-800 overflow-hidden">
+                <table className="w-full text-left">
+                    <thead className="bg-gray-800 border-b border-gray-700">
+                        <tr>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Title</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Category</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Date</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                        {posts.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                                    No blog posts found.
+                                </td>
+                            </tr>
+                        ) : (
+                            posts.map((post: any) => (
+                                <tr key={post.slug} className="hover:bg-gray-800/50 transition-colors">
+                                    <td className="px-6 py-4 font-medium text-white">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-indigo-900/30 text-indigo-400 rounded-lg">
+                                                <FileText size={20} />
+                                            </div>
+                                            {post.meta.title}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-400 text-sm">
+                                        {post.meta.category}
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-400 text-sm">
+                                        {post.meta.date}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Link href={`/admin/blog/${post.slug}`} className="p-2 text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors" title="Edit Post">
+                                                <Edit size={18} />
+                                            </Link>
+                                            <DeleteButton slug={post.slug} type="blog" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
