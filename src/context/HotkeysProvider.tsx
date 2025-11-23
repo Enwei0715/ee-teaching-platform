@@ -89,14 +89,14 @@ export default function HotkeysProvider({
                     return;
                 }
 
-                // Lesson Navigation (J/K)
+                // Lesson Navigation (J/K) - K for Next, J for Previous
                 if (!e.metaKey && !e.ctrlKey && !e.altKey) {
-                    if (e.key === "j") {
+                    if (e.key === "k") {
                         e.preventDefault();
                         window.dispatchEvent(new CustomEvent("nav-next-lesson"));
                         setChord(null);
                         return;
-                    } else if (e.key === "k") {
+                    } else if (e.key === "j") {
                         e.preventDefault();
                         window.dispatchEvent(new CustomEvent("nav-prev-lesson"));
                         setChord(null);

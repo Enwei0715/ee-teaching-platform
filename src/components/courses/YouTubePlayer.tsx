@@ -5,11 +5,12 @@ interface YouTubePlayerProps {
 }
 
 export default function YouTubePlayer({ url }: YouTubePlayerProps) {
-    // Extract video ID from URL
+    // Extract video ID from URL - supports all YouTube formats
     const getVideoId = (url: string) => {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        // Enhanced regex to support watch, youtu.be, and embed URLs with query params
+        const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
         const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
+        return (match && match[1].length === 11) ? match[1] : null;
     };
 
     const videoId = getVideoId(url);

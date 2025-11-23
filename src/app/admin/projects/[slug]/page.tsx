@@ -43,7 +43,11 @@ export default function EditProjectPage() {
         setSaving(true);
         try {
             // Remove features from meta as it's no longer used
-            const sanitizedMeta = { ...meta, features: [] };
+            const sanitizedMeta = {
+                ...meta,
+                features: [],
+                level: meta.level || 'Beginner' // Ensure level is set
+            };
 
             if (isNew) {
                 // Create new project - backend will auto-generate slug from title
