@@ -242,28 +242,6 @@ export default function EditCoursePage() {
                                         className="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-3 text-gray-300 text-sm font-mono outline-none focus:border-indigo-500 resize-none"
                                     />
                                 </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Video URL</label>
-                                    <input
-                                        type="text"
-                                        value={meta.videoUrl || ''}
-                                        onChange={(e) => setMeta({ ...meta, videoUrl: e.target.value })}
-                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                        placeholder="https://youtube.com/..."
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Estimated Duration</label>
-                                    <input
-                                        type="text"
-                                        value={meta.duration || ''}
-                                        onChange={(e) => setMeta({ ...meta, duration: e.target.value })}
-                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                        placeholder="e.g., 4 Weeks, 10 Hours, Self-paced"
-                                    />
-                                </div>
                             </div>
                         </div>
                     )}

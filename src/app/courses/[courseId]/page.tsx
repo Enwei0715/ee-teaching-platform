@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Clock, BarChart, PlayCircle, BookOpen, CheckCircle } from 'lucide-react';
 import { getCourseStructure, getCourseBySlug } from '@/lib/mdx';
+import { calculateCourseTotalDuration, calculateReadingTime } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 
 import { getServerSession } from "next-auth";
@@ -27,6 +28,7 @@ export default async function CoursePage({ params }: Props) {
 
     const lessons = await getCourseStructure(params.courseId);
     const firstLessonId = lessons.length > 0 ? lessons[0].id : null;
+    const totalDuration = calculateCourseTotalDuration(lessons);
 
     const session = await getServerSession(authOptions);
     let completedLessons: string[] = [];
@@ -68,7 +70,7 @@ export default async function CoursePage({ params }: Props) {
                         </span>
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <Clock size={16} className="text-accent-primary" />
-                            Self-paced
+                            {totalDuration}
                         </span>
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <BookOpen size={16} className="text-accent-primary" />
@@ -121,7 +123,7 @@ export default async function CoursePage({ params }: Props) {
                                             <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
                                                 {lesson.title}
                                             </h3>
-                                            <p className="text-xs text-text-secondary mt-1">15 min read</p>
+                                            <p className="text-xs text-text-secondary mt-1">{calculateReadingTime(lesson.content)}</p>
                                         </div>
 
                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">

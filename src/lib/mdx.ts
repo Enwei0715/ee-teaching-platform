@@ -147,6 +147,7 @@ export const getCourseStructure = async (courseSlug: string) => {
             slug: true,
             title: true,
             order: true,
+            content: true,
         }
     });
 
@@ -154,6 +155,7 @@ export const getCourseStructure = async (courseSlug: string) => {
         id: lesson.slug,
         title: lesson.title,
         order: lesson.order,
+        content: lesson.content,
     }));
 };
 

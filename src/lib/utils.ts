@@ -19,21 +19,54 @@ export function slugify(text: string): string {
 }
 
 export function calculateReadingTime(content: string): string {
-    const wordsPerMinute = 225;
+    const wordsPerMinute = 225; // Standard for English
+    const charsPerMinute = 300; // Rough estimate for CJK characters
 
-    // Strip HTML and markdown tags for more accurate word count
+    // Strip HTML and markdown tags
     const plainText = content
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/[#*`_~\[\]()]/g, '') // Remove markdown formatting chars
-        .replace(/!\[.*?\]\(.*?\)/g, '') // Remove image syntax
-        .replace(/\[.*?\]\(.*?\)/g, ''); // Remove link syntax
+        .replace(/<[^>]*>/g, '')
+        .replace(/[#*`_~\[\]()!]/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '');
 
-    // Count words (split by whitespace and filter empty strings)
-    const wordCount = plainText.split(/\s+/).filter(word => word.length > 0).length;
+    const englishWords = plainText.split(/\s+/).filter(word => /^[a-zA-Z0-9]+$/.test(word) && word.length > 0);
+    const cjkChars = plainText.replace(/[\x00-\x7F]/g, '').length; // Count non-ASCII characters
 
-    // Calculate minutes
-    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    const estimatedEnglishMinutes = englishWords.length / wordsPerMinute;
+    const estimatedCjkMinutes = cjkChars / charsPerMinute;
 
-    // Return formatted string
-    return minutes === 0 ? "1 min read" : `${minutes} min read`;
+    const totalMinutes = Math.ceil(estimatedEnglishMinutes + estimatedCjkMinutes);
+
+    return totalMinutes === 0 ? "1 min read" : `${totalMinutes} min read`;
+}
+
+export function calculateCourseTotalDuration(lessons: { content: string }[]): string {
+    let totalMinutes = 0;
+    const wordsPerMinute = 225;
+    const charsPerMinute = 300;
+
+    lessons.forEach(lesson => {
+        const plainText = lesson.content
+            .replace(/<[^>]*>/g, '')
+            .replace(/[#*`_~\[\]()!]/g, '')
+            .replace(/\[.*?\]\(.*?\)/g, '');
+
+        const englishWords = plainText.split(/\s+/).filter(word => /^[a-zA-Z0-9]+$/.test(word) && word.length > 0);
+        const cjkChars = plainText.replace(/[\x00-\x7F]/g, '').length;
+
+        const estimatedEnglishMinutes = englishWords.length / wordsPerMinute;
+        const estimatedCjkMinutes = cjkChars / charsPerMinute;
+
+        totalMinutes += (estimatedEnglishMinutes + estimatedCjkMinutes);
+    });
+
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = Math.ceil(totalMinutes % 60);
+
+    if (totalHours === 0) {
+        return `${remainingMinutes} min`;
+    } else if (remainingMinutes === 0) {
+        return `${totalHours} hr${totalHours > 1 ? 's' : ''}`;
+    } else {
+        return `${totalHours} hr${totalHours > 1 ? 's' : ''} ${remainingMinutes} min`;
+    }
 }
