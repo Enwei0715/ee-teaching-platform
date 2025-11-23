@@ -40,23 +40,17 @@ export default function EditProjectPage() {
             return;
         }
 
-        if (isNew && !meta.slug) {
-            alert("Slug is required");
-            return;
-        }
-
         setSaving(true);
         try {
             // Remove features from meta as it's no longer used
             const sanitizedMeta = { ...meta, features: [] };
 
             if (isNew) {
-                // Create new project
-                const slug = meta.slug;
+                // Create new project - backend will auto-generate slug from title
                 const res = await fetch(`/api/admin/projects`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, meta: sanitizedMeta, slug }),
+                    body: JSON.stringify({ content, meta: sanitizedMeta }),
                 });
 
                 if (res.ok) {
@@ -158,24 +152,6 @@ export default function EditProjectPage() {
                                 onChange={(e) => setMeta({ ...meta, title: e.target.value })}
                                 className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
                             />
-                        </div>
-
-                        {/* Slug */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">
-                                Slug <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={meta.slug || ''}
-                                onChange={(e) => setMeta({ ...meta, slug: e.target.value })}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                placeholder="diode-rectifier"
-                                required
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                URL-friendly ID (e.g., diode-rectifier)
-                            </p>
                         </div>
 
                         {/* Description */}

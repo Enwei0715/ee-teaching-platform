@@ -16,12 +16,14 @@ export async function POST(
 
         const { courseId, lessonId } = params;
 
+        // Since courses and lessons are MDX files (not in Prisma),
+        // we use the URL slugs directly as IDs in UserProgress
         await prisma.userProgress.upsert({
             where: {
                 userId_courseId_lessonId: {
                     userId: session.user.id,
-                    courseId,
-                    lessonId,
+                    courseId: courseId,   // Use course slug as ID
+                    lessonId: lessonId,   // Use lesson slug as ID
                 },
             },
             update: {
@@ -29,8 +31,8 @@ export async function POST(
             },
             create: {
                 userId: session.user.id,
-                courseId,
-                lessonId,
+                courseId: courseId,       // Use course slug as ID
+                lessonId: lessonId,       // Use lesson slug as ID
                 completed: true,
                 timeSpent: 0, // Will be updated by TimeTracker
             },
