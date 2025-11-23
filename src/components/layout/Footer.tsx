@@ -24,8 +24,7 @@ export default function Footer() {
                 <div>
                     <h4 className="text-text-primary font-semibold mb-4">Community</h4>
                     <ul className="space-y-2">
-                        <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">GitHub</a></li>
-                        <li><a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">Discord</a></li>
+                        <li><a href="https://github.com/Enwei0715/ee-teaching-platform" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">GitHub</a></li>
                         <li><Link href="/about" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">About Us</Link></li>
                     </ul>
                 </div>

@@ -188,6 +188,18 @@ export default function EditProjectPage() {
                             />
                         </div>
 
+                        {/* Cover Image URL */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Cover Image URL</label>
+                            <input
+                                type="text"
+                                value={meta.image || ''}
+                                onChange={(e) => setMeta({ ...meta, image: e.target.value })}
+                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                                placeholder="e.g., /images/projects/my-project.jpg or https://..."
+                            />
+                        </div>
+
                         {/* Video URL */}
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Video URL</label>
