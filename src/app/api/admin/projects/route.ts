@@ -27,7 +27,7 @@ export async function POST(request: Request) {
                     description: meta.description,
                     content: content || "",
                     image: meta.image,
-                    videoUrl: meta.videoUrl,
+
                     level: meta.level,
                     published: true,
                     tools: meta.tools || [],

@@ -29,7 +29,7 @@ export async function GET(
         title: project.title,
         description: project.description,
         image: project.image,
-        videoUrl: project.videoUrl,
+
         level: project.level,
         tools: project.tools,
         materials: project.materials,

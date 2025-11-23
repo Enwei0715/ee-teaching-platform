@@ -5,7 +5,7 @@
     overflow: hidden;
     transition: transform 0.2s, border-color 0.2s;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     height: 100%;
     text-decoration: none;
 }
@@ -16,13 +16,15 @@
 }
 
 .imageContainer {
-    width: 100%;
-    height: 160px;
+    width: 160px;
+    height: auto;
     background-color: var(--bg-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid var(--border-primary);
+    border-right: 1px solid var(--border-primary);
+    border-bottom: none;
+    flex-shrink: 0;
 }
 
 .placeholderIcon {
@@ -35,6 +37,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    gap: 0.5rem;
 }
 
 .title {
@@ -42,14 +46,20 @@
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .description {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: auto;
     line-height: 1.5;
-    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .meta {

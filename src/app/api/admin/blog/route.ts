@@ -27,7 +27,7 @@ export async function POST(request: Request) {
                     content: content || "",
                     excerpt: meta.excerpt,
                     image: meta.image,
-                    videoUrl: meta.videoUrl,
+
                     category: meta.category,
                     published: true, // Default to published for now, or use meta.published
                     authorId: session.user.id,
