@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { getCourseLesson, getCourseStructure } from '@/lib/mdx';
+import { calculateReadingTime } from '@/lib/utils';
 import MDXContent from '@/components/mdx/MDXContent';
 import CourseSidebar from '@/components/course/CourseSidebar';
 import AIQuizGenerator from '@/components/assignment/AIQuizGenerator';
@@ -54,12 +55,21 @@ export default async function LessonPage({ params }: Props) {
         notFound();
     }
 
-    const mdxSource = await serialize(lesson.content, {
-        mdxOptions: {
-            remarkPlugins: [remarkGfm, remarkMath],
-            rehypePlugins: [rehypeKatex],
-        },
-    });
+    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    let mdxSource;
+    try {
+        mdxSource = await serialize(lesson.content, {
+            mdxOptions: {
+                remarkPlugins: [remarkGfm, remarkMath],
+                rehypePlugins: [rehypeKatex],
+            },
+        });
+    } catch (error) {
+        console.error('Error serializing MDX content for lesson:', params.lessonId, error);
+        // Return 404 if content is malformed
+        notFound();
+    }
+
     const courseStructure = await getCourseStructure(params.courseId);
 
     const currentIndex = courseStructure.findIndex(l => l.id === params.lessonId);
@@ -90,7 +100,7 @@ export default async function LessonPage({ params }: Props) {
                         <div className="flex items-center gap-4 text-sm text-text-secondary">
                             <span>Module {Math.floor(currentIndex / 5) + 1}</span>
                             <span>•</span>
-                            <span>15 min read</span>
+                            <span>{calculateReadingTime(lesson.content)}</span>
                         </div>
                     </div>
 

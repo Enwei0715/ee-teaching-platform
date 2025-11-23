@@ -52,7 +52,16 @@ export default async function BlogPost({ params }: Props) {
         notFound();
     }
 
-    const mdxSource = await serialize(post.content);
+    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    let mdxSource;
+    try {
+        mdxSource = await serialize(post.content);
+    } catch (error) {
+        console.error('Error serializing MDX content for blog post:', params.slug, error);
+        // Return 404 if content is malformed
+        notFound();
+    }
+
     const readingTime = calculateReadingTime(post.content);
 
     // Check if user is author or admin

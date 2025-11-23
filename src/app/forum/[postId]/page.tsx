@@ -41,7 +41,15 @@ export default async function PostPage({ params }: { params: { postId: string } 
         notFound();
     }
 
-    const mdxSource = await serialize(post.content);
+    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    let mdxSource;
+    try {
+        mdxSource = await serialize(post.content);
+    } catch (error) {
+        console.error('Error serializing MDX content for forum post:', params.postId, error);
+        // Return 404 if content is malformed
+        notFound();
+    }
 
     return (
         <div className="min-h-screen bg-bg-primary">

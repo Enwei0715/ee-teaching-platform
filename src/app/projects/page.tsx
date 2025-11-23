@@ -74,9 +74,9 @@ export default async function ProjectsPage() {
                                     )}
 
                                     <div className="absolute top-4 right-4 z-20">
-                                        <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
-                                            project.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
-                                                'bg-red-900/30 text-red-400'
+                                        <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.level === 'Beginner' ? 'bg-green-600 text-white' :
+                                            project.level === 'Intermediate' ? 'bg-amber-600 text-white' :
+                                                'bg-red-600 text-white'
                                             }`}>
                                             {project.level || 'All Levels'}
                                         </span>
