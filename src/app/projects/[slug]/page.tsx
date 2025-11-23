@@ -12,7 +12,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
-        const project = getProjectBySlug(params.slug);
+        const project = await getProjectBySlug(params.slug);
+        if (!project) {
+            return {
+                title: 'Project Not Found | EE Master',
+            };
+        }
         return {
             title: `${project.meta.title} | EE Master Projects`,
             description: project.meta.description,
@@ -25,17 +30,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-    const projects = getAllProjects();
+    const projects = await getAllProjects();
     return projects.map((project) => ({
         slug: project.slug,
     }));
 }
 
 export default async function ProjectPage({ params }: Props) {
-    let project;
-    try {
-        project = getProjectBySlug(params.slug);
-    } catch (e) {
+    const project = await getProjectBySlug(params.slug);
+
+    if (!project) {
         notFound();
     }
 
@@ -80,18 +84,16 @@ export default async function ProjectPage({ params }: Props) {
                             Tools Needed
                         </h3>
                         <ul className="space-y-2 text-text-secondary text-sm mb-8">
-                            <li className="flex items-center">
-                                <span className="w-1.5 h-1.5 bg-accent-primary rounded-full mr-2"></span>
-                                Soldering Iron
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-1.5 h-1.5 bg-accent-primary rounded-full mr-2"></span>
-                                Wire Cutters
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-1.5 h-1.5 bg-accent-primary rounded-full mr-2"></span>
-                                Multimeter
-                            </li>
+                            {project.meta.tools && project.meta.tools.length > 0 ? (
+                                project.meta.tools.map((tool: string, index: number) => (
+                                    <li key={index} className="flex items-center">
+                                        <span className="w-1.5 h-1.5 bg-accent-primary rounded-full mr-2"></span>
+                                        {tool}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="text-text-secondary/50 italic">No tools listed</li>
+                            )}
                         </ul>
 
                         <h3 className="text-lg font-bold text-text-primary mb-4 flex items-center">
@@ -99,14 +101,14 @@ export default async function ProjectPage({ params }: Props) {
                             Bill of Materials
                         </h3>
                         <ul className="space-y-2 text-text-secondary text-sm">
-                            {project.meta.components && project.meta.components.length > 0 ? (
-                                project.meta.components.map((component: string, index: number) => (
+                            {project.meta.materials && project.meta.materials.length > 0 ? (
+                                project.meta.materials.map((material: string, index: number) => (
                                     <li key={index} className="flex justify-between">
-                                        <span>{component}</span>
+                                        <span>{material}</span>
                                     </li>
                                 ))
                             ) : (
-                                <li className="text-text-secondary/50 italic">No components listed</li>
+                                <li className="text-text-secondary/50 italic">No materials listed</li>
                             )}
                         </ul>
                     </div>

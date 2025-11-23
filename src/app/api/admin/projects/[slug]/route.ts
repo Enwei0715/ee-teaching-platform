@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(
     request: Request,
@@ -16,18 +15,30 @@ export async function GET(
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const projectId = params.slug;
-    const projectsDir = path.join(process.cwd(), 'src/content/projects');
-    const filePath = path.join(projectsDir, `${projectId}.mdx`);
+    const slug = params.slug;
 
-    if (!fs.existsSync(filePath)) {
+    const project = await prisma.project.findUnique({
+        where: { slug }
+    });
+
+    if (!project) {
         return new NextResponse("Project not found", { status: 404 });
     }
 
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const { content, data: meta } = matter(fileContent);
+    const meta = {
+        title: project.title,
+        description: project.description,
+        image: project.image,
+        level: project.level,
+        tools: project.tools,
+        materials: project.materials,
+        technologies: project.technologies,
+        features: project.features,
+        // Map technologies to tags for compatibility if needed
+        tags: project.technologies,
+    };
 
-    return NextResponse.json({ content, meta });
+    return NextResponse.json({ content: project.content, meta });
 }
 
 export async function PATCH(
@@ -45,27 +56,21 @@ export async function PATCH(
         const { content, meta } = await request.json();
         const slug = params.slug;
 
-        const projectsDir = path.join(process.cwd(), 'src/content/projects');
-        const filePath = path.join(projectsDir, `${slug}.mdx`);
+        await prisma.project.update({
+            where: { slug },
+            data: {
+                title: meta.title,
+                description: meta.description,
+                content: content,
+                image: meta.image,
+                level: meta.level,
+                tools: meta.tools,
+                materials: meta.materials,
+                technologies: meta.technologies,
+                features: meta.features,
+            }
+        });
 
-        if (!fs.existsSync(filePath)) {
-            return NextResponse.json({ message: "Project not found" }, { status: 404 });
-        }
-
-        // Read existing file to preserve content/meta if not provided
-        const existingFileContent = fs.readFileSync(filePath, 'utf-8');
-        const { content: existingContent, data: existingMeta } = matter(existingFileContent);
-
-        const newContent = content !== undefined ? content : existingContent;
-        const newMeta = meta ? { ...existingMeta, ...meta } : existingMeta;
-
-        // Reconstruct file content with frontmatter
-        const fileContent = matter.stringify(newContent, newMeta);
-
-        fs.writeFileSync(filePath, fileContent);
-
-        // Revalidate paths
-        const { revalidatePath } = await import("next/cache");
         revalidatePath('/admin/projects');
         revalidatePath('/projects');
         revalidatePath(`/projects/${slug}`);
@@ -90,21 +95,15 @@ export async function DELETE(
 
     try {
         const slug = params.slug;
-        const projectsDir = path.join(process.cwd(), 'src/content/projects');
-        const filePath = path.join(projectsDir, `${slug}.mdx`);
 
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+        await prisma.project.delete({
+            where: { slug }
+        });
 
-            // Revalidate paths
-            const { revalidatePath } = await import("next/cache");
-            revalidatePath('/admin/projects');
-            revalidatePath('/projects');
+        revalidatePath('/admin/projects');
+        revalidatePath('/projects');
 
-            return NextResponse.json({ message: "Deleted successfully" });
-        } else {
-            return NextResponse.json({ message: "Project not found" }, { status: 404 });
-        }
+        return NextResponse.json({ message: "Deleted successfully" });
     } catch (error) {
         console.error("Error deleting project:", error);
         return NextResponse.json({ message: "Error deleting project" }, { status: 500 });

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(
     request: Request,
@@ -17,20 +16,27 @@ export async function GET(
     }
 
     const slug = decodeURIComponent(params.slug);
-    const postsDir = path.join(process.cwd(), 'src/content/blog');
-    const filePath = path.join(postsDir, `${slug}.mdx`);
 
-    console.log(`[Admin Blog GET] Slug: ${slug}, Path: ${filePath}`);
+    const post = await prisma.blogPost.findUnique({
+        where: { slug },
+        include: { author: true }
+    });
 
-    if (!fs.existsSync(filePath)) {
-        console.error(`[Admin Blog GET] File not found: ${filePath}`);
+    if (!post) {
         return new NextResponse("Post not found", { status: 404 });
     }
 
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const { content, data: meta } = matter(fileContent);
+    // Map to expected format { content, meta }
+    const meta = {
+        title: post.title,
+        excerpt: post.excerpt,
+        image: post.image,
+        category: post.category,
+        date: post.createdAt.toISOString().split('T')[0],
+        author: post.author?.name || 'EE Master Team',
+    };
 
-    return NextResponse.json({ content, meta });
+    return NextResponse.json({ content: post.content, meta });
 }
 
 export async function PATCH(
@@ -48,17 +54,17 @@ export async function PATCH(
         const { content, meta } = await request.json();
         const slug = decodeURIComponent(params.slug);
 
-        const postsDir = path.join(process.cwd(), 'src/content/blog');
-        const filePath = path.join(postsDir, `${slug}.mdx`);
+        await prisma.blogPost.update({
+            where: { slug },
+            data: {
+                title: meta.title,
+                content: content,
+                excerpt: meta.excerpt,
+                image: meta.image,
+                category: meta.category,
+            }
+        });
 
-        console.log(`[Admin Blog PATCH] Saving to: ${filePath}`);
-
-        const fileContent = matter.stringify(content, meta);
-
-        fs.writeFileSync(filePath, fileContent);
-
-        // Revalidate paths
-        const { revalidatePath } = await import("next/cache");
         revalidatePath('/admin/blog');
         revalidatePath('/blog');
         revalidatePath(`/blog/${slug}`);
@@ -83,21 +89,15 @@ export async function DELETE(
 
     try {
         const slug = decodeURIComponent(params.slug);
-        const postsDir = path.join(process.cwd(), 'src/content/blog');
-        const filePath = path.join(postsDir, `${slug}.mdx`);
 
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+        await prisma.blogPost.delete({
+            where: { slug }
+        });
 
-            // Revalidate paths
-            const { revalidatePath } = await import("next/cache");
-            revalidatePath('/admin/blog');
-            revalidatePath('/blog');
+        revalidatePath('/admin/blog');
+        revalidatePath('/blog');
 
-            return NextResponse.json({ message: "Deleted successfully" });
-        } else {
-            return NextResponse.json({ message: "Post not found" }, { status: 404 });
-        }
+        return NextResponse.json({ message: "Deleted successfully" });
     } catch (error) {
         console.error("Error deleting post:", error);
         return NextResponse.json({ message: "Error deleting post" }, { status: 500 });

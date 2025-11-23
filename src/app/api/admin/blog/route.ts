@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -21,27 +19,31 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Slug is required" }, { status: 400 });
         }
 
-        const postsDir = path.join(process.cwd(), 'src/content/blog');
-        const filePath = path.join(postsDir, `${slug}.mdx`);
+        const existingPost = await prisma.blogPost.findUnique({
+            where: { slug }
+        });
 
-        if (fs.existsSync(filePath)) {
+        if (existingPost) {
             return NextResponse.json({ message: "Post with this slug already exists" }, { status: 409 });
         }
 
-        // Reconstruct file content with frontmatter
-        const newMeta = {
-            ...meta,
-            author: meta?.author || session.user.name || 'EE Master Team',
-            date: meta?.date || new Date().toISOString().split('T')[0],
-        };
-        const fileContent = matter.stringify(content || "", newMeta);
-
-        fs.writeFileSync(filePath, fileContent);
+        const newPost = await prisma.blogPost.create({
+            data: {
+                slug,
+                title: meta.title,
+                content: content || "",
+                excerpt: meta.excerpt,
+                image: meta.image,
+                category: meta.category,
+                published: true, // Default to published for now, or use meta.published
+                authorId: session.user.id,
+            }
+        });
 
         revalidatePath('/admin/blog');
         revalidatePath('/blog');
 
-        return NextResponse.json({ message: "Created successfully", slug });
+        return NextResponse.json({ message: "Created successfully", slug: newPost.slug });
     } catch (error) {
         console.error("Error creating post:", error);
         return NextResponse.json({ message: "Error creating post" }, { status: 500 });

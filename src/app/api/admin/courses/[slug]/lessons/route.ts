@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
+import prisma from "@/lib/prisma";
 
 export async function POST(
     request: Request,
@@ -18,39 +17,53 @@ export async function POST(
 
     try {
         const { filename, title } = await request.json();
-        const courseId = params.slug;
+        const courseSlug = params.slug;
 
         if (!filename || !title) {
             return new NextResponse("Missing filename or title", { status: 400 });
         }
 
-        // Sanitize filename
-        const safeFilename = filename.replace(/[^a-z0-9-]/gi, '-').toLowerCase() + '.mdx';
-        const coursesDir = path.join(process.cwd(), 'src/content/courses', courseId);
-        const filePath = path.join(coursesDir, safeFilename);
+        const course = await prisma.course.findUnique({
+            where: { slug: courseSlug }
+        });
 
-        if (fs.existsSync(filePath)) {
-            return new NextResponse("File already exists", { status: 409 });
+        if (!course) {
+            return new NextResponse("Course not found", { status: 404 });
         }
 
-        const content = `---
-title: '${title}'
-order: 99
----
+        // Sanitize filename to get slug
+        const lessonSlug = filename.replace(/[^a-z0-9-]/gi, '-').toLowerCase().replace(/\.mdx$/, '');
 
-# ${title}
+        const existingLesson = await prisma.lesson.findFirst({
+            where: {
+                courseId: course.id,
+                slug: lessonSlug
+            }
+        });
 
-Start writing your lesson content here...
-`;
+        if (existingLesson) {
+            return new NextResponse("Lesson with this slug already exists", { status: 409 });
+        }
 
-        fs.writeFileSync(filePath, content, 'utf-8');
+        const content = `# ${title}\n\nStart writing your lesson content here...`;
 
-        revalidatePath(`/admin/courses/${courseId}`);
-        revalidatePath(`/courses/${courseId}`);
+        await prisma.lesson.create({
+            data: {
+                slug: lessonSlug,
+                title: title,
+                content: content,
+                order: 99,
+                courseId: course.id,
+                published: true
+            }
+        });
+
+        revalidatePath(`/admin/courses/${courseSlug}`);
+        revalidatePath(`/courses/${courseSlug}`);
 
         return NextResponse.json({
             message: "Lesson created successfully",
-            filename: safeFilename
+            filename: `${lessonSlug}.mdx`
         });
     } catch (error) {
         console.error("Error creating lesson:", error);
@@ -72,23 +85,39 @@ export async function DELETE(
     try {
         const { searchParams } = new URL(request.url);
         const filename = searchParams.get('filename');
-        const courseId = params.slug;
+        const courseSlug = params.slug;
 
         if (!filename) {
             return new NextResponse("Missing filename", { status: 400 });
         }
 
-        const coursesDir = path.join(process.cwd(), 'src/content/courses', courseId);
-        const filePath = path.join(coursesDir, filename);
+        const course = await prisma.course.findUnique({
+            where: { slug: courseSlug }
+        });
 
-        if (!fs.existsSync(filePath)) {
-            return new NextResponse("File not found", { status: 404 });
+        if (!course) {
+            return new NextResponse("Course not found", { status: 404 });
         }
 
-        fs.unlinkSync(filePath);
+        const lessonSlug = filename.replace(/\.mdx$/, '');
 
-        revalidatePath(`/admin/courses/${courseId}`);
-        revalidatePath(`/courses/${courseId}`);
+        const lesson = await prisma.lesson.findFirst({
+            where: {
+                courseId: course.id,
+                slug: lessonSlug
+            }
+        });
+
+        if (!lesson) {
+            return new NextResponse("Lesson not found", { status: 404 });
+        }
+
+        await prisma.lesson.delete({
+            where: { id: lesson.id }
+        });
+
+        revalidatePath(`/admin/courses/${courseSlug}`);
+        revalidatePath(`/courses/${courseSlug}`);
 
         return NextResponse.json({ message: "Lesson deleted successfully" });
     } catch (error) {

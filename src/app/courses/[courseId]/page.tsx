@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Clock, BarChart, PlayCircle, BookOpen, CheckCircle } from 'lucide-react';
-import { getCourseStructure } from '@/lib/mdx';
+import { getCourseStructure, getCourseBySlug } from '@/lib/mdx';
+import { notFound } from 'next/navigation';
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,31 +13,40 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const title = params.courseId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const course = await getCourseBySlug(params.courseId);
+    if (!course) return { title: 'Course Not Found | EE Master' };
     return {
-        title: `${title} | EE Master`,
-        description: `Learn about ${title} on EE Master.`,
+        title: `${course.title} | EE Master`,
+        description: course.description,
     };
 }
 
 export default async function CoursePage({ params }: Props) {
-    const title = params.courseId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    const lessons = getCourseStructure(params.courseId);
+    const course = await getCourseBySlug(params.courseId);
+    if (!course) notFound();
+
+    const lessons = await getCourseStructure(params.courseId);
     const firstLessonId = lessons.length > 0 ? lessons[0].id : null;
 
     const session = await getServerSession(authOptions);
     let completedLessons: string[] = [];
 
     if (session?.user?.id) {
-        const progress = await prisma.userProgress.findMany({
-            where: {
-                userId: session.user.id,
-                courseId: params.courseId,
-                completed: true,
-            },
-            select: { lessonId: true },
+        const dbCourse = await prisma.course.findUnique({
+            where: { slug: params.courseId }
         });
-        completedLessons = progress.map((p: { lessonId: string }) => p.lessonId);
+
+        if (dbCourse) {
+            const progress = await prisma.userProgress.findMany({
+                where: {
+                    userId: session.user.id,
+                    courseId: dbCourse.id,
+                    completed: true,
+                },
+                select: { lessonId: true },
+            });
+            completedLessons = progress.map((p: { lessonId: string }) => p.lessonId);
+        }
     }
 
     return (
@@ -49,12 +59,12 @@ export default async function CoursePage({ params }: Props) {
                         <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back to Courses
                     </Link>
-                    <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 leading-tight tracking-tight">{title}</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 leading-tight tracking-tight">{course.title}</h1>
 
                     <div className="flex flex-wrap items-center gap-6 text-sm text-text-secondary mb-10">
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <BarChart size={16} className="text-accent-primary" />
-                            Beginner
+                            {course.level}
                         </span>
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
                             <Clock size={16} className="text-accent-primary" />

@@ -12,7 +12,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
-        const post = getPostBySlug(params.slug);
+        const post = await getPostBySlug(params.slug);
+        if (!post) {
+            return {
+                title: 'Post Not Found | EE Master Blog',
+            };
+        }
         return {
             title: `${post.meta.title} | EE Master Blog`,
             description: post.meta.excerpt,
@@ -25,17 +30,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-    const posts = getAllBlogPosts();
+    const posts = await getAllBlogPosts();
     return posts.map((post) => ({
         slug: post.slug,
     }));
 }
 
 export default async function BlogPost({ params }: Props) {
-    let post;
-    try {
-        post = getPostBySlug(params.slug);
-    } catch (e) {
+    const post = await getPostBySlug(params.slug);
+
+    if (!post) {
         notFound();
     }
 

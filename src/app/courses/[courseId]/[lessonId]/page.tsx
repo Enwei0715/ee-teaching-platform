@@ -24,7 +24,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
-        const lesson = getCourseLesson(params.courseId, params.lessonId);
+        const lesson = await getCourseLesson(params.courseId, params.lessonId);
+        if (!lesson) {
+            return {
+                title: 'Lesson Not Found | EE Master',
+            };
+        }
         return {
             title: `${lesson.meta.title} | EE Master`,
         };
@@ -38,8 +43,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LessonPage({ params }: Props) {
     let lesson;
     try {
-        lesson = getCourseLesson(params.courseId, params.lessonId);
+        lesson = await getCourseLesson(params.courseId, params.lessonId);
     } catch (e) {
+        notFound();
+    }
+
+    if (!lesson) {
         notFound();
     }
 
@@ -49,7 +58,7 @@ export default async function LessonPage({ params }: Props) {
             rehypePlugins: [rehypeKatex],
         },
     });
-    const courseStructure = getCourseStructure(params.courseId);
+    const courseStructure = await getCourseStructure(params.courseId);
 
     const currentIndex = courseStructure.findIndex(l => l.id === params.lessonId);
     const prevLesson = currentIndex > 0 ? courseStructure[currentIndex - 1] : null;
