@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { MessageSquare, User, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { stripMarkdown } from '@/lib/utils';
 
 interface Post {
     id: string;
@@ -51,7 +52,7 @@ export default function ForumList() {
                     className="block bg-bg-secondary border border-border-primary rounded-xl p-6 hover:border-accent-primary transition-colors"
                 >
                     <h3 className="text-xl font-bold text-text-primary mb-2">{post.title}</h3>
-                    <p className="text-text-secondary line-clamp-2 mb-4">{post.content}</p>
+                    <p className="text-text-secondary line-clamp-2 mb-4">{stripMarkdown(post.content, 120)}</p>
                     <div className="flex items-center gap-4 text-sm text-text-secondary">
                         <div className="flex items-center gap-1">
                             <User size={16} />
