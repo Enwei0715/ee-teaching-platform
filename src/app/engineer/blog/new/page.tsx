@@ -14,7 +14,11 @@ export default function EngineerNewBlogPage() {
     useEffect(() => {
         if (status === "loading") return;
 
-        const isEngineer = session?.user?.occupation?.toLowerCase().includes('engineer') || session?.user?.occupation?.toLowerCase().includes('engineering');
+        const isEngineer =
+            session?.user?.occupation?.toLowerCase().includes('engineer') ||
+            session?.user?.occupation?.toLowerCase().includes('engineering') ||
+            session?.user?.major?.toLowerCase().includes('engineer') ||
+            session?.user?.major?.toLowerCase().includes('engineering');
         const isAdmin = session?.user?.role === 'ADMIN';
 
         if (!session || (!isEngineer && !isAdmin)) {

@@ -26,15 +26,16 @@ export async function POST(request: Request) {
             messages: [
                 {
                     role: "system",
-                    content: "You are a helpful physics and engineering tutor. Generate a multiple-choice question about the given topic. Return the response in strictly valid JSON format with the following structure: { \"question\": \"string\", \"options\": [\"string\", \"string\", \"string\", \"string\"], \"correctAnswer\": number (0-3), \"explanation\": \"string\" }."
+                    content: "You are a helpful physics and engineering tutor. Generate a unique and diverse multiple-choice question about the given topic. Focus on different aspects such as conceptual understanding, practical application, or calculation. Avoid repeating common questions. Return the response in strictly valid JSON format with the following structure: { \"question\": \"string\", \"options\": [\"string\", \"string\", \"string\", \"string\"], \"correctAnswer\": number (0-3), \"explanation\": \"string\" }."
                 },
                 {
                     role: "user",
-                    content: `Generate a quiz question about: ${topic}`
+                    content: `Generate a quiz question about: ${topic}. Ensure it is distinct from typical questions on this topic.`
                 }
             ],
             model: "gemini-2.5-flash",
             response_format: { type: "json_object" },
+            temperature: 0.7,
         });
 
         console.log("Google AI Response:", completion);

@@ -8,7 +8,11 @@ export default async function BlogPage() {
     const blogPosts = await getAllBlogPosts();
     const session = await getServerSession(authOptions);
 
-    const isEngineer = session?.user?.occupation?.toLowerCase().includes('engineer') || session?.user?.occupation?.toLowerCase().includes('engineering');
+    const isEngineer =
+        session?.user?.occupation?.toLowerCase().includes('engineer') ||
+        session?.user?.occupation?.toLowerCase().includes('engineering') ||
+        session?.user?.major?.toLowerCase().includes('engineer') ||
+        session?.user?.major?.toLowerCase().includes('engineering');
     // @ts-ignore
     const isAdmin = session?.user?.role === 'ADMIN';
     const canCreatePost = isEngineer || isAdmin;

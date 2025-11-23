@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/utils";
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -16,7 +17,29 @@ export async function POST(request: Request) {
         const { content, meta, slug } = await request.json();
 
         if (!slug) {
-            return NextResponse.json({ message: "Slug is required" }, { status: 400 });
+            // Auto-generate slug if not provided
+            const generatedSlug = slugify(meta.title);
+
+            const newProject = await prisma.project.create({
+                data: {
+                    slug: generatedSlug,
+                    title: meta.title,
+                    description: meta.description,
+                    content: content || "",
+                    image: meta.image,
+                    level: meta.level,
+                    published: true,
+                    tools: meta.tools || [],
+                    materials: meta.materials || [],
+                    technologies: meta.technologies || [],
+                    features: meta.features || [],
+                }
+            });
+
+            revalidatePath('/admin/projects');
+            revalidatePath('/projects');
+
+            return NextResponse.json({ message: "Created successfully", slug: newProject.slug });
         }
 
         const existingProject = await prisma.project.findUnique({

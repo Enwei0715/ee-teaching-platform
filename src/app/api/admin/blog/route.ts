@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/utils";
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -16,7 +17,26 @@ export async function POST(request: Request) {
         const { content, meta, slug } = await request.json();
 
         if (!slug) {
-            return NextResponse.json({ message: "Slug is required" }, { status: 400 });
+            // Auto-generate slug if not provided
+            const generatedSlug = slugify(meta.title);
+
+            const newPost = await prisma.blogPost.create({
+                data: {
+                    slug: generatedSlug,
+                    title: meta.title,
+                    content: content || "",
+                    excerpt: meta.excerpt,
+                    image: meta.image,
+                    category: meta.category,
+                    published: true, // Default to published for now, or use meta.published
+                    authorId: session.user.id,
+                }
+            });
+
+            revalidatePath('/admin/blog');
+            revalidatePath('/blog');
+
+            return NextResponse.json({ message: "Created successfully", slug: newPost.slug });
         }
 
         const existingPost = await prisma.blogPost.findUnique({

@@ -3,11 +3,17 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/utils";
 
 // Helper to check if user is engineer or admin
 const isAuthorized = (session: any) => {
     if (!session || !session.user) return false;
-    const isEngineer = session.user.occupation?.toLowerCase().includes('engineer') || session.user.occupation?.toLowerCase().includes('engineering');
+    const isEngineer =
+        session.user.occupation?.toLowerCase().includes('engineer') ||
+        session.user.occupation?.toLowerCase().includes('engineering') ||
+        session.user.major?.toLowerCase().includes('engineer') ||
+        session.user.major?.toLowerCase().includes('engineering');
+
     // @ts-ignore
     const isAdmin = session.user.role === 'ADMIN';
     return isEngineer || isAdmin;
@@ -59,7 +65,26 @@ export async function POST(request: Request) {
         const { content, meta, slug } = await request.json();
 
         if (!slug) {
-            return NextResponse.json({ message: "Slug is required" }, { status: 400 });
+            // Auto-generate slug if not provided
+            const generatedSlug = slugify(meta.title);
+
+            const newPost = await prisma.blogPost.create({
+                data: {
+                    slug: generatedSlug,
+                    title: meta.title,
+                    content: content || "",
+                    excerpt: meta.excerpt,
+                    image: meta.image,
+                    category: meta.category,
+                    published: true,
+                    authorId: session!.user!.id,
+                }
+            });
+
+            revalidatePath('/admin/blog');
+            revalidatePath('/blog');
+
+            return NextResponse.json({ message: "Created successfully", slug: newPost.slug });
         }
 
         const existingPost = await prisma.blogPost.findUnique({

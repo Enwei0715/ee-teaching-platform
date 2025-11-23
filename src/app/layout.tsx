@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     description: "The ultimate resource for learning Electronic Engineering, from circuits to FPGAs.",
 };
 
+import HotkeysProvider from "@/context/HotkeysProvider";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -20,14 +22,16 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <AuthProvider>
-                    <div className="flex flex-col min-h-screen">
-                        <Navbar />
-                        <main className="flex-grow">
-                            {children}
-                        </main>
-                        <AITutor />
-                        <Footer />
-                    </div>
+                    <HotkeysProvider>
+                        <div className="flex flex-col min-h-screen">
+                            <Navbar />
+                            <main className="flex-grow">
+                                {children}
+                            </main>
+                            <AITutor />
+                            <Footer />
+                        </div>
+                    </HotkeysProvider>
                 </AuthProvider>
             </body>
         </html>

@@ -14,19 +14,22 @@ export default function Navbar() {
     const userMenuRef = useRef<HTMLDivElement>(null);
 
     // Keyboard shortcut to open search
+    // Listen for global hotkey events
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                setIsSearchOpen(true);
-            }
-            if (e.key === 'Escape') {
-                setIsSearchOpen(false);
-            }
+        const handleOpenSearch = () => setIsSearchOpen(true);
+        const handleCloseModals = () => {
+            setIsSearchOpen(false);
+            setIsMenuOpen(false);
+            setIsUserMenuOpen(false);
         };
 
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener('open-search', handleOpenSearch);
+        window.addEventListener('close-modals', handleCloseModals);
+
+        return () => {
+            window.removeEventListener('open-search', handleOpenSearch);
+            window.removeEventListener('close-modals', handleCloseModals);
+        };
     }, []);
 
 
@@ -50,7 +53,11 @@ export default function Navbar() {
         };
     }, []);
 
-    const isEngineer = session?.user?.occupation?.toLowerCase().includes('engineer') || session?.user?.occupation?.toLowerCase().includes('engineering');
+    const isEngineer =
+        session?.user?.occupation?.toLowerCase().includes('engineer') ||
+        session?.user?.occupation?.toLowerCase().includes('engineering') ||
+        session?.user?.major?.toLowerCase().includes('engineer') ||
+        session?.user?.major?.toLowerCase().includes('engineering');
 
     return (
         <>

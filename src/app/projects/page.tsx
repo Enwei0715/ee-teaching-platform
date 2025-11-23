@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllProjects } from '@/lib/mdx';
+import prisma from '@/lib/prisma';
 import { Wrench, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -8,8 +8,13 @@ export const metadata: Metadata = {
     description: 'Hands-on electronics projects for all skill levels.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProjectsPage() {
-    const projects = await getAllProjects();
+    const projects = await prisma.project.findMany({
+        where: { published: true },
+        orderBy: { createdAt: 'desc' },
+    });
 
     return (
         <div className="min-h-screen bg-gray-950">
@@ -59,20 +64,20 @@ export default async function ProjectsPage() {
                                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
                                     <Wrench size={64} className="text-gray-700 group-hover:text-indigo-500/50 group-hover:scale-110 transition-all duration-500" />
                                     <div className="absolute top-4 right-4">
-                                        <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.meta.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
-                                            project.meta.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
+                                        <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
+                                            project.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
                                                 'bg-red-900/30 text-red-400'
                                             }`}>
-                                            {project.meta.level || 'All Levels'}
+                                            {project.level || 'All Levels'}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="p-6 flex-1 flex flex-col">
                                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
-                                        {project.meta.title}
+                                        {project.title}
                                     </h3>
                                     <p className="text-gray-400 text-sm mb-6 line-clamp-3 flex-1 leading-relaxed">
-                                        {project.meta.description}
+                                        {project.description}
                                     </p>
                                     <div className="flex items-center text-indigo-400 text-sm font-bold mt-auto pt-4 border-t border-gray-800">
                                         Start Building <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
