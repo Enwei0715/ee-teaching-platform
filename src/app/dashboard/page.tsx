@@ -6,6 +6,23 @@ import { BookOpen, Trophy, Clock, Activity, PlayCircle } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { getAllCourses, getCourseStructure } from "@/lib/mdx";
 
+export const dynamic = 'force-dynamic';
+
+// Helper function to format duration
+function formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+        return `${minutes}m ${secs}s`;
+    } else {
+        return `${secs}s`;
+    }
+}
+
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
 
@@ -37,7 +54,7 @@ export default async function DashboardPage() {
         const totalLessons = lessons.length;
         const lessonIds = new Set(lessons.map((l: any) => l.id));
 
-        const courseProgress = progress.filter((p: any) => p.courseId === course.id);
+        const courseProgress = progress.filter((p: any) => p.courseId === course.id || p.courseId === course.slug);
         const courseLessonsCompleted = courseProgress.filter((p: any) => p.completed && lessonIds.has(p.lessonId)).length;
 
         const percentage = totalLessons > 0 ? Math.min(100, Math.round((courseLessonsCompleted / totalLessons) * 100)) : 0;
@@ -75,9 +92,9 @@ export default async function DashboardPage() {
         return prog && prog.percentage > 0 && prog.percentage < 100;
     }).length;
 
-    // Calculate total time spent (in hours) - using only actual tracked time
+    // Calculate total time spent - using only actual tracked time
     const totalSeconds = progress.reduce((acc: number, curr: any) => acc + (curr.timeSpent || 0), 0);
-    const hoursLearned = (totalSeconds / 3600).toFixed(1);
+    const timeFormatted = formatDuration(totalSeconds);
 
     const streak = user?.streak || 0;
 
@@ -139,8 +156,8 @@ export default async function DashboardPage() {
                                 <Clock size={24} />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Hours Learned</p>
-                                <h3 className="text-2xl font-bold text-white">{hoursLearned}</h3>
+                                <p className="text-sm text-gray-400">Time Learned</p>
+                                <h3 className="text-2xl font-bold text-white">{timeFormatted}</h3>
                             </div>
                         </div>
                     </div>
