@@ -30,6 +30,10 @@ async function getPost(id: string) {
     return post;
 }
 
+import { serialize } from 'next-mdx-remote/serialize';
+
+// ...
+
 export default async function PostPage({ params }: { params: { postId: string } }) {
     const post = await getPost(params.postId);
 
@@ -37,9 +41,11 @@ export default async function PostPage({ params }: { params: { postId: string } 
         notFound();
     }
 
+    const mdxSource = await serialize(post.content);
+
     return (
         <div className="min-h-screen bg-bg-primary">
-            <PostDetail post={post} />
+            <PostDetail post={post} mdxSource={mdxSource} />
         </div>
     );
 }

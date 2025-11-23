@@ -124,12 +124,21 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                             Error: {error}
                         </div>
                     ) : (
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
-                            spellCheck={false}
-                        />
+                        <>
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
+                                spellCheck={false}
+                            />
+                            <div className="px-4 py-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500 flex gap-4">
+                                <span>**Bold**</span>
+                                <span>*Italic*</span>
+                                <span>[Link](url)</span>
+                                <span>![Image](url)</span>
+                                <span>{'<YouTube url="..." />'}</span>
+                            </div>
+                        </>
                     )}
                 </div>
 
@@ -185,6 +194,18 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                                 value={meta.description || ''}
                                 onChange={(e) => setMeta({ ...meta, description: e.target.value })}
                                 className="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-3 text-gray-300 text-sm font-mono outline-none focus:border-indigo-500 resize-none"
+                            />
+                        </div>
+
+                        {/* Video URL */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Video URL</label>
+                            <input
+                                type="text"
+                                value={meta.videoUrl || ''}
+                                onChange={(e) => setMeta({ ...meta, videoUrl: e.target.value })}
+                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                                placeholder="https://youtube.com/..."
                             />
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function HotkeysProvider({
@@ -9,60 +9,106 @@ export default function HotkeysProvider({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const [chord, setChord] = useState<string | null>(null);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ctrl + K or Cmd + K: Focus Search
+            const isTyping = (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA" || (document.activeElement as HTMLElement)?.isContentEditable);
+
+            // Global shortcuts (even when typing for some, or with modifiers)
+            // Ctrl + K or Cmd + K: Focus Search / Open Search
             if ((e.ctrlKey || e.metaKey) && e.key === "k") {
                 e.preventDefault();
-                const searchInput = document.getElementById("search-input"); // Assuming search input has this ID
+                const searchInput = document.getElementById("search-input");
                 if (searchInput) {
                     searchInput.focus();
                 } else {
-                    // Fallback if search input is not found, maybe dispatch a custom event
                     window.dispatchEvent(new CustomEvent("open-search"));
                 }
+                setChord(null);
+                return;
             }
 
             // Ctrl + S or Cmd + S: Trigger Save
             if ((e.ctrlKey || e.metaKey) && e.key === "s") {
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent("trigger-save"));
+                setChord(null);
+                return;
             }
 
-            // G then H: Go Home
-            // G then D: Go Dashboard
-            // We need to track 'g' press state, but for simplicity let's use a simpler approach or a library.
-            // Since we are implementing raw, let's skip complex sequences for now or implement a simple state.
-            // Let's stick to simple modifiers for now as per requirement "G then H" might conflict with typing.
-            // However, the requirement is specific. Let's try to implement it safely (only when not typing).
-
-            const isTyping = (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA" || (document.activeElement as HTMLElement)?.isContentEditable);
-
-            if (!isTyping) {
-                if (e.key === "g") {
-                    // Set a temporary flag or listener for the next key
-                    const handleNextKey = (nextEvent: KeyboardEvent) => {
-                        if (nextEvent.key === "h") {
-                            router.push("/");
-                        } else if (nextEvent.key === "d") {
-                            router.push("/dashboard");
-                        }
-                        document.removeEventListener("keydown", handleNextKey);
-                    };
-                    document.addEventListener("keydown", handleNextKey, { once: true });
-                }
+            // Ctrl + Enter or Cmd + Enter: Trigger Submit
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("trigger-submit"));
+                setChord(null);
+                return;
             }
 
             // Esc: Close Modals
             if (e.key === "Escape") {
                 window.dispatchEvent(new CustomEvent("close-modals"));
+                setChord(null);
+                return;
+            }
+
+            // Shortcuts that should NOT trigger when typing in an input/textarea
+            if (!isTyping) {
+                // ? : Toggle Shortcuts Help
+                if (e.key === "?") {
+                    e.preventDefault();
+                    window.dispatchEvent(new CustomEvent("toggle-shortcuts-help"));
+                    setChord(null);
+                    return;
+                }
+
+                // Navigation Chords (G then ...)
+                if (e.key === "g" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                    e.preventDefault();
+                    setChord("g");
+                    setTimeout(() => setChord(null), 1000);
+                    return;
+                }
+
+                if (chord === "g" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                    e.preventDefault();
+                    if (e.key === "h") {
+                        router.push("/");
+                    } else if (e.key === "d") {
+                        router.push("/dashboard");
+                    } else if (e.key === "c") {
+                        router.push("/courses");
+                    } else if (e.key === "p") {
+                        router.push("/projects");
+                    } else if (e.key === "b") {
+                        router.push("/blog");
+                    } else if (e.key === "f") {
+                        router.push("/forum");
+                    }
+                    setChord(null);
+                    return;
+                }
+
+                // Lesson Navigation (J/K)
+                if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+                    if (e.key === "j") {
+                        e.preventDefault();
+                        window.dispatchEvent(new CustomEvent("nav-next-lesson"));
+                        setChord(null);
+                        return;
+                    } else if (e.key === "k") {
+                        e.preventDefault();
+                        window.dispatchEvent(new CustomEvent("nav-prev-lesson"));
+                        setChord(null);
+                        return;
+                    }
+                }
             }
         };
 
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [router]);
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [chord, router]);
 
     return <>{children}</>;
 }

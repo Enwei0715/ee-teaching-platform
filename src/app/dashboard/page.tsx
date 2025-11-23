@@ -54,7 +54,8 @@ export default async function DashboardPage() {
         const totalLessons = lessons.length;
         const lessonIds = new Set(lessons.map((l: any) => l.id));
 
-        const courseProgress = progress.filter((p: any) => p.courseId === course.id || p.courseId === course.slug);
+        // Strictly match by ID to avoid slug mismatches
+        const courseProgress = progress.filter((p: any) => p.courseId === course.id);
         const courseLessonsCompleted = courseProgress.filter((p: any) => p.completed && lessonIds.has(p.lessonId)).length;
 
         const percentage = totalLessons > 0 ? Math.min(100, Math.round((courseLessonsCompleted / totalLessons) * 100)) : 0;
@@ -86,10 +87,10 @@ export default async function DashboardPage() {
     // Stats Calculations
     const completedLessons = progress.filter((p: any) => p.completed).length;
 
-    // Courses in progress: > 0% and < 100%
+    // Courses in progress: strictly > 0 completed AND < total lessons
     const coursesInProgressCount = allCourses.filter(course => {
         const prog = courseProgressMap.get(course.id);
-        return prog && prog.percentage > 0 && prog.percentage < 100;
+        return prog && prog.completed > 0 && prog.completed < prog.total;
     }).length;
 
     // Calculate total time spent - using only actual tracked time

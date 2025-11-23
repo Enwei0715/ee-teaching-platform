@@ -22,11 +22,21 @@ export async function POST(request: Request) {
         }
 
         console.log("Calling Google AI Studio with topic:", topic);
+        const focusAngles = [
+            'Conceptual Understanding',
+            'Real-world Application',
+            'Common Mistakes',
+            'Calculation/Analysis'
+        ];
+        const randomFocus = focusAngles[Math.floor(Math.random() * focusAngles.length)];
+
         const completion = await openai.chat.completions.create({
             messages: [
                 {
                     role: "system",
-                    content: "You are a helpful physics and engineering tutor. Generate a unique and diverse multiple-choice question about the given topic. Focus on different aspects such as conceptual understanding, practical application, or calculation. Avoid repeating common questions. Return the response in strictly valid JSON format with the following structure: { \"question\": \"string\", \"options\": [\"string\", \"string\", \"string\", \"string\"], \"correctAnswer\": number (0-3), \"explanation\": \"string\" }."
+                    content: `You are a helpful physics and engineering tutor. Generate a unique and diverse multiple-choice question about the given topic. 
+                    Focus this specific question on: ${randomFocus}.
+                    Avoid repeating common questions. Return the response in strictly valid JSON format with the following structure: { "question": "string", "options": ["string", "string", "string", "string"], "correctAnswer": number (0-3), "explanation": "string" }.`
                 },
                 {
                     role: "user",
@@ -35,7 +45,7 @@ export async function POST(request: Request) {
             ],
             model: "gemini-2.5-flash",
             response_format: { type: "json_object" },
-            temperature: 0.7,
+            temperature: 0.8,
         });
 
         console.log("Google AI Response:", completion);

@@ -1,10 +1,13 @@
 'use client';
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { User, Clock, MessageSquare, Send, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import MDXContent from '@/components/mdx/MDXContent';
 
 interface Comment {
     id: string;
@@ -23,7 +26,12 @@ interface Post {
     comments: Comment[];
 }
 
-export default function PostDetail({ post }: { post: Post }) {
+interface PostDetailProps {
+    post: Post;
+    mdxSource: MDXRemoteSerializeResult;
+}
+
+export default function PostDetail({ post, mdxSource }: PostDetailProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const [replyContent, setReplyContent] = useState('');
@@ -112,7 +120,7 @@ export default function PostDetail({ post }: { post: Post }) {
                     </div>
                 </div>
                 <div className="prose prose-invert max-w-none text-text-secondary text-lg leading-relaxed">
-                    {post.content}
+                    <MDXContent source={mdxSource} />
                 </div>
             </div>
 

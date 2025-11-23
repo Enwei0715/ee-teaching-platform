@@ -202,6 +202,13 @@ export default function EditCoursePage() {
                                     className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
                                     spellCheck={false}
                                 />
+                                <div className="px-4 py-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500 flex gap-4">
+                                    <span>**Bold**</span>
+                                    <span>*Italic*</span>
+                                    <span>[Link](url)</span>
+                                    <span>![Image](url)</span>
+                                    <span>{'<YouTube url="..." />'}</span>
+                                </div>
                             </>
                         ) : (
                             <div className="flex-1 flex items-center justify-center text-gray-500">

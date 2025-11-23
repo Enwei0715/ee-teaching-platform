@@ -47,13 +47,16 @@ export default function EditProjectPage() {
 
         setSaving(true);
         try {
+            // Remove features from meta as it's no longer used
+            const sanitizedMeta = { ...meta, features: [] };
+
             if (isNew) {
                 // Create new project
                 const slug = meta.slug;
                 const res = await fetch(`/api/admin/projects`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, meta, slug }),
+                    body: JSON.stringify({ content, meta: sanitizedMeta, slug }),
                 });
 
                 if (res.ok) {
@@ -69,7 +72,7 @@ export default function EditProjectPage() {
                 const res = await fetch(`/api/admin/projects/${projectId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, meta }),
+                    body: JSON.stringify({ content, meta: sanitizedMeta }),
                 });
 
                 if (res.ok) {
@@ -122,12 +125,21 @@ export default function EditProjectPage() {
                     {loading ? (
                         <div className="flex-1 flex items-center justify-center text-gray-500">Loading...</div>
                     ) : (
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
-                            spellCheck={false}
-                        />
+                        <>
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
+                                spellCheck={false}
+                            />
+                            <div className="px-4 py-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500 flex gap-4">
+                                <span>**Bold**</span>
+                                <span>*Italic*</span>
+                                <span>[Link](url)</span>
+                                <span>![Image](url)</span>
+                                <span>{'<YouTube url="..." />'}</span>
+                            </div>
+                        </>
                     )}
                 </div>
 
@@ -176,7 +188,17 @@ export default function EditProjectPage() {
                             />
                         </div>
 
-
+                        {/* Video URL */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Video URL</label>
+                            <input
+                                type="text"
+                                value={meta.videoUrl || ''}
+                                onChange={(e) => setMeta({ ...meta, videoUrl: e.target.value })}
+                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                                placeholder="https://youtube.com/..."
+                            />
+                        </div>
 
                         {/* Technologies */}
                         <div>
@@ -188,20 +210,9 @@ export default function EditProjectPage() {
                                 placeholder="React&#10;TypeScript"
                             />
                         </div>
-
-                        {/* Features */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">Features (one per line)</label>
-                            <textarea
-                                value={(meta.features || []).join('\n')}
-                                onChange={(e) => handleArrayChange('features', e.target.value)}
-                                className="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-3 text-gray-300 text-sm font-mono outline-none focus:border-indigo-500 resize-none"
-                                placeholder="Authentication&#10;Database"
-                            />
-                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

@@ -36,8 +36,16 @@ export async function generateStaticParams() {
     }));
 }
 
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import DeletePostButton from '@/components/blog/DeletePostButton';
+import YouTubePlayer from '@/components/courses/YouTubePlayer';
+
+// ... imports ...
+
 export default async function BlogPost({ params }: Props) {
     const post = await getPostBySlug(params.slug);
+    const session = await getServerSession(authOptions);
 
     if (!post) {
         notFound();
@@ -45,16 +53,28 @@ export default async function BlogPost({ params }: Props) {
 
     const mdxSource = await serialize(post.content);
 
+    // Check if user is author or admin
+    // @ts-ignore
+    const isAuthor = session?.user?.id === post.authorId;
+    // @ts-ignore
+    const isAdmin = session?.user?.role === 'ADMIN';
+    const canDelete = isAuthor || isAdmin;
+
     return (
         <article className="min-h-screen bg-bg-primary">
             {/* Hero Section */}
             <header className="relative py-20 px-6 bg-bg-secondary border-b border-border-primary overflow-hidden">
                 <div className="absolute inset-0 bg-accent-primary/5 pointer-events-none" />
                 <div className="max-w-3xl mx-auto relative z-10">
-                    <Link href="/blog" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors mb-8 text-sm font-medium group">
-                        <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to Blog
-                    </Link>
+                    <div className="flex items-center justify-between mb-8">
+                        <Link href="/blog" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm font-medium group">
+                            <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                            Back to Blog
+                        </Link>
+                        {canDelete && (
+                            <DeletePostButton slug={params.slug} />
+                        )}
+                    </div>
 
                     <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary mb-6">
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1 rounded-full border border-border-primary text-accent-primary font-medium">
@@ -79,6 +99,9 @@ export default async function BlogPost({ params }: Props) {
             <div className="max-w-3xl mx-auto px-6 py-12">
                 {/* Content */}
                 <div className="prose prose-invert prose-blue max-w-none prose-lg">
+                    {post.meta.videoUrl && (
+                        <YouTubePlayer url={post.meta.videoUrl} />
+                    )}
                     <MDXContent source={mdxSource} />
                 </div>
 

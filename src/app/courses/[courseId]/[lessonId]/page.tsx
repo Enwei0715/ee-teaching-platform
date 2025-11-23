@@ -13,6 +13,7 @@ import LessonNavigation from '@/components/course/LessonNavigation';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import YouTubePlayer from '@/components/courses/YouTubePlayer';
 
 
 interface Props {
@@ -93,15 +94,7 @@ export default async function LessonPage({ params }: Props) {
                     </div>
 
                     {lesson.meta.videoUrl && (
-                        <div className="mb-8 aspect-video rounded-xl overflow-hidden shadow-lg">
-                            <iframe
-                                src={`https://www.youtube.com/embed/${lesson.meta.videoUrl.split('v=')[1]?.split('&')[0] || lesson.meta.videoUrl.split('/').pop()}`}
-                                title={lesson.meta.title}
-                                className="w-full h-full"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
-                        </div>
+                        <YouTubePlayer url={lesson.meta.videoUrl} />
                     )}
 
                     <div className="prose prose-invert prose-blue max-w-none mb-16">

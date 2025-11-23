@@ -74,8 +74,15 @@ export default function CreatePostForm() {
                         onChange={(e) => setContent(e.target.value)}
                         rows={4}
                         className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-2 px-4 text-text-primary focus:outline-none focus:border-accent-primary resize-none"
-                        placeholder="Describe your question or topic..."
+                        placeholder="Describe your question or topic... (Markdown supported)"
                     />
+                    <div className="text-xs text-text-secondary mt-2 flex gap-4">
+                        <span>**Bold**</span>
+                        <span>*Italic*</span>
+                        <span>[Link](url)</span>
+                        <span>![Image](url)</span>
+                        <span>{'<YouTube url="..." />'}</span>
+                    </div>
                 </div>
                 <div className="flex gap-3 justify-end">
                     <button
