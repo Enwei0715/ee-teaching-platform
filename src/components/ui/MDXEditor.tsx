@@ -64,7 +64,7 @@ export default function MDXEditor({
     return (
         <div className={className}>
             {/* Toolbar */}
-            <div className="flex gap-1 p-2 bg-bg-tertiary border border-border-primary rounded-t-lg">
+            <div className="flex flex-wrap gap-1 p-2 border-b border-border-primary">
                 <button
                     type="button"
                     onClick={() => insertMarkdown('**', '**')}
@@ -113,7 +113,7 @@ export default function MDXEditor({
                 >
                     <Video size={16} />
                 </button>
-                <div className="ml-auto text-xs text-text-secondary self-center px-2 flex gap-3">
+                <div className="ml-auto text-xs text-text-secondary self-center px-2 flex gap-3 whitespace-nowrap">
                     <span className="hover:text-text-primary cursor-help" title="Markdown help">
                         Markdown supported
                     </span>
@@ -128,7 +128,7 @@ export default function MDXEditor({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 rows={rows}
-                className="w-full bg-bg-tertiary border border-border-primary rounded-b-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary resize-none font-mono text-sm"
+                className="w-full bg-transparent py-3 px-4 text-text-primary focus:outline-none resize-none font-mono text-sm"
                 placeholder={placeholder}
             />
         </div>

@@ -127,7 +127,7 @@ export default function EditCoursePage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100vh-100px)] flex flex-col relative">
+        <div className="max-w-6xl mx-auto h-[calc(100vh-100px)] flex flex-col relative overflow-y-auto lg:overflow-hidden">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <Link href="/admin/courses" className="text-gray-400 hover:text-white transition-colors">
@@ -156,13 +156,14 @@ export default function EditCoursePage() {
                 </div>
             </div>
 
-            <div className="flex-1 flex gap-6 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
                 {/* File List */}
-                <div className="w-64 bg-gray-900 rounded-xl border border-gray-800 overflow-y-auto">
-                    <div className="p-4 border-b border-gray-800">
+                <div className="w-full lg:w-64 bg-gray-900 rounded-xl border border-gray-800 flex flex-col max-h-[200px] lg:max-h-none lg:h-full">
+                    <div className="p-4 border-b border-gray-800 flex justify-between items-center">
                         <h2 className="font-bold text-gray-400">Course Files</h2>
+                        <span className="text-xs text-gray-500 lg:hidden">{files.length} files</span>
                     </div>
-                    <div className="p-2">
+                    <div className="p-2 overflow-y-auto flex-1">
                         {files.map(file => (
                             <div
                                 key={file}
@@ -177,7 +178,7 @@ export default function EditCoursePage() {
                                 </button>
                                 <button
                                     onClick={(e) => handleDeleteLesson(file, e)}
-                                    className="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="p-1 text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
                                     title="Delete Lesson"
                                 >
                                     <Trash2 size={14} />
@@ -188,21 +189,23 @@ export default function EditCoursePage() {
                 </div>
 
                 {/* Editor & Sidebar */}
-                <div className="flex-1 flex gap-6 overflow-hidden">
+                <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
                     {/* Main Content Editor */}
-                    <div className="flex-1 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col">
+                    <div className="flex-1 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col min-h-[400px]">
                         {selectedFile ? (
                             <>
                                 <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
                                     <FileText size={18} />
                                     {selectedFile}
                                 </div>
-                                <MDXEditor
-                                    value={content}
-                                    onChange={setContent}
-                                    className="flex-1 flex flex-col h-full"
-                                    rows={20}
-                                />
+                                <div className="flex-1 overflow-hidden flex flex-col">
+                                    <MDXEditor
+                                        value={content}
+                                        onChange={setContent}
+                                        className="flex-1 flex flex-col h-full"
+                                        rows={20}
+                                    />
+                                </div>
                             </>
                         ) : (
                             <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -213,7 +216,7 @@ export default function EditCoursePage() {
 
                     {/* Sidebar Settings */}
                     {selectedFile && (
-                        <div className="w-80 bg-gray-900 rounded-xl border border-gray-800 overflow-y-auto flex flex-col">
+                        <div className="w-full lg:w-80 bg-gray-900 rounded-xl border border-gray-800 overflow-y-auto flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
                             <div className="p-4 border-b border-gray-800 font-semibold text-gray-300">
                                 Lesson Settings
                             </div>
