@@ -64,7 +64,7 @@ export async function PATCH(
                 description: meta.description,
                 content: content,
                 image: meta.image,
-                videoUrl: meta.videoUrl,
+
                 level: meta.level,
                 tools: meta.tools,
                 materials: meta.materials,

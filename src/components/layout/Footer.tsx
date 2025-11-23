@@ -18,6 +18,7 @@ export default function Footer() {
                         <li><Link href="/courses" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">Courses</Link></li>
                         <li><Link href="/blog" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">Blog</Link></li>
                         <li><Link href="/projects" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">Projects</Link></li>
+                        <li><Link href="/forum" className="text-text-secondary hover:text-accent-primary transition-colors text-sm">Forum</Link></li>
                     </ul>
                 </div>
 

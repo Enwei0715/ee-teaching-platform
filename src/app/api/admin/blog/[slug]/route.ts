@@ -62,7 +62,7 @@ export async function PATCH(
                 content: content,
                 excerpt: meta.excerpt,
                 image: meta.image,
-                videoUrl: meta.videoUrl,
+
                 category: meta.category,
             }
         });

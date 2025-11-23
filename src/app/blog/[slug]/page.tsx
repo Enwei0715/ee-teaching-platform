@@ -110,9 +110,7 @@ export default async function BlogPost({ params }: Props) {
             <div className="max-w-3xl mx-auto px-6 py-12">
                 {/* Content */}
                 <div className="prose prose-invert prose-blue max-w-none prose-lg">
-                    {post.meta.videoUrl && (
-                        <YouTubePlayer url={post.meta.videoUrl} />
-                    )}
+
                     <MDXContent source={mdxSource} />
                 </div>
 

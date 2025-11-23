@@ -11,7 +11,7 @@ export default function EditCoursePage() {
     const params = useParams();
     const courseId = params.slug as string;
 
-    const [files, setFiles] = useState<string[]>([]);
+    const [files, setFiles] = useState<{ filename: string; order: number }[]>([]);
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [content, setContent] = useState<string>("");
     const [meta, setMeta] = useState<any>({});
@@ -57,6 +57,10 @@ export default function EditCoursePage() {
             });
             if (res.ok) {
                 alert("Saved successfully!");
+                // Refresh file list to update order if changed
+                const listRes = await fetch(`/api/admin/courses/${courseId}`);
+                const listData = await listRes.json();
+                setFiles(listData.files || []);
             } else {
                 alert("Failed to save.");
             }
@@ -84,7 +88,11 @@ export default function EditCoursePage() {
 
             if (res.ok) {
                 const data = await res.json();
-                setFiles(prev => [...prev, data.filename]);
+                // Refresh list to get correct order
+                const listRes = await fetch(`/api/admin/courses/${courseId}`);
+                const listData = await listRes.json();
+                setFiles(listData.files || []);
+
                 setShowNewLessonModal(false);
                 setNewLessonTitle("");
                 setNewLessonFilename("");
@@ -110,7 +118,7 @@ export default function EditCoursePage() {
             });
 
             if (res.ok) {
-                setFiles(prev => prev.filter(f => f !== filename));
+                setFiles(prev => prev.filter(f => f.filename !== filename));
                 if (selectedFile === filename) {
                     setSelectedFile(null);
                     setContent("");
@@ -166,18 +174,20 @@ export default function EditCoursePage() {
                     <div className="p-2 overflow-y-auto flex-1">
                         {files.map(file => (
                             <div
-                                key={file}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors group ${selectedFile === file ? 'bg-indigo-900/50 text-indigo-400' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                                key={file.filename}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors group ${selectedFile === file.filename ? 'bg-indigo-900/50 text-indigo-400' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
                             >
                                 <button
-                                    onClick={() => loadFile(file)}
+                                    onClick={() => loadFile(file.filename)}
                                     className="flex items-center gap-2 flex-1 min-w-0 text-left"
                                 >
                                     <FileText size={16} className="shrink-0" />
-                                    <span className="truncate text-sm">{file}</span>
+                                    <span className="truncate text-sm">
+                                        {file.order ? `${file.order}. ` : ''}{file.filename}
+                                    </span>
                                 </button>
                                 <button
-                                    onClick={(e) => handleDeleteLesson(file, e)}
+                                    onClick={(e) => handleDeleteLesson(file.filename, e)}
                                     className="p-1 text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
                                     title="Delete Lesson"
                                 >
@@ -227,6 +237,16 @@ export default function EditCoursePage() {
                                         type="text"
                                         value={meta.title || ''}
                                         onChange={(e) => setMeta({ ...meta, title: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Order</label>
+                                    <input
+                                        type="number"
+                                        value={meta.order || ''}
+                                        onChange={(e) => setMeta({ ...meta, order: parseInt(e.target.value) })}
                                         className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
                                     />
                                 </div>

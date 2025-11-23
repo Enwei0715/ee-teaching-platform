@@ -110,7 +110,7 @@ export async function PATCH(
                 excerpt: meta.excerpt,
                 category: meta.category,
                 image: meta.image,
-                videoUrl: meta.videoUrl,
+
                 published: meta.published ?? false,
             }
         });

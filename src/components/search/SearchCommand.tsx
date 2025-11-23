@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, FileText, BookOpen, Wrench, Loader2, MessageSquare } from 'lucide-react';
+import { Search, X, FileText, BookOpen, Wrench, Loader2, MessageSquare, FolderKanban } from 'lucide-react';
 import { SearchResult } from '@/lib/search';
+import Fuse from 'fuse.js';
 
 interface Props {
     isOpen: boolean;
@@ -17,6 +18,16 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Initialize Fuse instance
+    const fuse = useMemo(() => {
+        return new Fuse(allData, {
+            keys: ['title', 'description', 'tags'],
+            threshold: 0.4, // Allow for some typos (0.0 is exact, 1.0 is match anything)
+            distance: 100,
+            includeScore: true,
+        });
+    }, [allData]);
 
     // Fetch index on mount (or when first opened)
     useEffect(() => {
@@ -42,28 +53,54 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
         }
     }, [isOpen]);
 
-    // Filter results
+    // Filter results using Fuse.js
     useEffect(() => {
         if (!query) {
             setResults([]);
             return;
         }
 
-        const lowerQuery = query.toLowerCase();
-        const filtered = allData.filter(item =>
-            item.title.toLowerCase().includes(lowerQuery) ||
-            item.description.toLowerCase().includes(lowerQuery) ||
-            item.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
-        ).slice(0, 5); // Limit to 5 results
-
-        setResults(filtered);
-    }, [query, allData]);
+        const fuseResults = fuse.search(query);
+        // Take top 10 results
+        setResults(fuseResults.slice(0, 10).map(r => r.item));
+    }, [query, fuse]);
 
     // Handle navigation
     const handleSelect = (url: string) => {
         router.push(url);
         onClose();
         setQuery('');
+    };
+
+    // Group results by type
+    const groupedResults = useMemo(() => {
+        const groups: { [key: string]: SearchResult[] } = {};
+        results.forEach(result => {
+            const type = result.type;
+            if (!groups[type]) {
+                groups[type] = [];
+            }
+            groups[type].push(result);
+        });
+        return groups;
+    }, [results]);
+
+    const getTypeLabel = (type: string) => {
+        switch (type) {
+            case 'course': return 'Courses';
+            case 'blog': return 'Blog Posts';
+            case 'project': return 'Projects';
+            default: return 'Other';
+        }
+    };
+
+    const getTypeIcon = (type: string) => {
+        switch (type) {
+            case 'course': return <BookOpen size={18} />;
+            case 'blog': return <FileText size={18} />;
+            case 'project': return <Wrench size={18} />;
+            default: return <Search size={18} />;
+        }
     };
 
     if (!isOpen) return null;
@@ -106,6 +143,10 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                                     <BookOpen size={16} className="text-accent-primary" />
                                     Courses
                                 </button>
+                                <button onClick={() => handleSelect('/projects')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
+                                    <FolderKanban size={16} className="text-accent-primary" />
+                                    Projects
+                                </button>
                                 <button onClick={() => handleSelect('/blog')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
                                     <FileText size={16} className="text-accent-primary" />
                                     Blog
@@ -124,35 +165,40 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                         </div>
                     )}
 
-                    {results.map((result, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleSelect(result.url)}
-                            className="w-full flex items-start p-3 rounded-lg hover:bg-bg-tertiary transition-colors text-left group"
-                        >
-                            <div className="mt-1 mr-3 text-text-secondary group-hover:text-accent-primary">
-                                {result.type === 'course' && <BookOpen size={18} />}
-                                {result.type === 'blog' && <FileText size={18} />}
-                                {result.type === 'project' && <Wrench size={18} />}
-                            </div>
-                            <div>
-                                <h4 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors">
-                                    {result.title}
-                                </h4>
-                                <p className="text-text-secondary text-xs line-clamp-1">
-                                    {result.description}
-                                </p>
-                                {result.tags && (
-                                    <div className="flex gap-2 mt-1">
-                                        {result.tags.slice(0, 2).map(tag => (
-                                            <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-bg-primary border border-border-primary text-text-secondary">
-                                                {tag}
-                                            </span>
-                                        ))}
+                    {Object.entries(groupedResults).map(([type, items]) => (
+                        <div key={type} className="mb-2">
+                            <h4 className="px-3 py-1 text-xs font-semibold text-text-secondary uppercase tracking-wider bg-bg-tertiary/50">
+                                {getTypeLabel(type)}
+                            </h4>
+                            {items.map((result, index) => (
+                                <button
+                                    key={`${type}-${index}`}
+                                    onClick={() => handleSelect(result.url)}
+                                    className="w-full flex items-start p-3 rounded-lg hover:bg-bg-tertiary transition-colors text-left group"
+                                >
+                                    <div className="mt-1 mr-3 text-text-secondary group-hover:text-accent-primary">
+                                        {getTypeIcon(result.type)}
                                     </div>
-                                )}
-                            </div>
-                        </button>
+                                    <div>
+                                        <h4 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors">
+                                            {result.title}
+                                        </h4>
+                                        <p className="text-text-secondary text-xs line-clamp-1">
+                                            {result.description}
+                                        </p>
+                                        {result.tags && (
+                                            <div className="flex gap-2 mt-1">
+                                                {result.tags.slice(0, 2).map(tag => (
+                                                    <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-bg-primary border border-border-primary text-text-secondary">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     ))}
                 </div>
 

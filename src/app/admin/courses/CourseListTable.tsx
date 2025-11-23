@@ -50,66 +50,68 @@ export default function CourseListTable({ initialCourses }: { initialCourses: Co
 
     return (
         <div className="bg-gray-900 rounded-xl shadow-sm border border-gray-800 overflow-hidden">
-            <table className="w-full text-left">
-                <thead className="bg-gray-800 border-b border-gray-700">
-                    <tr>
-                        <th className="px-6 py-4 font-semibold text-gray-300">Course Title</th>
-                        <th className="px-6 py-4 font-semibold text-gray-300">Level</th>
-                        <th className="px-6 py-4 font-semibold text-gray-300">Description</th>
-                        <th className="px-6 py-4 font-semibold text-gray-300 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800">
-                    {courses.length === 0 ? (
+            <div className="overflow-x-auto">
+                <table className="w-full text-left min-w-[800px]">
+                    <thead className="bg-gray-800 border-b border-gray-700">
                         <tr>
-                            <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                                No courses found.
-                            </td>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Course Title</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Level</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300">Description</th>
+                            <th className="px-6 py-4 font-semibold text-gray-300 text-right">Actions</th>
                         </tr>
-                    ) : (
-                        courses.map((course) => (
-                            <tr key={course.slug} className="hover:bg-gray-800/50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-white">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-indigo-900/50 text-indigo-400 rounded-lg">
-                                            <BookOpen size={18} />
-                                        </div>
-                                        {course.meta.title}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <select
-                                        value={course.meta.level || 'Beginner'}
-                                        onChange={(e) => handleLevelChange(course.slug, e.target.value)}
-                                        className={`px-2 py-1 text-xs font-bold rounded-full border-none outline-none cursor-pointer ${course.meta.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
-                                            course.meta.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
-                                                'bg-red-900/30 text-red-400'
-                                            }`}
-                                    >
-                                        <option value="Beginner" className="bg-gray-900 text-gray-300">Beginner</option>
-                                        <option value="Intermediate" className="bg-gray-900 text-gray-300">Intermediate</option>
-                                        <option value="Advanced" className="bg-gray-900 text-gray-300">Advanced</option>
-                                    </select>
-                                </td>
-                                <td className="px-6 py-4 text-gray-400 text-sm max-w-[300px] truncate" title={course.meta.description}>
-                                    {course.meta.description || "No description"}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2 items-center">
-                                        <Link href={`/courses/${course.slug}`} target="_blank" className="p-2 text-gray-400 hover:text-gray-300 rounded-lg transition-colors" title="View Live">
-                                            <ExternalLink size={18} />
-                                        </Link>
-                                        <Link href={`/admin/courses/${course.slug}`} className="p-2 text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors" title="Edit Course Content">
-                                            <Edit size={18} />
-                                        </Link>
-                                        <DeleteButton slug={course.slug} type="courses" />
-                                    </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                        {courses.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                                    No courses found.
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+                        ) : (
+                            courses.map((course) => (
+                                <tr key={course.slug} className="hover:bg-gray-800/50 transition-colors">
+                                    <td className="px-6 py-4 font-medium text-white">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-indigo-900/50 text-indigo-400 rounded-lg">
+                                                <BookOpen size={18} />
+                                            </div>
+                                            {course.meta.title}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <select
+                                            value={course.meta.level || 'Beginner'}
+                                            onChange={(e) => handleLevelChange(course.slug, e.target.value)}
+                                            className={`px-2 py-1 text-xs font-bold rounded-full border-none outline-none cursor-pointer ${course.meta.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
+                                                course.meta.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
+                                                    'bg-red-900/30 text-red-400'
+                                                }`}
+                                        >
+                                            <option value="Beginner" className="bg-gray-900 text-gray-300">Beginner</option>
+                                            <option value="Intermediate" className="bg-gray-900 text-gray-300">Intermediate</option>
+                                            <option value="Advanced" className="bg-gray-900 text-gray-300">Advanced</option>
+                                        </select>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-400 text-sm max-w-[300px] truncate" title={course.meta.description}>
+                                        {course.meta.description || "No description"}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2 items-center">
+                                            <Link href={`/courses/${course.slug}`} target="_blank" className="p-2 text-gray-400 hover:text-gray-300 rounded-lg transition-colors" title="View Live">
+                                                <ExternalLink size={18} />
+                                            </Link>
+                                            <Link href={`/admin/courses/${course.slug}`} className="p-2 text-indigo-400 hover:bg-indigo-900/20 rounded-lg transition-colors" title="Edit Course Content">
+                                                <Edit size={18} />
+                                            </Link>
+                                            <DeleteButton slug={course.slug} type="courses" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

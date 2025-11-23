@@ -55,11 +55,15 @@ export async function GET(
         // List all lessons
         const lessons = await prisma.lesson.findMany({
             where: { courseId: course.id },
-            select: { slug: true }
+            select: { slug: true, order: true },
+            orderBy: { order: 'asc' }
         });
 
-        // Return files as array of strings (slugs with .mdx for compatibility if needed, or just slugs)
-        const files = lessons.map(l => `${l.slug}.mdx`);
+        // Return files as array of objects
+        const files = lessons.map(l => ({
+            filename: `${l.slug}.mdx`,
+            order: l.order
+        }));
         return NextResponse.json({ files });
 
     } catch (error) {

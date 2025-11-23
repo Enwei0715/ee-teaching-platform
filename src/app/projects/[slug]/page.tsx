@@ -81,9 +81,7 @@ export default async function ProjectPage({ params }: Props) {
 
             <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2">
-                    {project.meta.videoUrl && (
-                        <YouTubePlayer url={project.meta.videoUrl} />
-                    )}
+
                     <div className="prose prose-invert prose-blue max-w-none">
                         <MDXContent source={mdxSource} />
                     </div>

@@ -104,9 +104,7 @@ export default async function LessonPage({ params }: Props) {
                         </div>
                     </div>
 
-                    {lesson.meta.videoUrl && (
-                        <YouTubePlayer url={lesson.meta.videoUrl} />
-                    )}
+
 
                     <div className="prose prose-invert prose-blue max-w-none mb-16">
                         <MDXContent
