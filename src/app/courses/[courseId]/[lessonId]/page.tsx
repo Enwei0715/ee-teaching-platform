@@ -10,6 +10,7 @@ import AIQuizGenerator from '@/components/assignment/AIQuizGenerator';
 import AITutor from '@/components/ai/AITutor';
 import TimeTracker from '@/components/course/TimeTracker';
 import LessonNavigation from '@/components/course/LessonNavigation';
+import LessonQuiz from '@/components/course/LessonQuiz';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -111,6 +112,10 @@ export default async function LessonPage({ params }: Props) {
                             lessonId={params.lessonId}
                         />
                     </div>
+
+                    {lesson.questions && lesson.questions.length > 0 && (
+                        <LessonQuiz questions={lesson.questions} />
+                    )}
 
                     <AIQuizGenerator
                         courseId={params.courseId}

@@ -23,6 +23,14 @@ export type CourseLesson = {
         [key: string]: any;
     };
     content: string;
+    questions?: Array<{
+        id: string;
+        question: string;
+        options: string[];
+        correctAnswer: number;
+        explanation?: string;
+        order: number;
+    }>;
 };
 
 export type Project = {
@@ -116,6 +124,11 @@ export const getCourseLesson = async (courseSlug: string, lessonSlug: string): P
         where: {
             courseId: course.id,
             slug: lessonSlug,
+        },
+        include: {
+            questions: {
+                orderBy: { order: 'asc' }
+            }
         }
     });
 
@@ -129,6 +142,10 @@ export const getCourseLesson = async (courseSlug: string, lessonSlug: string): P
             order: lesson.order,
         },
         content: lesson.content,
+        questions: lesson.questions?.map(q => ({
+            ...q,
+            explanation: q.explanation ?? undefined
+        })) || [],
     };
 };
 

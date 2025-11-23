@@ -145,8 +145,22 @@ model Lesson {
   courseId  String
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   published Boolean  @default(false)
+  questions QuizQuestion[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([courseId, slug])
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  question      String
+  options       String[]
+  correctAnswer Int      // Index 0-3 of correct option
+  explanation   String?
+  order         Int      @default(0)
+  lessonId      String
+  lesson        Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
