@@ -75,13 +75,9 @@ export default async function DashboardPage() {
         return prog && prog.percentage > 0 && prog.percentage < 100;
     }).length;
 
-    // Calculate total time spent (in hours)
+    // Calculate total time spent (in hours) - using only actual tracked time
     const totalSeconds = progress.reduce((acc: number, curr: any) => acc + (curr.timeSpent || 0), 0);
-    // Estimate 15 mins (900s) per completed lesson if timeSpent is 0
-    const estimatedSeconds = completedLessons * 900;
-    // Use the larger of recorded time or estimate
-    const finalSeconds = Math.max(totalSeconds, estimatedSeconds);
-    const hoursLearned = (finalSeconds / 3600).toFixed(1);
+    const hoursLearned = (totalSeconds / 3600).toFixed(1);
 
     const streak = user?.streak || 0;
 
