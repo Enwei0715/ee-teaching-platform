@@ -31,6 +31,7 @@ async function getPost(id: string) {
 }
 
 import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
 
 // ...
 
@@ -44,7 +45,11 @@ export default async function PostPage({ params }: { params: { postId: string } 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource;
     try {
-        mdxSource = await serialize(post.content);
+        mdxSource = await serialize(post.content, {
+            mdxOptions: {
+                remarkPlugins: [remarkGfm],
+            },
+        });
     } catch (error) {
         console.error('Error serializing MDX content for forum post:', params.postId, error);
         // Return 404 if content is malformed
