@@ -14,6 +14,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
+import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
 
 
 interface Props {
@@ -117,6 +118,11 @@ export default async function LessonPage({ params }: Props) {
                         currentLessonId={params.lessonId}
                         prevLesson={prevLesson}
                         nextLesson={nextLesson}
+                    />
+                    <LessonNavigationListener
+                        courseId={params.courseId}
+                        nextLessonId={nextLesson?.id}
+                        prevLessonId={prevLesson?.id}
                     />
                 </div>
             </main>

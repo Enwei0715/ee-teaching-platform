@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         console.log("API Request Body:", body);
-        const { topic } = body;
+        const { topic, context } = body;
 
         if (!topic) {
             console.error("Topic missing");
@@ -26,7 +26,8 @@ export async function POST(request: Request) {
             'Conceptual Understanding',
             'Real-world Application',
             'Common Mistakes',
-            'Calculation/Analysis'
+            'Calculation/Analysis',
+            'Specific Detail Recall'
         ];
         const randomFocus = focusAngles[Math.floor(Math.random() * focusAngles.length)];
 
@@ -34,18 +35,27 @@ export async function POST(request: Request) {
             messages: [
                 {
                     role: "system",
-                    content: `You are a helpful physics and engineering tutor. Generate a unique and diverse multiple-choice question about the given topic. 
-                    Focus this specific question on: ${randomFocus}.
-                    Avoid repeating common questions. Return the response in strictly valid JSON format with the following structure: { "question": "string", "options": ["string", "string", "string", "string"], "correctAnswer": number (0-3), "explanation": "string" }.`
+                    content: `You are a strict teacher assistant. All questions must be based ONLY on the facts provided in the lessonContent below. Do not introduce outside information.
+                    
+                    Ensure DIVERSITY in your questions. Do NOT generate multiple questions that test the exactly same specific fact, keyword, or definition. Cover different paragraphs and concepts from the text.
+                    
+                    Aim for a mix of conceptual understanding questions and specific detail recall questions, but ensure every question is distinct.
+                    
+                    Return the response in strictly valid JSON format with the following structure: { "question": "string", "options": ["string", "string", "string", "string"], "correctAnswer": number (0-3), "explanation": "string" }.`
                 },
                 {
                     role: "user",
-                    content: `Generate a quiz question about: ${topic}. Ensure it is distinct from typical questions on this topic.`
+                    content: `Generate a multiple-choice question about: ${topic}.
+                    
+                    Focus strictly on this angle: ${randomFocus}.
+                    
+                    Lesson Content:
+                    ${context ? context.substring(0, 2000) : 'No specific context provided. Generate a standard question based on the topic.'}`
                 }
             ],
             model: "gemini-2.5-flash",
             response_format: { type: "json_object" },
-            temperature: 0.8,
+            temperature: 0.5,
         });
 
         console.log("Google AI Response:", completion);
