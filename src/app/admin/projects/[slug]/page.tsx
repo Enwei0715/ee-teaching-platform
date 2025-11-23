@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save, FileText } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import MDXEditor from "@/components/ui/MDXEditor";
 
 export default function EditProjectPage() {
     const params = useParams();
@@ -124,19 +125,12 @@ export default function EditProjectPage() {
                         <div className="flex-1 flex items-center justify-center text-gray-500">Loading...</div>
                     ) : (
                         <>
-                            <textarea
+                            <MDXEditor
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
-                                spellCheck={false}
+                                onChange={setContent}
+                                className="flex-1 flex flex-col h-full"
+                                rows={20}
                             />
-                            <div className="px-4 py-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500 flex gap-4">
-                                <span>**Bold**</span>
-                                <span>*Italic*</span>
-                                <span>[Link](url)</span>
-                                <span>![Image](url)</span>
-                                <span>{'<YouTube url="..." />'}</span>
-                            </div>
                         </>
                     )}
                 </div>
@@ -175,10 +169,11 @@ export default function EditProjectPage() {
                         {/* Description */}
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                            <textarea
+                            <MDXEditor
                                 value={meta.description || ''}
-                                onChange={(e) => setMeta({ ...meta, description: e.target.value })}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500 h-24 resize-none"
+                                onChange={(val) => setMeta({ ...meta, description: val })}
+                                rows={4}
+                                placeholder="Project description..."
                             />
                         </div>
 

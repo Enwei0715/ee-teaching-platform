@@ -100,11 +100,11 @@ export default function NewCoursePage() {
                             value={formData.slug}
                             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                             className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-                            placeholder="electronics-101"
+                            placeholder="electronics"
                             required
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                            URL-friendly ID (e.g., electronics-101)
+                            URL-friendly ID (e.g., electronics)
                         </p>
                     </div>
 

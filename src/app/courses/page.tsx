@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Cpu, Zap, Radio, BookOpen } from 'lucide-react';
+import { Cpu, Zap, Radio, BookOpen, Wifi, Layout } from 'lucide-react';
 import prisma from '@/lib/prisma';
 
 // Force dynamic rendering to disable caching
@@ -8,17 +8,18 @@ export const dynamic = 'force-dynamic';
 const iconMap: any = {
     'circuit-theory': Zap,
     'electronics': Radio,
-    'electronics-101': Radio, // Added mapping for electronics-101
     'digital-logic': Cpu,
     'microcontrollers': Cpu,
     'fpga-design': Cpu,
     'signals-systems': Radio,
+    'embedded-systems': Cpu,
+    'iot-basics': Wifi,
+    'pcb-design': Layout,
 };
 
 const colorMap: any = {
     'circuit-theory': 'text-yellow-500',
     'electronics': 'text-blue-500',
-    'electronics-101': 'text-blue-500', // Added color for electronics-101
     'digital-logic': 'text-green-500',
     'microcontrollers': 'text-purple-500',
     'fpga-design': 'text-red-500',

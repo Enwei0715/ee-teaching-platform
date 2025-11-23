@@ -8,6 +8,7 @@ import { User, Clock, MessageSquare, Send, ArrowLeft, Trash2 } from 'lucide-reac
 import Link from 'next/link';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import MDXContent from '@/components/mdx/MDXContent';
+import MDXEditor from '@/components/ui/MDXEditor';
 
 interface Comment {
     id: string;
@@ -148,13 +149,13 @@ export default function PostDetail({ post, mdxSource }: PostDetailProps) {
                 <div className="bg-bg-secondary border border-border-primary rounded-xl p-6">
                     <h3 className="text-lg font-bold text-text-primary mb-4">Leave a Reply</h3>
                     <form onSubmit={handleReply}>
-                        <textarea
-                            required
+                        <MDXEditor
                             value={replyContent}
-                            onChange={(e) => setReplyContent(e.target.value)}
-                            rows={4}
-                            className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary resize-none mb-4"
+                            onChange={setReplyContent}
                             placeholder="Write your comment here..."
+                            rows={4}
+                            required
+                            className="mb-4"
                         />
                         <div className="flex justify-end">
                             <button

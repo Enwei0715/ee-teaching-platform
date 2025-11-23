@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, FileText, Plus, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import DeleteButton from "../../components/DeleteButton";
+import MDXEditor from "@/components/ui/MDXEditor";
 
 export default function EditCoursePage() {
     const params = useParams();
@@ -196,19 +197,12 @@ export default function EditCoursePage() {
                                     <FileText size={18} />
                                     {selectedFile}
                                 </div>
-                                <textarea
+                                <MDXEditor
                                     value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    className="flex-1 w-full bg-gray-950 p-6 text-gray-300 font-mono outline-none resize-none"
-                                    spellCheck={false}
+                                    onChange={setContent}
+                                    className="flex-1 flex flex-col h-full"
+                                    rows={20}
                                 />
-                                <div className="px-4 py-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500 flex gap-4">
-                                    <span>**Bold**</span>
-                                    <span>*Italic*</span>
-                                    <span>[Link](url)</span>
-                                    <span>![Image](url)</span>
-                                    <span>{'<YouTube url="..." />'}</span>
-                                </div>
                             </>
                         ) : (
                             <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -236,10 +230,11 @@ export default function EditCoursePage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
-                                    <textarea
+                                    <MDXEditor
                                         value={meta.description || ''}
-                                        onChange={(e) => setMeta({ ...meta, description: e.target.value })}
-                                        className="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-3 text-gray-300 text-sm font-mono outline-none focus:border-indigo-500 resize-none"
+                                        onChange={(val) => setMeta({ ...meta, description: val })}
+                                        rows={6}
+                                        placeholder="Course description..."
                                     />
                                 </div>
                             </div>

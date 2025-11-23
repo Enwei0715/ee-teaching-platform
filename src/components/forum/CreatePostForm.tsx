@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Send, Bold, Italic, Link as LinkIcon, Image, Code } from 'lucide-react';
+import { Send } from 'lucide-react';
+import MDXEditor from '@/components/ui/MDXEditor';
 
 export default function CreatePostForm() {
     const router = useRouter();
@@ -40,25 +41,6 @@ export default function CreatePostForm() {
         }
     };
 
-    const insertMarkdown = (before: string, after: string = '') => {
-        const textarea = document.getElementById('forum-content') as HTMLTextAreaElement;
-        if (!textarea) return;
-
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const selectedText = content.substring(start, end);
-        const newText = content.substring(0, start) + before + selectedText + after + content.substring(end);
-
-        setContent(newText);
-
-        // Set cursor position after insertion
-        setTimeout(() => {
-            textarea.focus();
-            const newCursorPos = start + before.length + selectedText.length;
-            textarea.setSelectionRange(newCursorPos, newCursorPos);
-        }, 0);
-    };
-
     if (!isOpen) {
         return (
             <button
@@ -87,64 +69,13 @@ export default function CreatePostForm() {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-text-secondary mb-2">Content</label>
-
-                    {/* MDX Editor Toolbar */}
-                    <div className="flex gap-1 mb-2 p-2 bg-bg-tertiary border border-border-primary rounded-t-lg">
-                        <button
-                            type="button"
-                            onClick={() => insertMarkdown('**', '**')}
-                            className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                            title="Bold"
-                        >
-                            <Bold size={16} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => insertMarkdown('*', '*')}
-                            className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                            title="Italic"
-                        >
-                            <Italic size={16} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => insertMarkdown('[', '](url)')}
-                            className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                            title="Link"
-                        >
-                            <LinkIcon size={16} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => insertMarkdown('![', '](url)')}
-                            className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                            title="Image"
-                        >
-                            <Image size={16} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => insertMarkdown('`', '`')}
-                            className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                            title="Code"
-                        >
-                            <Code size={16} />
-                        </button>
-                        <div className="ml-auto text-xs text-text-secondary self-center px-2">
-                            <span className="hover:text-text-primary cursor-help" title="YouTube embed">
-                                {'<YouTube url="..." />'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <textarea
+                    <MDXEditor
                         id="forum-content"
-                        required
                         value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        onChange={setContent}
+                        required
                         rows={8}
-                        className="w-full bg-bg-tertiary border border-border-primary rounded-b-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary resize-none font-mono text-sm"
-                        placeholder="Write your question or topic here... (Markdown supported)"
+                        placeholder="Write your question or topic here..."
                     />
                 </div>
                 <div className="flex gap-3 justify-end">
