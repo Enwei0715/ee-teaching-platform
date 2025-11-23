@@ -1,4 +1,4 @@
-import { getAllPosts, getAllProjects, getCourseStructure } from './mdx';
+import { getAllBlogPosts, getAllProjects, getCourseStructure } from './mdx';
 
 export type SearchResult = {
     type: 'blog' | 'course' | 'project';
@@ -12,7 +12,7 @@ export const getSearchIndex = (): SearchResult[] => {
     const results: SearchResult[] = [];
 
     // Index Blog Posts
-    const posts = getAllPosts();
+    const posts = getAllBlogPosts();
     posts.forEach(post => {
         results.push({
             type: 'blog',
