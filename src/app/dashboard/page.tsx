@@ -25,7 +25,7 @@ export default async function DashboardPage() {
     });
 
     // Get all courses
-    const allCourses = getAllCourses();
+    const allCourses = await getAllCourses();
 
     // Calculate detailed course progress
     const courseProgressMap = new Map();
