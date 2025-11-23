@@ -3,8 +3,8 @@ import { Plus } from "lucide-react";
 import { getAllProjects } from "@/lib/mdx";
 import ProjectListTable from "./ProjectListTable";
 
-export default function AdminProjectsPage() {
-    const projects = getAllProjects();
+export default async function AdminProjectsPage() {
+    const projects = await getAllProjects();
 
     return (
         <div>

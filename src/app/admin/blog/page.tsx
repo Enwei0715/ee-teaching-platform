@@ -5,8 +5,8 @@ import DeleteButton from "../components/DeleteButton";
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminBlogPage() {
-    const posts = getAllBlogPosts();
+export default async function AdminBlogPage() {
+    const posts = await getAllBlogPosts();
 
     return (
         <div>

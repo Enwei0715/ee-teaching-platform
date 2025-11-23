@@ -8,8 +8,8 @@ export const metadata: Metadata = {
     description: 'Hands-on electronics projects for all skill levels.',
 };
 
-export default function ProjectsPage() {
-    const projects = getAllProjects();
+export default async function ProjectsPage() {
+    const projects = await getAllProjects();
 
     return (
         <div className="min-h-screen bg-gray-950">

@@ -20,8 +20,8 @@ const colorMap: any = {
     'signals-systems': 'text-orange-500',
 };
 
-export default function CoursesPage() {
-    const allCourses = getAllCourses();
+export default async function CoursesPage() {
+    const allCourses = await getAllCourses();
 
     return (
         <main className="min-h-screen py-12 px-6">

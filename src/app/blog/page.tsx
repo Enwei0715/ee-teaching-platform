@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
 export default async function BlogPage() {
-    const blogPosts = getAllBlogPosts();
+    const blogPosts = await getAllBlogPosts();
     const session = await getServerSession(authOptions);
 
     const isEngineer = session?.user?.occupation?.toLowerCase().includes('engineer') || session?.user?.occupation?.toLowerCase().includes('engineering');
