@@ -17,17 +17,65 @@ export function useProgress() {
     const [progress, setProgress] = useState<UserProgress>({ courses: {} });
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Load progress from LocalStorage on mount
+    // Load progress from LocalStorage and API on mount
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                setProgress(JSON.parse(stored));
-            } catch (e) {
-                console.error('Failed to parse progress', e);
+        const loadProgress = async () => {
+            // 1. Load from LocalStorage first for immediate UI
+            const stored = localStorage.getItem(STORAGE_KEY);
+            let localProgress: UserProgress = { courses: {} };
+
+            if (stored) {
+                try {
+                    localProgress = JSON.parse(stored);
+                    setProgress(localProgress);
+                } catch (e) {
+                    console.error('Failed to parse progress', e);
+                }
             }
-        }
-        setIsLoaded(true);
+
+            // 2. Fetch from API to sync across devices
+            try {
+                const res = await fetch('/api/progress');
+                if (res.ok) {
+                    const serverProgress = await res.json();
+
+                    // Merge server progress with local progress
+                    // Server is source of truth for completion
+                    setProgress(prev => {
+                        const merged = { ...prev };
+
+                        Object.keys(serverProgress.courses).forEach(courseId => {
+                            const serverCourse = serverProgress.courses[courseId];
+                            const localCourse = merged.courses[courseId] || {
+                                courseId,
+                                completedLessons: [],
+                                lastAccessedLessonId: undefined,
+                                lastAccessedAt: undefined
+                            };
+
+                            // Merge completed lessons (union)
+                            const allCompleted = Array.from(new Set([
+                                ...localCourse.completedLessons,
+                                ...serverCourse.completedLessons
+                            ]));
+
+                            merged.courses[courseId] = {
+                                ...localCourse,
+                                completedLessons: allCompleted
+                            };
+                        });
+
+                        return merged;
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch progress from API', error);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+
+        loadProgress();
     }, []);
 
     // Save progress to LocalStorage whenever it changes

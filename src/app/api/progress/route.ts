@@ -44,3 +44,43 @@ export async function POST(request: Request) {
         return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
+
+export async function GET(request: Request) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    try {
+        const progress = await prisma.userProgress.findMany({
+            where: {
+                userId: session.user.id,
+            },
+        });
+
+        // Transform to the format expected by the frontend
+        const formattedProgress = {
+            courses: progress.reduce((acc, curr) => {
+                if (!acc[curr.courseId]) {
+                    acc[curr.courseId] = {
+                        courseId: curr.courseId,
+                        completedLessons: [],
+                        lastAccessedAt: curr.updatedAt.toISOString(),
+                    };
+                }
+
+                if (curr.completed) {
+                    acc[curr.courseId].completedLessons.push(curr.lessonId);
+                }
+
+                return acc;
+            }, {} as Record<string, any>)
+        };
+
+        return NextResponse.json(formattedProgress);
+    } catch (error) {
+        console.error("Error fetching progress:", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
+    }
+}

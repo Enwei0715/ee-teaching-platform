@@ -61,9 +61,19 @@ export default async function ProjectsPage() {
                                 className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-900/20 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full hover:border-indigo-500/50"
                             >
                                 <div className="h-56 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden border-b border-gray-800">
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
-                                    <Wrench size={64} className="text-gray-700 group-hover:text-indigo-500/50 group-hover:scale-110 transition-all duration-500" />
-                                    <div className="absolute top-4 right-4">
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors z-10"></div>
+
+                                    {project.image ? (
+                                        <img
+                                            src={project.image}
+                                            alt={project.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <Wrench size={64} className="text-gray-700 group-hover:text-indigo-500/50 group-hover:scale-110 transition-all duration-500 relative z-0" />
+                                    )}
+
+                                    <div className="absolute top-4 right-4 z-20">
                                         <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.level === 'Beginner' ? 'bg-green-900/30 text-green-400' :
                                             project.level === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
                                                 'bg-red-900/30 text-red-400'
@@ -85,9 +95,9 @@ export default async function ProjectsPage() {
                                 </div>
                             </Link>
                         ))}
-                    </div>
+                    </div >
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

@@ -33,7 +33,7 @@ export default function RootLayout({
                     <HotkeysProvider>
                         <div className="flex flex-col min-h-screen">
                             <Navbar />
-                            <main className="flex-grow pt-16">
+                            <main className="flex-grow">
                                 {children}
                             </main>
                             <AITutor />

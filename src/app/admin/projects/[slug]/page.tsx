@@ -154,6 +154,20 @@ export default function EditProjectPage() {
                             />
                         </div>
 
+                        {/* Level */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Level</label>
+                            <select
+                                value={meta.level || 'Beginner'}
+                                onChange={(e) => setMeta({ ...meta, level: e.target.value })}
+                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                            >
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+
                         {/* Description */}
                         <div>
                             <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
