@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     for (const course of allCourses) {
         const lessons = await getCourseStructure(course.id);
         const totalLessons = lessons.length;
-        const lessonIds = new Set(lessons.map(l => l.id));
+        const lessonIds = new Set(lessons.map((l: any) => l.id));
 
         const courseProgress = progress.filter((p: any) => p.courseId === course.id);
         const courseLessonsCompleted = courseProgress.filter((p: any) => p.completed && lessonIds.has(p.lessonId)).length;
