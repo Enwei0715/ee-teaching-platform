@@ -38,28 +38,6 @@
 
 .excerpt {
     font-size: 0.95rem;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    flex: 1;
-}
-
-.meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-}
-
-.tags {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.tag {
-    font-size: 0.75rem;
-    color: var(--accent-primary);
-    background-color: rgba(47, 129, 247, 0.1);
     padding: 0.2rem 0.5rem;
     border-radius: 12px;
 }
