@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { mdxComponents } from '@/components/mdx/mdx-components';
 import { useSession } from 'next-auth/react';
 import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -12,6 +14,7 @@ interface Lesson {
     title: string;
     content: string;
     description?: string;
+    serializedDescription?: MDXRemoteSerializeResult;
 }
 
 interface CourseProgressProps {
@@ -73,9 +76,20 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                         <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
                             {lesson.title}
                         </h3>
-                        <p className="text-xs text-text-secondary mt-1">
-                            {lesson.description || calculateReadingTime(lesson.content)}
-                        </p>
+                        <div className="text-xs text-text-secondary mt-1 prose prose-invert prose-sm max-w-none [&>p]:text-xs [&>p]:m-0 [&>p]:leading-normal">
+                            {lesson.serializedDescription ? (
+                                <MDXRemote
+                                    {...lesson.serializedDescription}
+                                    components={{
+                                        p: (props: any) => <p className="text-xs text-text-secondary m-0" {...props} />,
+                                        a: (props: any) => <a className="text-accent-primary hover:underline" {...props} />,
+                                        code: (props: any) => <code className="bg-bg-tertiary px-1 rounded text-xs font-mono" {...props} />,
+                                    }}
+                                />
+                            ) : (
+                                lesson.description || calculateReadingTime(lesson.content)
+                            )}
+                        </div>
                     </div>
 
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">

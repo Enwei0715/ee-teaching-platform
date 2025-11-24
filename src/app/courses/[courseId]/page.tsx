@@ -5,6 +5,11 @@ import { getCourseStructure, getCourseBySlug, getAllCourses } from '@/lib/mdx';
 import { calculateCourseTotalDuration, calculateReadingTime } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 import CourseProgress from '@/components/courses/CourseProgress';
+import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
+import rehypeKatex from 'rehype-katex';
 
 interface Props {
     params: { courseId: string };
@@ -31,6 +36,39 @@ export default async function CoursePage({ params }: Props) {
     if (!course) notFound();
 
     const lessons = await getCourseStructure(params.courseId);
+
+    // Serialize descriptions for MDX rendering
+    const lessonsWithSerializedDescriptions = await Promise.all(lessons.map(async (lesson) => {
+        let serializedDescription: any = undefined;
+        if (lesson.description) {
+            try {
+                // Preprocess LaTeX syntax similar to LessonPage
+                const processedContent = lesson.description
+                    .replace(/\\\(/g, '$')
+                    .replace(/\\\)/g, '$')
+                    .replace(/\\\[/g, '$$\n')
+                    .replace(/\\\]/g, '\n$$');
+
+                serializedDescription = await serialize(processedContent, {
+                    mdxOptions: {
+                        remarkPlugins: [
+                            remarkGfm,
+                            remarkBreaks,
+                            [remarkMath, { singleDollarTextMath: true }]
+                        ],
+                        rehypePlugins: [rehypeKatex],
+                    },
+                });
+            } catch (error) {
+                console.error('Error serializing description for lesson:', lesson.id, error);
+            }
+        }
+        return {
+            ...lesson,
+            serializedDescription
+        };
+    }));
+
     const firstLessonId = lessons.length > 0 ? lessons[0].id : null;
     const totalDuration = calculateCourseTotalDuration(lessons);
 
@@ -84,7 +122,7 @@ export default async function CoursePage({ params }: Props) {
                     </h2>
 
                     <div className="bg-bg-secondary border border-border-primary rounded-xl overflow-hidden shadow-sm">
-                        <CourseProgress courseId={params.courseId} lessons={lessons} />
+                        <CourseProgress courseId={params.courseId} lessons={lessonsWithSerializedDescriptions} />
                     </div>
                 </div>
 
