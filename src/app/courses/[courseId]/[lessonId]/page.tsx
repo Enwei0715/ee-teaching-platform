@@ -71,21 +71,56 @@ export default async function LessonPage({ params }: Props) {
         console.error('Error serializing MDX content for lesson:', params.lessonId, error);
         serializationError = true;
 
-        // Retry: Wrap content in code block for safety
+        // Retry 1: Try without math plugins (might have LaTeX syntax issues)
         try {
-            const wrappedContent = '```text\n' + lesson.content + '\n```';
-            mdxSource = await serialize(wrappedContent, {
+            console.log('Retry 1: Attempting serialization without math plugins...');
+            mdxSource = await serialize(lesson.content, {
                 mdxOptions: {
                     remarkPlugins: [remarkGfm],
                 },
             });
-            autoFormatted = true;
+            console.log('Retry 1: Success - rendered without math support');
             serializationError = false;
-        } catch (retryError) {
-            console.error('Retry serialization also failed for lesson:', params.lessonId, retryError);
-            // Final fallback: display raw content with warning
-            mdxSource = await serialize('> **⚠️ Formatting Error:** Unable to render content properly.\n\n```text\n' + lesson.content.replace(/`/g, '\\`') + '\n```');
-            serializationError = false;
+        } catch (retryError1) {
+            console.error('Retry 1 failed:', retryError1);
+
+            // Retry 2: Try with just basic GFM, escaping potential problematic characters
+            try {
+                console.log('Retry 2: Attempting with escaped content...');
+                const escapedContent = lesson.content
+                    .replace(/\\\(/g, '\\\\(')
+                    .replace(/\\\)/g, '\\\\)')
+                    .replace(/\\\[/g, '\\\\[')
+                    .replace(/\\\]/g, '\\\\]');
+
+                mdxSource = await serialize(escapedContent, {
+                    mdxOptions: {
+                        remarkPlugins: [remarkGfm],
+                    },
+                });
+                console.log('Retry 2: Success - rendered with escaped content');
+                serializationError = false;
+            } catch (retryError2) {
+                console.error('Retry 2 failed:', retryError2);
+
+                // Final fallback: Wrap in code block
+                try {
+                    console.log('Final fallback: Wrapping in code block...');
+                    const wrappedContent = '```text\n' + lesson.content + '\n```';
+                    mdxSource = await serialize(wrappedContent, {
+                        mdxOptions: {
+                            remarkPlugins: [remarkGfm],
+                        },
+                    });
+                    autoFormatted = true;
+                    serializationError = false;
+                } catch (finalError) {
+                    console.error('All retry attempts failed:', finalError);
+                    // Absolute last resort
+                    mdxSource = await serialize('> **⚠️ 格式錯誤：** 無法正確渲染內容。\n\n```text\n' + lesson.content.substring(0, 500) + '\n...\n```');
+                    serializationError = false;
+                }
+            }
         }
     }
 
