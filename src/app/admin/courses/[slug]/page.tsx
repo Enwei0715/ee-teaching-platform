@@ -135,7 +135,7 @@ export default function EditCoursePage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100vh-100px)] flex flex-col relative overflow-y-auto lg:overflow-hidden">
+        <div className="max-w-6xl mx-auto h-[calc(100dvh-100px)] flex flex-col relative overflow-y-auto lg:overflow-hidden">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                     <Link href="/admin/courses" className="text-gray-400 hover:text-white transition-colors">
