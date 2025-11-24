@@ -6,8 +6,9 @@ import prisma from "@/lib/prisma";
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
 
+    // If no user is logged in, silently return success without tracking
     if (!session || !session.user) {
-        return new NextResponse("Unauthorized", { status: 401 });
+        return NextResponse.json({ message: "No user to track" }, { status: 200 });
     }
 
     try {
