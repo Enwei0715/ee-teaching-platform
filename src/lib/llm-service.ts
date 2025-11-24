@@ -6,13 +6,13 @@ export interface Quiz {
     model?: string;
 }
 
-export async function generateQuiz(lessonId: string): Promise<Quiz> {
+export async function generateQuiz(courseSlug: string, lessonSlug: string): Promise<Quiz> {
     const response = await fetch('/api/llm/quiz', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ lessonId }),
+        body: JSON.stringify({ courseSlug, lessonSlug }),
     });
 
     if (!response.ok) {

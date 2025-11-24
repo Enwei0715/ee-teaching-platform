@@ -48,6 +48,9 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
         }
     };
 
+    // Quiz generation disabled in ChatInterface - use AIQuizGenerator component instead
+    // which has access to courseId and lessonId
+    /*
     const handleGenerateQuiz = async () => {
         setLoading(true);
         try {
@@ -60,6 +63,7 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
             setLoading(false);
         }
     };
+    */
 
     const handleVerify = (explanation: string) => {
         onQuizExplanation(explanation);
@@ -85,6 +89,8 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
                         <p className="text-sm text-gray-600 max-w-sm mb-6">
                             Ask me anything about the assignment, or generate a quiz to test your understanding.
                         </p>
+                        {/* Quiz generation buttons removed - use AIQuizGenerator instead */}
+                        {/*
                         <button
                             onClick={handleGenerateQuiz}
                             disabled={loading}
@@ -93,6 +99,7 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
                             <Sparkles size={16} />
                             Generate Quiz
                         </button>
+                        */}
                     </div>
                 ) : (
                     <>
@@ -163,6 +170,7 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
                         <Send size={18} />
                     </button>
                 </div>
+                {/* Quiz generation button removed
                 {!quiz && messages.length > 0 && (
                     <button
                         onClick={handleGenerateQuiz}
@@ -173,6 +181,7 @@ export default function ChatInterface({ onQuizExplanation }: ChatInterfaceProps)
                         Generate Quiz
                     </button>
                 )}
+                */}
             </div>
         </div>
     );

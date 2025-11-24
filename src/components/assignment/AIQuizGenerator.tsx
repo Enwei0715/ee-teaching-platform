@@ -23,7 +23,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
         setLoading(true);
         setError(null);
         try {
-            const newQuiz = await generateQuiz(lessonId);
+            const newQuiz = await generateQuiz(courseId, lessonId);
             setQuiz(newQuiz);
         } catch (err) {
             setError("Failed to generate quiz. Please try again.");

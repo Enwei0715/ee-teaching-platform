@@ -15,15 +15,20 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         console.log("API Request Body:", body);
-        const { lessonId } = body;
+        const { courseSlug, lessonSlug } = body;
 
-        if (!lessonId) {
-            return NextResponse.json({ error: 'Lesson ID is required' }, { status: 400 });
+        if (!courseSlug || !lessonSlug) {
+            return NextResponse.json({ error: 'Course slug and lesson slug are required' }, { status: 400 });
         }
 
-        // 1. Fetch Lesson Content from DB
-        const lesson = await prisma.lesson.findUnique({
-            where: { id: lessonId },
+        // 1. Fetch Lesson Content from DB using slugs
+        const lesson = await prisma.lesson.findFirst({
+            where: {
+                slug: lessonSlug,
+                course: {
+                    slug: courseSlug
+                }
+            },
             select: {
                 title: true,
                 content: true,
