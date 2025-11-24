@@ -45,6 +45,7 @@ export async function GET(
             if (lesson) {
                 const meta = {
                     title: lesson.title,
+                    description: lesson.description,
                     order: lesson.order,
                 };
                 return NextResponse.json({ content: lesson.content, meta });
@@ -119,8 +120,20 @@ export async function POST(
                 where: { id: existingLesson.id },
                 data: {
                     title: meta.title,
+                    description: meta.description,
                     content: content,
                     order: meta.order || existingLesson.order,
+                }
+            });
+
+            // Reset completion status for all users who have completed this lesson
+            await prisma.userProgress.updateMany({
+                where: {
+                    lessonId: existingLesson.id,
+                    completed: true
+                },
+                data: {
+                    completed: false
                 }
             });
         } else {
@@ -129,6 +142,7 @@ export async function POST(
                 data: {
                     slug: lessonSlug,
                     title: meta.title,
+                    description: meta.description,
                     content: content,
                     order: meta.order || 999,
                     courseId: course.id,

@@ -16,14 +16,35 @@ export async function POST(
 
         const { courseId, lessonId } = params;
 
-        // Since courses and lessons are MDX files (not in Prisma),
-        // we use the URL slugs directly as IDs in UserProgress
+        // Resolve course slug to UUID
+        const course = await prisma.course.findUnique({
+            where: { slug: courseId },
+            select: { id: true }
+        });
+
+        if (!course) {
+            return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+        }
+
+        // Resolve lesson slug to UUID
+        const lesson = await prisma.lesson.findFirst({
+            where: {
+                courseId: course.id,
+                slug: lessonId
+            },
+            select: { id: true }
+        });
+
+        if (!lesson) {
+            return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+        }
+
         await prisma.userProgress.upsert({
             where: {
                 userId_courseId_lessonId: {
                     userId: session.user.id,
-                    courseId: courseId,   // Use course slug as ID
-                    lessonId: lessonId,   // Use lesson slug as ID
+                    courseId: course.id,
+                    lessonId: lesson.id,
                 },
             },
             update: {
@@ -31,10 +52,10 @@ export async function POST(
             },
             create: {
                 userId: session.user.id,
-                courseId: courseId,       // Use course slug as ID
-                lessonId: lessonId,       // Use lesson slug as ID
+                courseId: course.id,
+                lessonId: lesson.id,
                 completed: true,
-                timeSpent: 0, // Will be updated by TimeTracker
+                timeSpent: 0,
             },
         });
 

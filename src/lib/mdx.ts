@@ -20,6 +20,7 @@ export type CourseLesson = {
     lessonId: string;
     meta: {
         title: string;
+        description?: string;
         order: number;
         [key: string]: any;
     };
@@ -46,6 +47,7 @@ export type Project = {
 
 export type Course = {
     id: string;
+    uuid: string;
     title: string;
     description: string;
     level: 'Beginner' | 'Intermediate' | 'Advanced';
@@ -137,6 +139,7 @@ export const getCourseLesson = async (courseSlug: string, lessonSlug: string): P
         lessonId: lesson.slug,
         meta: {
             title: lesson.title,
+            description: lesson.description || undefined,
             order: lesson.order,
         },
         content: lesson.content,
@@ -155,7 +158,9 @@ export const getCourseStructure = async (courseSlug: string) => {
         orderBy: { order: 'asc' },
         select: {
             slug: true,
+            id: true,
             title: true,
+            description: true,
             order: true,
             content: true,
         }
@@ -163,7 +168,9 @@ export const getCourseStructure = async (courseSlug: string) => {
 
     return lessons.map(lesson => ({
         id: lesson.slug,
+        uuid: lesson.id,
         title: lesson.title,
+        description: lesson.description || undefined,
         order: lesson.order,
         content: lesson.content,
     }));
@@ -230,6 +237,7 @@ export const getAllCourses = async (): Promise<Course[]> => {
 
     return courses.map(course => ({
         id: course.slug, // Using slug as ID for routing compatibility
+        uuid: course.id,
         title: course.title,
         description: course.description,
         level: (course.level as 'Beginner' | 'Intermediate' | 'Advanced') || 'Beginner',
@@ -258,6 +266,7 @@ export const getCourseBySlug = async (slug: string): Promise<Course | null> => {
 
     return {
         id: course.slug,
+        uuid: course.id,
         title: course.title,
         description: course.description,
         level: (course.level as 'Beginner' | 'Intermediate' | 'Advanced') || 'Beginner',

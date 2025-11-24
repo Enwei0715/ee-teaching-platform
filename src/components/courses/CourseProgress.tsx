@@ -11,6 +11,7 @@ interface Lesson {
     id: string;
     title: string;
     content: string;
+    description?: string;
 }
 
 interface CourseProgressProps {
@@ -72,7 +73,9 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                         <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
                             {lesson.title}
                         </h3>
-                        <p className="text-xs text-text-secondary mt-1">{calculateReadingTime(lesson.content)}</p>
+                        <p className="text-xs text-text-secondary mt-1">
+                            {lesson.description || calculateReadingTime(lesson.content)}
+                        </p>
                     </div>
 
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">

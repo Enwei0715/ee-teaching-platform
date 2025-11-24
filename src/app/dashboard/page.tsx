@@ -52,10 +52,10 @@ export default async function DashboardPage() {
     for (const course of allCourses) {
         const lessons = await getCourseStructure(course.id);
         const totalLessons = lessons.length;
-        const lessonIds = new Set(lessons.map((l: any) => l.id));
+        const lessonIds = new Set(lessons.map((l: any) => l.uuid));
 
         // Strictly match by ID to avoid slug mismatches
-        const courseProgress = progress.filter((p: any) => p.courseId === course.id);
+        const courseProgress = progress.filter((p: any) => p.courseId === course.uuid);
         const courseLessonsCompleted = courseProgress.filter((p: any) => p.completed && lessonIds.has(p.lessonId)).length;
 
         const percentage = totalLessons > 0 ? Math.min(100, Math.round((courseLessonsCompleted / totalLessons) * 100)) : 0;
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
         // Find next lesson
         let nextLesson = null;
         for (const lesson of lessons) {
-            const isCompleted = courseProgress.some((p: any) => p.lessonId === lesson.id && p.completed);
+            const isCompleted = courseProgress.some((p: any) => p.lessonId === lesson.uuid && p.completed);
             if (!isCompleted) {
                 nextLesson = { ...lesson, slug: lesson.id };
                 break;

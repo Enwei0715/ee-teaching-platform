@@ -145,6 +145,7 @@ model Lesson {
   id        String   @id @default(cuid())
   slug      String
   title     String
+  description String?
   content   String   @db.Text
 
   order     Int
