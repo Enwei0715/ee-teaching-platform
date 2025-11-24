@@ -78,7 +78,7 @@ export default function Navbar() {
                                         priority
                                     />
                                 </div>
-                                <span className="text-text-primary font-bold text-xl tracking-tight">EE Master</span>
+                                <span className="text-text-primary font-bold text-xl tracking-tight whitespace-nowrap">EE Master</span>
                             </Link>
                         </div>
 
