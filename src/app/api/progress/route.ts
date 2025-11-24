@@ -39,7 +39,13 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json(progress);
-    } catch (error) {
+    } catch (error: any) {
+        // Handle "Foreign key constraint failed" (User not found)
+        if (error.code === 'P2003') {
+            console.warn("User not found during progress update (stale session). Ignoring.");
+            return NextResponse.json({ success: true, ignored: true });
+        }
+
         console.error("Error updating progress:", error);
         return new NextResponse("Internal Server Error", { status: 500 });
     }

@@ -73,8 +73,8 @@ Content Rules:
             temperature: 0.5,
         });
 
-        console.log("Google AI Response:", completion);
         const content = completion.choices[0].message.content;
+        console.log("Google AI Response Content:", content);
         if (!content) {
             throw new Error("No content received from LLM");
         }
