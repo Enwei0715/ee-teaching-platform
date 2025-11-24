@@ -6,6 +6,9 @@ import { ArrowLeft, Calendar, Clock, User, Share2, Tag } from 'lucide-react';
 import { getPostBySlug, getAllBlogPosts } from '@/lib/mdx';
 import MDXContent from '@/components/mdx/MDXContent';
 import { calculateReadingTime } from '@/lib/utils';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 interface Props {
     params: { slug: string };
@@ -55,13 +58,15 @@ export default async function BlogPost({ params }: Props) {
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource;
     try {
-        mdxSource = await serialize(post.content);
+        mdxSource = await serialize(post.content, {
+            mdxOptions: {
+                remarkPlugins: [remarkGfm, remarkMath],
+                rehypePlugins: [rehypeKatex],
+            },
+        });
     } catch (error) {
         console.error('Error serializing MDX content for blog post:', params.slug, error);
         // Fallback to displaying raw content or a friendly error if serialization fails
-        // For now, we'll just log it and maybe show a placeholder or raw text if we had a way to pass it safely
-        // But to prevent 500, we can render a simple error message in the MDXContent component or here.
-        // Let's try to serialize a simple error message so the page still loads.
         try {
             mdxSource = await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${post.content.replace(/`/g, '\\`')}`);
         } catch (retryError) {

@@ -6,6 +6,9 @@ import { ArrowLeft, Wrench, Clock, BarChart } from 'lucide-react';
 import { getProjectBySlug, getAllProjects } from '@/lib/mdx';
 import MDXContent from '@/components/mdx/MDXContent';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 interface Props {
     params: { slug: string };
@@ -47,11 +50,20 @@ export default async function ProjectPage({ params }: Props) {
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource;
     try {
-        mdxSource = await serialize(project.content);
+        mdxSource = await serialize(project.content, {
+            mdxOptions: {
+                remarkPlugins: [remarkGfm, remarkMath],
+                rehypePlugins: [rehypeKatex],
+            },
+        });
     } catch (error) {
         console.error('Error serializing MDX content for project:', params.slug, error);
-        // Return 404 if content is malformed
-        notFound();
+        // Fallback: Try to render with basic formatting
+        try {
+            mdxSource = await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${project.content.replace(/`/g, '\\`')}`);
+        } catch (retryError) {
+            mdxSource = await serialize('Content unavailable.');
+        }
     }
 
     return (
