@@ -135,7 +135,7 @@ export default function EditCoursePage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100dvh-100px)] flex flex-col relative overflow-y-auto lg:overflow-hidden">
+        <div className="max-w-6xl mx-auto flex flex-col relative h-auto min-h-screen lg:h-[calc(100dvh-100px)] lg:overflow-hidden pb-40 lg:pb-0">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                     <Link href="/admin/courses" className="text-gray-400 hover:text-white transition-colors">
@@ -164,9 +164,9 @@ export default function EditCoursePage() {
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-6 lg:overflow-hidden">
                 {/* File List */}
-                <div className="w-full lg:w-64 bg-gray-900 rounded-xl border border-gray-800 flex flex-col max-h-[200px] lg:max-h-none lg:h-full">
+                <div className="w-full lg:w-64 bg-gray-900 rounded-xl border border-gray-800 flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
                     <div className="p-4 border-b border-gray-800 flex justify-between items-center">
                         <h2 className="font-bold text-gray-400">Course Files</h2>
                         <span className="text-xs text-gray-500 lg:hidden">{files.length} files</span>
@@ -199,9 +199,9 @@ export default function EditCoursePage() {
                 </div>
 
                 {/* Editor & Sidebar */}
-                <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
+                <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-6 lg:overflow-hidden">
                     {/* Main Content Editor */}
-                    <div className="flex-1 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col min-h-[400px]">
+                    <div className="flex-1 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col min-h-[50vh] lg:min-h-[400px]">
                         {selectedFile ? (
                             <>
                                 <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
@@ -218,7 +218,7 @@ export default function EditCoursePage() {
                                 </div>
                             </>
                         ) : (
-                            <div className="flex-1 flex items-center justify-center text-gray-500">
+                            <div className="flex-1 flex items-center justify-center text-gray-500 min-h-[200px]">
                                 Select a file to edit
                             </div>
                         )}
