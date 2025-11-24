@@ -40,7 +40,13 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
+        // Handle "Foreign key constraint failed" (User not found)
+        if (error.code === 'P2003') {
+            console.warn("User not found during time tracking (stale session). Ignoring.");
+            return NextResponse.json({ success: true, ignored: true });
+        }
+
         console.error("Error tracking time:", error);
         return new NextResponse("Error tracking time", { status: 500 });
     }

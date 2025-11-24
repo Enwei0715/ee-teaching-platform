@@ -37,6 +37,7 @@ Do not give away answers to other potential questions if not asked.`;
         });
 
         const reply = completion.choices[0].message.content;
+        console.log("AI Tutor Reply:", reply);
         return NextResponse.json({ reply });
 
     } catch (error) {
