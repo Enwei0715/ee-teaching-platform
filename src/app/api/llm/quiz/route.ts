@@ -35,13 +35,28 @@ export async function POST(request: Request) {
             messages: [
                 {
                     role: "system",
-                    content: `You are a strict teacher assistant. All questions must be based ONLY on the facts provided in the lessonContent below. Do not introduce outside information.
-                    
-                    Ensure DIVERSITY in your questions. Do NOT generate multiple questions that test the exactly same specific fact, keyword, or definition. Cover different paragraphs and concepts from the text.
-                    
-                    Aim for a mix of conceptual understanding questions and specific detail recall questions, but ensure every question is distinct.
-                    
-                    Return the response in strictly valid JSON format with the following structure: { "question": "string", "options": ["string", "string", "string", "string"], "correctAnswer": number (0-3), "explanation": "string" }.`
+                    content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
+Task: Generate a single multiple-choice question based on the provided topic or content context.
+
+Output Format (Strict JSON):
+You must output valid JSON only. No conversational text before or after.
+Structure:
+{
+  "question": "The question text here. Use LaTeX $...$ for math.",
+  "options": [
+    "Option A text (incorrect)",
+    "Option B text (incorrect)",
+    "Option C text (correct answer)",
+    "Option D text (incorrect)"
+  ],
+  "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
+  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
+}
+
+Content Rules:
+1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
+2. Difficulty: Match the level of the provided content.
+3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.`
                 },
                 {
                     role: "user",
@@ -65,6 +80,12 @@ export async function POST(request: Request) {
         }
 
         const quiz = JSON.parse(content);
+
+        // Map correctAnswerIndex to correctAnswer for frontend compatibility
+        if (typeof quiz.correctAnswerIndex === 'number') {
+            quiz.correctAnswer = quiz.correctAnswerIndex;
+        }
+
         return NextResponse.json({ ...quiz, model: "gemini-2.5-flash" });
 
     } catch (error) {
