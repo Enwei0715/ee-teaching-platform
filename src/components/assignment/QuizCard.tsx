@@ -3,6 +3,11 @@
 import React, { useState } from 'react';
 import { Quiz } from '@/lib/llm-service';
 import QuizChat from './QuizChat';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface QuizCardProps {
     quiz: Quiz;
@@ -28,7 +33,14 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
     return (
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm my-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quiz Time!</h3>
-            <p className="text-gray-800 mb-6">{quiz.question}</p>
+            <div className="text-gray-800 mb-6 prose prose-lg max-w-none">
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
+                >
+                    {quiz.question}
+                </ReactMarkdown>
+            </div>
 
             <div className="space-y-3">
                 {quiz.options.map((option, index) => (
@@ -46,7 +58,17 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                             }`}
                     >
                         <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
-                        {option}
+                        <div className="inline-block align-middle">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath]}
+                                rehypePlugins={[rehypeKatex]}
+                                components={{
+                                    p: ({ children }) => <span className="m-0">{children}</span>
+                                }}
+                            >
+                                {option}
+                            </ReactMarkdown>
+                        </div>
                     </button>
                 ))}
             </div>
@@ -54,7 +76,14 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
             {showExplanation && (
                 <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-100">
                     <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Explanation:</h4>
-                    <p className="text-sm text-gray-900">{quiz.explanation}</p>
+                    <div className="text-sm text-gray-900 prose prose-sm max-w-none">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
+                        >
+                            {quiz.explanation}
+                        </ReactMarkdown>
+                    </div>
                     <p className="text-xs text-blue-600 mt-2 italic">
                         (Review this explanation carefully. Is it 100% correct?)
                     </p>
