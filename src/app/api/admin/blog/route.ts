@@ -26,7 +26,6 @@ export async function POST(request: Request) {
                     title: meta.title,
                     content: content || "",
                     excerpt: meta.excerpt,
-                    image: meta.image,
 
                     category: meta.category,
                     published: true, // Default to published for now, or use meta.published
@@ -54,7 +53,6 @@ export async function POST(request: Request) {
                 title: meta.title,
                 content: content || "",
                 excerpt: meta.excerpt,
-                image: meta.image,
 
                 category: meta.category,
                 published: true, // Default to published for now, or use meta.published

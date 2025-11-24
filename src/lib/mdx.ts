@@ -74,7 +74,6 @@ export const getPostBySlug = async (slug: string): Promise<Post | null> => {
             excerpt: post.excerpt || '',
             author: post.author.name || 'EE Master Team',
             category: post.category || 'General',
-            image: post.image || undefined,
         },
         content: post.content,
     };
@@ -95,7 +94,6 @@ export const getAllBlogPosts = async (): Promise<Post[]> => {
             excerpt: post.excerpt || '',
             author: post.author.name || 'EE Master Team',
             category: post.category || 'General',
-            image: post.image || undefined,
         },
         content: post.content,
     }));

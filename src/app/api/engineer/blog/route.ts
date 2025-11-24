@@ -45,7 +45,6 @@ export async function GET(request: Request) {
         const meta = {
             title: post.title,
             excerpt: post.excerpt,
-            image: post.image,
             category: post.category,
             date: post.createdAt.toISOString().split('T')[0],
             author: post.author.name,
@@ -74,7 +73,6 @@ export async function POST(request: Request) {
                     title: meta.title,
                     content: content || "",
                     excerpt: meta.excerpt,
-                    image: meta.image,
                     category: meta.category,
                     published: true,
                     authorId: session!.user!.id,
@@ -101,7 +99,6 @@ export async function POST(request: Request) {
                 title: meta.title,
                 content: content || "",
                 excerpt: meta.excerpt,
-                image: meta.image,
                 category: meta.category,
                 published: true,
                 authorId: session!.user!.id,
@@ -147,7 +144,6 @@ export async function PATCH(request: Request) {
                 title: meta.title,
                 content: content,
                 excerpt: meta.excerpt,
-                image: meta.image,
                 category: meta.category,
             }
         });

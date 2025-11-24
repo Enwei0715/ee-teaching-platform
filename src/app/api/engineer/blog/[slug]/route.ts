@@ -30,7 +30,6 @@ export async function GET(
             title: true,
             content: true,
             excerpt: true,
-            image: true,
 
             category: true,
             published: true,
@@ -63,7 +62,6 @@ export async function GET(
             title: post.title,
             excerpt: post.excerpt,
             category: post.category,
-            image: post.image,
 
             author: post.author.name,
             date: post.createdAt.toISOString().split('T')[0],
@@ -109,7 +107,6 @@ export async function PATCH(
                 content: content || "",
                 excerpt: meta.excerpt,
                 category: meta.category,
-                image: meta.image,
 
                 published: meta.published ?? false,
             }

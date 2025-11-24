@@ -97,7 +97,6 @@ model BlogPost {
   title     String
   content   String   @db.Text
   excerpt   String?
-  image     String?
 
   category  String?
   published Boolean  @default(false)
@@ -130,6 +129,7 @@ model Course {
   slug        String   @unique
   title       String
   description String
+  image       String?
   level       String
   duration    String?
   published   Boolean  @default(false)

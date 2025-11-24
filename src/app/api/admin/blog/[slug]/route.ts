@@ -30,7 +30,6 @@ export async function GET(
     const meta = {
         title: post.title,
         excerpt: post.excerpt,
-        image: post.image,
 
         category: post.category,
         date: post.createdAt.toISOString().split('T')[0],
@@ -61,7 +60,6 @@ export async function PATCH(
                 title: meta.title,
                 content: content,
                 excerpt: meta.excerpt,
-                image: meta.image,
 
                 category: meta.category,
             }
