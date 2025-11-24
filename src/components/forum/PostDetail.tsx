@@ -31,10 +31,11 @@ interface PostDetailProps {
     post: Post;
     mdxSource: MDXRemoteSerializeResult | null;
     serializationError?: boolean;
+    autoFormatted?: boolean;
     rawContent?: string;
 }
 
-export default function PostDetail({ post, mdxSource, serializationError, rawContent }: PostDetailProps) {
+export default function PostDetail({ post, mdxSource, serializationError, autoFormatted, rawContent }: PostDetailProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const [replyContent, setReplyContent] = useState('');
@@ -137,7 +138,14 @@ export default function PostDetail({ post, mdxSource, serializationError, rawCon
                             </pre>
                         </div>
                     ) : (
-                        mdxSource && <MDXContent source={mdxSource} />
+                        <>
+                            {autoFormatted && (
+                                <div className="mb-4 p-3 border border-yellow-900/50 bg-yellow-900/10 rounded-lg text-yellow-200 text-sm flex items-center gap-2">
+                                    <span>⚠️ Auto-formatted: Code blocks were missing. Please use Markdown code blocks for better formatting.</span>
+                                </div>
+                            )}
+                            {mdxSource && <MDXContent source={mdxSource} />}
+                        </>
                     )}
                 </div>
             </div>

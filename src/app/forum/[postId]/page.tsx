@@ -1,11 +1,9 @@
 import PostDetail from '@/components/forum/PostDetail';
 import { notFound } from 'next/navigation';
+import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
 
 async function getPost(id: string) {
-    // In a real app, we would fetch directly from DB here since it's a server component
-    // But for consistency with API routes, we can fetch from the API or use Prisma directly
-    // Using Prisma directly is better for Server Components
-    // Using Prisma directly is better for Server Components
     const prisma = require('@/lib/prisma').default;
 
     const post = await prisma.post.findUnique({
@@ -30,11 +28,6 @@ async function getPost(id: string) {
     return post;
 }
 
-import { serialize } from 'next-mdx-remote/serialize';
-import remarkGfm from 'remark-gfm';
-
-// ...
-
 export default async function PostPage({ params }: { params: { postId: string } }) {
     const post = await getPost(params.postId);
 
@@ -43,9 +36,9 @@ export default async function PostPage({ params }: { params: { postId: string } 
     }
 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
-    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource = null;
     let serializationError = false;
+    let autoFormatted = false;
 
     try {
         mdxSource = await serialize(post.content, {
@@ -55,7 +48,21 @@ export default async function PostPage({ params }: { params: { postId: string } 
         });
     } catch (error) {
         console.error('Error serializing MDX content for forum post:', params.postId, error);
-        serializationError = true;
+
+        // Retry Strategy: Attempt to wrap content in a code block
+        try {
+            console.log('Attempting auto-format recovery...');
+            const escapedContent = "```text\n" + post.content + "\n```";
+            mdxSource = await serialize(escapedContent, {
+                mdxOptions: {
+                    remarkPlugins: [remarkGfm],
+                },
+            });
+            autoFormatted = true;
+        } catch (retryError) {
+            console.error('Auto-format recovery failed:', retryError);
+            serializationError = true;
+        }
     }
 
     return (
@@ -64,6 +71,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
                 post={post}
                 mdxSource={mdxSource}
                 serializationError={serializationError}
+                autoFormatted={autoFormatted}
                 rawContent={post.content}
             />
         </div>
