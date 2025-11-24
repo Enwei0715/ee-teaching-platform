@@ -58,8 +58,15 @@ export default async function BlogPost({ params }: Props) {
         mdxSource = await serialize(post.content);
     } catch (error) {
         console.error('Error serializing MDX content for blog post:', params.slug, error);
-        // Return 404 if content is malformed
-        notFound();
+        // Fallback to displaying raw content or a friendly error if serialization fails
+        // For now, we'll just log it and maybe show a placeholder or raw text if we had a way to pass it safely
+        // But to prevent 500, we can render a simple error message in the MDXContent component or here.
+        // Let's try to serialize a simple error message so the page still loads.
+        try {
+            mdxSource = await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${post.content.replace(/`/g, '\\`')}`);
+        } catch (retryError) {
+            mdxSource = await serialize('Content unavailable.');
+        }
     }
 
     const readingTime = calculateReadingTime(post.content);

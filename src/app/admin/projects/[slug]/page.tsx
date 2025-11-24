@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, FileText } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import MDXEditor from "@/components/ui/MDXEditor";
+import TagInput from "@/components/ui/TagInput";
 
 export default function EditProjectPage() {
     const params = useParams();
@@ -46,7 +47,6 @@ export default function EditProjectPage() {
             // Remove features from meta as it's no longer used
             const sanitizedMeta = {
                 ...meta,
-                features: [],
                 level: meta.level || 'Beginner' // Ensure level is set
             };
 
@@ -190,16 +190,37 @@ export default function EditProjectPage() {
                         </div>
 
 
+                        {/* Tools */}
+                        <TagInput
+                            label="Tools"
+                            value={meta.tools || []}
+                            onChange={(val) => setMeta({ ...meta, tools: val })}
+                            placeholder="Add tool..."
+                        />
+
+                        {/* Materials */}
+                        <TagInput
+                            label="Materials"
+                            value={meta.materials || []}
+                            onChange={(val) => setMeta({ ...meta, materials: val })}
+                            placeholder="Add material..."
+                        />
+
                         {/* Technologies */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">Technologies (one per line)</label>
-                            <textarea
-                                value={(meta.technologies || []).join('\n')}
-                                onChange={(e) => handleArrayChange('technologies', e.target.value)}
-                                className="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-3 text-gray-300 text-sm font-mono outline-none focus:border-indigo-500 resize-none"
-                                placeholder="React&#10;TypeScript"
-                            />
-                        </div>
+                        <TagInput
+                            label="Technologies"
+                            value={meta.technologies || []}
+                            onChange={(val) => setMeta({ ...meta, technologies: val })}
+                            placeholder="Add technology..."
+                        />
+
+                        {/* Features */}
+                        <TagInput
+                            label="Features"
+                            value={meta.features || []}
+                            onChange={(val) => setMeta({ ...meta, features: val })}
+                            placeholder="Add feature..."
+                        />
                     </div>
                 </div>
             </div >

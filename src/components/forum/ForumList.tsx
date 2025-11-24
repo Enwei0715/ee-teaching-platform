@@ -53,7 +53,7 @@ export default function ForumList() {
                 >
                     <h3 className="text-xl font-bold text-text-primary mb-2">{post.title}</h3>
                     <p className="text-text-secondary line-clamp-2 mb-4">{stripMarkdown(post.content, 120)}</p>
-                    <div className="flex items-center gap-4 text-sm text-text-secondary">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-secondary">
                         <div className="flex items-center gap-1">
                             <User size={16} />
                             <span>{post.author.name || 'Anonymous'}</span>
@@ -62,7 +62,7 @@ export default function ForumList() {
                             <Clock size={16} />
                             <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <div className="flex items-center gap-1 ml-auto">
+                        <div className="flex items-center gap-1 ml-auto whitespace-nowrap">
                             <MessageSquare size={16} />
                             <span>{post._count.comments} comments</span>
                         </div>
