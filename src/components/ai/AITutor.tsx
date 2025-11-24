@@ -132,7 +132,7 @@ export default function AITutor() {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gray-50">
                         {messages.map((msg, idx) => (
                             <div
                                 key={idx}
@@ -140,7 +140,7 @@ export default function AITutor() {
                             >
                                 <div
                                     className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                        ? 'bg-indigo-600 text-white rounded-br-none'
+                                        ? 'bg-indigo-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
                                         : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm prose prose-sm max-w-none'
                                         }`}
                                 >
