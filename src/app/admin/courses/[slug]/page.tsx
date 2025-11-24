@@ -136,17 +136,17 @@ export default function EditCoursePage() {
 
     return (
         <div className="max-w-6xl mx-auto h-[calc(100vh-100px)] flex flex-col relative overflow-y-auto lg:overflow-hidden">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                     <Link href="/admin/courses" className="text-gray-400 hover:text-white transition-colors">
                         <ArrowLeft size={24} />
                     </Link>
-                    <h1 className="text-3xl font-bold text-white">Edit Course: {courseId}</h1>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white break-all">Edit Course: {courseId}</h1>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full lg:w-auto">
                     <button
                         onClick={() => setShowNewLessonModal(true)}
-                        className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors"
+                        className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors flex-1 lg:flex-none justify-center"
                     >
                         <Plus size={20} />
                         Add Lesson
@@ -155,7 +155,7 @@ export default function EditCoursePage() {
                         <button
                             onClick={saveFile}
                             disabled={saving}
-                            className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                            className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors disabled:opacity-50 flex-1 lg:flex-none justify-center"
                         >
                             <Save size={20} />
                             {saving ? "Saving..." : "Save Changes"}
