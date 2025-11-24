@@ -25,7 +25,7 @@ export async function POST(request: Request) {
                     slug: generatedSlug,
                     title: meta.title,
                     content: content || "",
-                    excerpt: meta.excerpt,
+                    description: meta.description,
 
                     category: meta.category,
                     published: true, // Default to published for now, or use meta.published
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
                 slug,
                 title: meta.title,
                 content: content || "",
-                excerpt: meta.excerpt,
+                description: meta.description,
 
                 category: meta.category,
                 published: true, // Default to published for now, or use meta.published

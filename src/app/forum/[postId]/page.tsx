@@ -2,6 +2,7 @@ import PostDetail from '@/components/forum/PostDetail';
 import { notFound } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 async function getPost(id: string) {
     const prisma = require('@/lib/prisma').default;
@@ -43,7 +44,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
     try {
         mdxSource = await serialize(post.content, {
             mdxOptions: {
-                remarkPlugins: [remarkGfm],
+                remarkPlugins: [remarkGfm, remarkBreaks],
             },
         });
     } catch (error) {

@@ -23,7 +23,28 @@ export const mdxComponents = {
     ul: (props: any) => <ul className="list-disc list-outside ml-6 mb-6 space-y-2 text-text-secondary text-lg" {...props} />,
     ol: (props: any) => <ol className="list-decimal list-outside ml-6 mb-6 space-y-2 text-text-secondary text-lg" {...props} />,
     li: (props: any) => <li className="pl-1" {...props} />,
-    a: (props: any) => <a className="text-accent-primary hover:text-accent-primary/80 underline decoration-2 underline-offset-2 transition-colors" {...props} />,
+    a: (props: any) => {
+        const { href, ...rest } = props;
+
+        // Fix for MDX links without protocol
+        let fixedHref = href;
+        if (href && !href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('/') && !href.startsWith('#')) {
+            // Assume it's an external link and add https://
+            fixedHref = `https://${href}`;
+        }
+
+        // Check if it's an external link
+        const isExternalLink = fixedHref && (fixedHref.startsWith('http://') || fixedHref.startsWith('https://'));
+
+        return (
+            <a
+                href={fixedHref}
+                className="text-accent-primary hover:text-accent-primary/80 underline decoration-2 underline-offset-2 transition-colors"
+                {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                {...rest}
+            />
+        );
+    },
     blockquote: (props: any) => (
         <blockquote className="border-l-4 border-accent-primary pl-6 italic my-8 text-text-secondary bg-bg-secondary py-4 pr-4 rounded-r-lg" {...props} />
     ),

@@ -1,0 +1,30 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="16" height="16" fill="#161b22" rx="2"/>
+  
+  <!-- CPU Icon - Highly simplified for tiny size -->
+  <g transform="translate(8, 8)">
+    <!-- Main chip body -->
+    <rect x="-3" y="-3" width="6" height="6" fill="#2f81f7" rx="0.5"/>
+    
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="1" fill="#161b22"/>
+    
+    <!-- Minimal pins -->
+    <!-- Left -->
+    <rect x="-5" y="-2" width="1.5" height="1" fill="#2f81f7"/>
+    <rect x="-5" y="1" width="1.5" height="1" fill="#2f81f7"/>
+    
+    <!-- Right -->
+    <rect x="3.5" y="-2" width="1.5" height="1" fill="#2f81f7"/>
+    <rect x="3.5" y="1" width="1.5" height="1" fill="#2f81f7"/>
+    
+    <!-- Top -->
+    <rect x="-2" y="-5" width="1" height="1.5" fill="#2f81f7"/>
+    <rect x="1" y="-5" width="1" height="1.5" fill="#2f81f7"/>
+    
+    <!-- Bottom -->
+    <rect x="-2" y="3.5" width="1" height="1.5" fill="#2f81f7"/>
+    <rect x="1" y="3.5" width="1" height="1.5" fill="#2f81f7"/>
+  </g>
+</svg>

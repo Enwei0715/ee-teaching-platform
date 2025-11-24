@@ -15,9 +15,12 @@ export const metadata: Metadata = {
     title: "EE Master | Electronic Engineering Platform",
     description: "The ultimate resource for learning Electronic Engineering, from circuits to FPGAs.",
     icons: {
-        icon: '/favicon.ico',
-        shortcut: '/favicon-16x16.png',
-        apple: '/apple-touch-icon.png',
+        icon: [
+            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' },
+            { url: '/favicon-32x32.svg', sizes: '32x32', type: 'image/svg+xml' },
+        ],
+        apple: '/apple-touch-icon.svg',
     },
 };
 

@@ -65,8 +65,8 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                 if (res.ok) {
                     const data = await res.json();
                     const finalRedirectUrl = redirectUrl.replace('{slug}', data.slug || newSlug);
-                    router.refresh();
-                    router.push(finalRedirectUrl);
+                    // Force full reload to ensure list is updated
+                    window.location.href = finalRedirectUrl;
                 } else {
                     const error = await res.json();
                     alert(`Failed to create: ${error.message}`);
@@ -80,8 +80,8 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                 });
 
                 if (res.ok) {
-                    router.refresh();
-                    router.push(redirectUrl.replace('{slug}', slug));
+                    // Force full reload to ensure fresh data
+                    window.location.href = redirectUrl.replace('{slug}', slug);
                 } else {
                     alert("Failed to save.");
                 }
@@ -154,9 +154,10 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                         </div>
 
                         {/* Categories */}
+                        {/* Categories */}
                         <TagInput
                             label="Categories"
-                            value={meta.category || []}
+                            value={Array.isArray(meta.category) ? meta.category : (meta.category ? [meta.category] : [])}
                             onChange={(val) => setMeta({ ...meta, category: val })}
                             placeholder="Add category..."
                         />

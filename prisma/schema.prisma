@@ -61,7 +61,9 @@ model UserProgress {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   completed Boolean  @default(false)
   timeSpent Int      @default(0) // Time spent in seconds
   updatedAt DateTime @updatedAt
@@ -96,7 +98,7 @@ model BlogPost {
   slug      String   @unique
   title     String
   content   String   @db.Text
-  excerpt   String?
+  description   String?
 
   category  String?
   published Boolean  @default(false)
@@ -134,6 +136,7 @@ model Course {
   duration    String?
   published   Boolean  @default(false)
   lessons     Lesson[]
+  userProgress UserProgress[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -149,6 +152,7 @@ model Lesson {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   published Boolean  @default(false)
   questions QuizQuestion[]
+  userProgress UserProgress[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -63,7 +63,7 @@ export default async function BlogPage() {
                             </Link>
 
                             <p className="text-text-secondary leading-relaxed mb-6">
-                                {post.meta.excerpt}
+                                {post.meta.description}
                             </p>
 
                             <Link href={`/blog/${post.slug}`} className="text-accent-primary font-medium hover:underline">

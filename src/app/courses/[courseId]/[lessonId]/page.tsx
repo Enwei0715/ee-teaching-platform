@@ -13,6 +13,7 @@ import TimeTracker from '@/components/course/TimeTracker';
 import LessonNavigation from '@/components/course/LessonNavigation';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
@@ -72,6 +73,7 @@ export default async function LessonPage({ params }: Props) {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
+                    remarkBreaks,
                     [remarkMath, { singleDollarTextMath: true }]
                 ],
                 rehypePlugins: [rehypeKatex],

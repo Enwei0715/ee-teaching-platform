@@ -18,13 +18,38 @@ export async function POST(request: Request) {
             return new NextResponse("Missing fields", { status: 400 });
         }
 
-        // Upsert user progress to update timeSpent
+        // Resolve courseId slug to UUID
+        const course = await prisma.course.findUnique({
+            where: { slug: courseId },
+            select: { id: true }
+        });
+
+        if (!course) {
+            console.warn(`Course not found for slug: ${courseId}`);
+            return NextResponse.json({ success: false, error: "Course not found" }, { status: 404 });
+        }
+
+        // Resolve lessonId slug to UUID
+        const lesson = await prisma.lesson.findFirst({
+            where: {
+                slug: lessonId,
+                courseId: course.id
+            },
+            select: { id: true }
+        });
+
+        if (!lesson) {
+            console.warn(`Lesson not found for slug: ${lessonId} in course: ${courseId}`);
+            return NextResponse.json({ success: false, error: "Lesson not found" }, { status: 404 });
+        }
+
+        // Upsert user progress to update timeSpent using actual UUIDs
         await prisma.userProgress.upsert({
             where: {
                 userId_courseId_lessonId: {
                     userId: session.user.id,
-                    courseId,
-                    lessonId,
+                    courseId: course.id,
+                    lessonId: lesson.id,
                 },
             },
             update: {
@@ -32,8 +57,8 @@ export async function POST(request: Request) {
             },
             create: {
                 userId: session.user.id,
-                courseId,
-                lessonId,
+                courseId: course.id,
+                lessonId: lesson.id,
                 completed: false,
                 timeSpent: seconds,
             },

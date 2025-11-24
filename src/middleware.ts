@@ -5,26 +5,6 @@ export default withAuth(
   function middleware(req) {
     const path = req.nextUrl.pathname;
 
-    // Public routes that don't require login
-    const publicRoutes = [
-      "/",
-      "/auth/signin",
-      "/auth/signup",
-      "/courses/circuit-theory" // Only this course is free
-    ];
-
-    // Check if the path starts with any public route
-    const isPublic = publicRoutes.some(route => path.startsWith(route));
-
-    if (isPublic) {
-      return NextResponse.next();
-    }
-
-    // If not public and not logged in, redirect to signin
-    if (!req.nextauth.token) {
-      return NextResponse.redirect(new URL("/auth/signin", req.url));
-    }
-
     // Admin routes protection
     if (path.startsWith("/admin") && req.nextauth.token?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", req.url));
@@ -34,10 +14,37 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const path = req.nextUrl.pathname;
-        // Allow if token exists OR if it's a public path (including sub-paths of circuit-theory)
-        if (path.startsWith("/courses/circuit-theory") || path === "/" || path.startsWith("/auth")) {
+
+        // 1. Always allow homepage
+        if (path === "/") return true;
+
+        // 2. Define Public Paths (No Login Required)
+        const publicPaths = [
+          "/auth/signin",
+          "/auth/signup",
+          "/auth/error",
+          "/courses/circuit-theory" // Free course
+        ];
+
+        // Check if path is public or a sub-path of a public route
+        const isPublic = publicPaths.some(publicPath =>
+          path === publicPath || path.startsWith(`${publicPath}/`)
+        );
+
+        if (isPublic) return true;
+
+        // 3. Allow static assets and Next.js internals
+        // (These are mostly handled by the matcher, but this is a safety net)
+        if (
+          path.startsWith("/_next") ||
+          path.startsWith("/api/auth") ||
+          path.includes(".") // Files like images, robots.txt, etc.
+        ) {
           return true;
         }
+
+        // 4. Require Token for Everything Else
+        // This includes: /blog, /projects, /forum, /dashboard, /courses (except free one)
         return !!token;
       },
     },
@@ -45,5 +52,11 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/courses/:path*", "/dashboard/:path*", "/admin/:path*", "/ai-tutor/:path*"],
+  // Match all request paths except for the ones starting with:
+  // - api/auth (NextAuth API routes)
+  // - _next/static (static files)
+  // - _next/image (image optimization files)
+  // - favicon.ico (favicon file)
+  // - icon.png (favicon file)
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|icon.png).*)"],
 };

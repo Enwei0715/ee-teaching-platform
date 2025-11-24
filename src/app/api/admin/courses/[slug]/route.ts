@@ -64,7 +64,16 @@ export async function GET(
             filename: `${l.slug}.mdx`,
             order: l.order
         }));
-        return NextResponse.json({ files });
+
+        return NextResponse.json({
+            files,
+            course: {
+                title: course.title,
+                slug: course.slug,
+                description: course.description,
+                level: course.level
+            }
+        });
 
     } catch (error) {
         console.error("Error fetching course:", error);
@@ -130,7 +139,6 @@ export async function POST(
 
         revalidatePath('/admin/courses');
         revalidatePath('/courses');
-        revalidatePath(`/courses/${courseSlug}`);
 
         return NextResponse.json({ message: "Saved successfully" });
     } catch (error) {
@@ -162,12 +170,24 @@ export async function PATCH(
             return NextResponse.json({ message: "Course not found" }, { status: 404 });
         }
 
+        // Check if slug is being updated and if it's unique
+        if (updates.slug && updates.slug !== courseSlug) {
+            const existingCourse = await prisma.course.findUnique({
+                where: { slug: updates.slug }
+            });
+
+            if (existingCourse) {
+                return NextResponse.json({ message: "Slug already exists" }, { status: 409 });
+            }
+        }
+
         await prisma.course.update({
             where: { slug: courseSlug },
             data: {
                 title: updates.title,
                 description: updates.description,
                 level: updates.level,
+                slug: updates.slug, // Allow slug update
             }
         });
 

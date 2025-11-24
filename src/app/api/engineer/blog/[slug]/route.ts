@@ -29,7 +29,7 @@ export async function GET(
             slug: true,
             title: true,
             content: true,
-            excerpt: true,
+            description: true,
 
             category: true,
             published: true,
@@ -60,7 +60,7 @@ export async function GET(
         content: post.content,
         meta: {
             title: post.title,
-            excerpt: post.excerpt,
+            description: post.description,
             category: post.category,
 
             author: post.author.name,
@@ -105,7 +105,7 @@ export async function PATCH(
             data: {
                 title: meta.title,
                 content: content || "",
-                excerpt: meta.excerpt,
+                description: meta.description,
                 category: meta.category,
 
                 published: meta.published ?? false,

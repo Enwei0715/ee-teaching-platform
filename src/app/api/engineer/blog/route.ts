@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
         const meta = {
             title: post.title,
-            excerpt: post.excerpt,
+            description: post.description,
             category: post.category,
             date: post.createdAt.toISOString().split('T')[0],
             author: post.author.name,
@@ -72,8 +72,8 @@ export async function POST(request: Request) {
                     slug: generatedSlug,
                     title: meta.title,
                     content: content || "",
-                    excerpt: meta.excerpt,
-                    category: meta.category,
+                    description: meta.description,
+                    category: Array.isArray(meta.category) ? meta.category[0] : meta.category,
                     published: true,
                     authorId: session!.user!.id,
                 }
@@ -98,8 +98,8 @@ export async function POST(request: Request) {
                 slug,
                 title: meta.title,
                 content: content || "",
-                excerpt: meta.excerpt,
-                category: meta.category,
+                description: meta.description,
+                category: Array.isArray(meta.category) ? meta.category[0] : meta.category,
                 published: true,
                 authorId: session!.user!.id,
             }
@@ -143,8 +143,8 @@ export async function PATCH(request: Request) {
             data: {
                 title: meta.title,
                 content: content,
-                excerpt: meta.excerpt,
-                category: meta.category,
+                description: meta.description,
+                category: Array.isArray(meta.category) ? meta.category[0] : meta.category,
             }
         });
 

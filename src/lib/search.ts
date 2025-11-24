@@ -17,7 +17,7 @@ export const getSearchIndex = async (): Promise<SearchResult[]> => {
         results.push({
             type: 'blog',
             title: post.meta.title,
-            description: post.meta.excerpt || post.meta.description || '',
+            description: post.meta.description || post.meta.description || '',
             url: `/blog/${post.slug}`,
             tags: post.meta.tags || [post.meta.category || 'Blog'],
         });

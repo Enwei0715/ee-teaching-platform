@@ -8,7 +8,9 @@ import MDXContent from '@/components/mdx/MDXContent';
 import { calculateReadingTime } from '@/lib/utils';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
+import BlogAdminControls from '@/components/blog/BlogAdminControls';
 
 interface Props {
     params: { slug: string };
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         }
         return {
             title: `${post.meta.title} | EE Master Blog`,
-            description: post.meta.excerpt,
+            description: post.meta.description,
         };
     } catch (e) {
         return {
@@ -40,16 +42,8 @@ export async function generateStaticParams() {
     }));
 }
 
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import DeletePostButton from '@/components/blog/DeletePostButton';
-import YouTubePlayer from '@/components/courses/YouTubePlayer';
-
-// ... imports ...
-
 export default async function BlogPost({ params }: Props) {
     const post = await getPostBySlug(params.slug);
-    const session = await getServerSession(authOptions);
 
     if (!post) {
         notFound();
@@ -70,6 +64,7 @@ export default async function BlogPost({ params }: Props) {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
+                    remarkBreaks,
                     [remarkMath, { singleDollarTextMath: true }]
                 ],
                 rehypePlugins: [rehypeKatex],
@@ -87,13 +82,6 @@ export default async function BlogPost({ params }: Props) {
 
     const readingTime = calculateReadingTime(post.content);
 
-    // Check if user is author or admin
-    // @ts-ignore
-    const isAuthor = session?.user?.id === post.authorId;
-    // @ts-ignore
-    const isAdmin = session?.user?.role === 'ADMIN';
-    const canDelete = isAuthor || isAdmin;
-
     return (
         <article className="min-h-screen bg-bg-primary">
             {/* Hero Section */}
@@ -105,9 +93,8 @@ export default async function BlogPost({ params }: Props) {
                             <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                             Back to Blog
                         </Link>
-                        {canDelete && (
-                            <DeletePostButton slug={params.slug} />
-                        )}
+
+                        <BlogAdminControls slug={params.slug} authorId={post.authorId || ''} />
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary mb-6">
@@ -126,7 +113,7 @@ export default async function BlogPost({ params }: Props) {
                     </div>
 
                     <h1 className="text-3xl md:text-5xl font-bold text-text-primary mb-6 leading-tight tracking-tight">{post.meta.title}</h1>
-                    <p className="text-xl text-text-secondary leading-relaxed">{post.meta.excerpt}</p>
+                    <p className="text-xl text-text-secondary leading-relaxed">{post.meta.description}</p>
                 </div>
             </header>
 

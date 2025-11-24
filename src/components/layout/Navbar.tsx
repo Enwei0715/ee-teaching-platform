@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, Cpu, User, LogOut, Bot, PenTool } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X, Search, User, LogOut, Bot, PenTool } from 'lucide-react';
 import SearchCommand from '@/components/search/SearchCommand';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -67,8 +68,15 @@ export default function Navbar() {
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center gap-2">
-                                <div className="bg-accent-primary/10 p-2 rounded-lg">
-                                    <Cpu className="h-6 w-6 text-accent-primary" />
+                                <div className="bg-accent-primary/10 p-1 rounded-lg relative w-10 h-10 flex items-center justify-center">
+                                    <Image
+                                        src="/icon.png"
+                                        alt="EE Master Logo"
+                                        width={32}
+                                        height={32}
+                                        className="object-contain"
+                                        priority
+                                    />
                                 </div>
                                 <span className="text-text-primary font-bold text-xl tracking-tight">EE Master</span>
                             </Link>
@@ -247,7 +255,7 @@ export default function Navbar() {
                         </div>
                     </div>
                 )}
-            </nav >
+            </nav>
 
             <SearchCommand isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </>

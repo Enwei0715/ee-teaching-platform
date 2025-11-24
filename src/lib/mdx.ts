@@ -5,13 +5,14 @@ export type Post = {
     meta: {
         title: string;
         date: string;
-        excerpt: string;
+        description: string;
         author?: string;
         category?: string;
         image?: string;
         [key: string]: any;
     };
     content: string;
+    authorId?: string; // Added for authorization checks
 };
 
 export type CourseLesson = {
@@ -59,44 +60,56 @@ export type Course = {
 };
 
 export const getPostBySlug = async (slug: string): Promise<Post | null> => {
-    const post = await prisma.blogPost.findUnique({
-        where: { slug },
-        include: { author: true }
-    });
+    try {
+        const post = await prisma.blogPost.findUnique({
+            where: { slug },
+            include: { author: true }
+        });
 
-    if (!post) return null;
+        if (!post) return null;
 
-    return {
-        slug: post.slug,
-        meta: {
-            title: post.title,
-            date: post.createdAt.toISOString().split('T')[0],
-            excerpt: post.excerpt || '',
-            author: post.author.name || 'EE Master Team',
-            category: post.category || 'General',
-        },
-        content: post.content,
-    };
+        return {
+            slug: post.slug,
+            meta: {
+                title: post.title,
+                date: post.createdAt.toISOString().split('T')[0],
+                description: post.description || '',
+                author: post.author?.name || 'EE Master Team',
+                category: post.category || 'General',
+            },
+            content: post.content,
+            authorId: post.authorId,
+        };
+    } catch (error) {
+        console.error(`Error fetching blog post with slug "${slug}":`, error);
+        return null;
+    }
 };
 
 export const getAllBlogPosts = async (): Promise<Post[]> => {
-    const posts = await prisma.blogPost.findMany({
-        where: { published: true },
-        orderBy: { createdAt: 'desc' },
-        include: { author: true }
-    });
+    try {
+        const posts = await prisma.blogPost.findMany({
+            where: { published: true },
+            orderBy: { createdAt: 'desc' },
+            include: { author: true }
+        });
 
-    return posts.map(post => ({
-        slug: post.slug,
-        meta: {
-            title: post.title,
-            date: post.createdAt.toISOString().split('T')[0],
-            excerpt: post.excerpt || '',
-            author: post.author.name || 'EE Master Team',
-            category: post.category || 'General',
-        },
-        content: post.content,
-    }));
+        return posts.map(post => ({
+            slug: post.slug,
+            meta: {
+                title: post.title,
+                date: post.createdAt.toISOString().split('T')[0],
+                description: post.description || '',
+                author: post.author?.name || 'EE Master Team',
+                category: post.category || 'General',
+            },
+            content: post.content,
+            authorId: post.authorId,
+        }));
+    } catch (error) {
+        console.error('Error fetching all blog posts:', error);
+        return [];
+    }
 };
 
 export const getBlogPost = (slug: string) => {

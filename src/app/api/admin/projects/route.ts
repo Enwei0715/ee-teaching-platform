@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         revalidatePath('/admin/projects');
         revalidatePath('/projects');
 
-        return NextResponse.json({ message: "Created successfully", slug: newProject.slug });
+        return NextResponse.json({ slug: newProject.slug });
     } catch (error) {
         console.error("Error creating project:", error);
         return NextResponse.json({ message: "Error creating project" }, { status: 500 });

@@ -1,13 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Clock, BarChart, PlayCircle, BookOpen, CheckCircle } from 'lucide-react';
-import { getCourseStructure, getCourseBySlug } from '@/lib/mdx';
+import { getCourseStructure, getCourseBySlug, getAllCourses } from '@/lib/mdx';
 import { calculateCourseTotalDuration, calculateReadingTime } from '@/lib/utils';
 import { notFound } from 'next/navigation';
-
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import CourseProgress from '@/components/courses/CourseProgress';
 
 interface Props {
     params: { courseId: string };
@@ -22,6 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
+export async function generateStaticParams() {
+    const courses = await getAllCourses();
+    return courses.map((course) => ({
+        courseId: course.slug,
+    }));
+}
+
 export default async function CoursePage({ params }: Props) {
     const course = await getCourseBySlug(params.courseId);
     if (!course) notFound();
@@ -29,27 +33,6 @@ export default async function CoursePage({ params }: Props) {
     const lessons = await getCourseStructure(params.courseId);
     const firstLessonId = lessons.length > 0 ? lessons[0].id : null;
     const totalDuration = calculateCourseTotalDuration(lessons);
-
-    const session = await getServerSession(authOptions);
-    let completedLessons: string[] = [];
-
-    if (session?.user?.id) {
-        const dbCourse = await prisma.course.findUnique({
-            where: { slug: params.courseId }
-        });
-
-        if (dbCourse) {
-            const progress = await prisma.userProgress.findMany({
-                where: {
-                    userId: session.user.id,
-                    courseId: dbCourse.id,
-                    completed: true,
-                },
-                select: { lessonId: true },
-            });
-            completedLessons = progress.map((p: { lessonId: string }) => p.lessonId);
-        }
-    }
 
     return (
         <div className="min-h-screen bg-bg-primary">
@@ -101,42 +84,7 @@ export default async function CoursePage({ params }: Props) {
                     </h2>
 
                     <div className="bg-bg-secondary border border-border-primary rounded-xl overflow-hidden shadow-sm">
-                        {lessons.length > 0 ? (
-                            <div className="divide-y divide-border-primary">
-                                {lessons.map((lesson, index) => (
-                                    <Link
-                                        key={lesson.id}
-                                        href={`/courses/${params.courseId}/${lesson.id}`}
-                                        className="flex items-center gap-4 p-5 hover:bg-bg-tertiary transition-colors group"
-                                    >
-                                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-accent-primary/50 group-hover:bg-accent-primary/10 transition-colors shrink-0">
-                                            {completedLessons.includes(lesson.id) ? (
-                                                <CheckCircle size={20} className="text-accent-success" />
-                                            ) : (
-                                                <span className="font-mono text-sm text-text-secondary group-hover:text-accent-primary font-medium">
-                                                    {String(index + 1).padStart(2, '0')}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
-                                                {lesson.title}
-                                            </h3>
-                                            <p className="text-xs text-text-secondary mt-1">{calculateReadingTime(lesson.content)}</p>
-                                        </div>
-
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
-                                            <PlayCircle size={20} />
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="p-8 text-center text-text-secondary">
-                                No lessons available yet.
-                            </div>
-                        )}
+                        <CourseProgress courseId={params.courseId} lessons={lessons} />
                     </div>
                 </div>
 

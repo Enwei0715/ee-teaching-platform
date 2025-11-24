@@ -29,7 +29,7 @@ export async function GET(
     // Map to expected format { content, meta }
     const meta = {
         title: post.title,
-        excerpt: post.excerpt,
+        description: post.description,
 
         category: post.category,
         date: post.createdAt.toISOString().split('T')[0],
@@ -59,7 +59,7 @@ export async function PATCH(
             data: {
                 title: meta.title,
                 content: content,
-                excerpt: meta.excerpt,
+                description: meta.description,
 
                 category: meta.category,
             }

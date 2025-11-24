@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import { Wrench, ArrowRight } from 'lucide-react';
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
 
 export const metadata: Metadata = {
     title: 'Projects | EE Master',
@@ -86,9 +87,9 @@ export default async function ProjectsPage() {
                                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
                                         {project.title}
                                     </h3>
-                                    <p className="text-gray-400 text-sm mb-6 line-clamp-3 flex-1 leading-relaxed">
-                                        {project.description}
-                                    </p>
+                                    <div className="text-gray-400 text-sm mb-6 line-clamp-3 flex-1 leading-relaxed">
+                                        <MarkdownRenderer content={project.description} />
+                                    </div>
                                     <div className="flex items-center text-indigo-400 text-sm font-bold mt-auto pt-4 border-t border-gray-800">
                                         Start Building <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </div>

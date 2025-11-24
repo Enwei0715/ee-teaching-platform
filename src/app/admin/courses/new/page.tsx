@@ -12,8 +12,7 @@ export default function NewCoursePage() {
         slug: '',
         title: '',
         description: '',
-        level: 'Beginner',
-        image: ''
+        level: 'Beginner'
     });
 
     const handleSave = async () => {
@@ -32,16 +31,15 @@ export default function NewCoursePage() {
                     meta: {
                         title: formData.title,
                         description: formData.description,
-                        level: formData.level,
-                        image: formData.image || undefined
+                        level: formData.level
                     }
                 }),
             });
 
             if (res.ok) {
                 const data = await res.json();
-                router.refresh();
-                router.push(`/admin/courses/${data.slug}`);
+                // Force full reload to ensure list is updated
+                window.location.href = `/admin/courses/${data.slug}`;
             } else {
                 const error = await res.json();
                 alert(`Failed to create: ${error.message}`);
@@ -136,23 +134,6 @@ export default function NewCoursePage() {
                             <option value="Intermediate">Intermediate</option>
                             <option value="Advanced">Advanced</option>
                         </select>
-                    </div>
-
-                    {/* Image URL */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
-                            Image URL
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.image}
-                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                            className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-                            placeholder="https://example.com/course-cover.jpg"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Optional: URL to the course cover image
-                        </p>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,40 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- CPU Icon Logo - Navbar sized -->
+  <g transform="translate(20, 20)">
+    <!-- Main chip body -->
+    <rect x="-8" y="-8" width="16" height="16" fill="#2f81f7" rx="1.5"/>
+    
+    <!-- Inner detail -->
+    <rect x="-6" y="-6" width="12" height="12" fill="#0d1117" rx="1"/>
+    <rect x="-5" y="-5" width="10" height="10" fill="#2f81f7" rx="1"/>
+    
+    <!-- Circuit lines -->
+    <line x1="-3" y1="-2" x2="3" y2="-2" stroke="#0d1117" stroke-width="1"/>
+    <line x1="-3" y1="0" x2="3" y2="0" stroke="#0d1117" stroke-width="1"/>
+    <line x1="-3" y1="2" x2="3" y2="2" stroke="#0d1117" stroke-width="1"/>
+    
+    <!-- Pins - Left side -->
+    <rect x="-12" y="-5" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="-12" y="-2" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="-12" y="1" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="-12" y="4" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    
+    <!-- Pins - Right side -->
+    <rect x="9" y="-5" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="9" y="-2" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="9" y="1" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    <rect x="9" y="4" width="3" height="1.5" fill="#2f81f7" rx="0.3"/>
+    
+    <!-- Pins - Top side -->
+    <rect x="-5" y="-12" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="-2" y="-12" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="1" y="-12" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="4" y="-12" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    
+    <!-- Pins - Bottom side -->
+    <rect x="-5" y="9" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="-2" y="9" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="1" y="9" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+    <rect x="4" y="9" width="1.5" height="3" fill="#2f81f7" rx="0.3"/>
+  </g>
+</svg>

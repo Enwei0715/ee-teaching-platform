@@ -60,8 +60,8 @@ export default function EditProjectPage() {
 
                 if (res.ok) {
                     const data = await res.json();
-                    router.refresh();
-                    router.push(`/admin/projects`);
+                    // Force full reload to ensure list is updated
+                    window.location.href = `/admin/projects`;
                 } else {
                     const error = await res.json();
                     alert(`Failed to create: ${error.message}`);
@@ -76,7 +76,6 @@ export default function EditProjectPage() {
 
                 if (res.ok) {
                     router.refresh();
-                    router.push(`/admin/projects`);
                 } else {
                     alert("Failed to save.");
                 }

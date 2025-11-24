@@ -8,6 +8,7 @@ import MDXContent from '@/components/mdx/MDXContent';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 
 interface Props {
@@ -62,6 +63,7 @@ export default async function ProjectPage({ params }: Props) {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
+                    remarkBreaks,
                     [remarkMath, { singleDollarTextMath: true }]
                 ],
                 rehypePlugins: [rehypeKatex],
