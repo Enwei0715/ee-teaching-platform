@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import prisma from '@/lib/prisma';
 
 const openai = new OpenAI({
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
@@ -14,29 +15,35 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         console.log("API Request Body:", body);
-        const { topic, context } = body;
+        const { lessonId } = body;
 
-        if (!topic) {
-            console.error("Topic missing");
-            return NextResponse.json({ error: 'Topic is required' }, { status: 400 });
+        if (!lessonId) {
+            return NextResponse.json({ error: 'Lesson ID is required' }, { status: 400 });
         }
 
-        console.log("Calling Google AI Studio with topic:", topic);
-        const focusAngles = [
-            'Conceptual Understanding',
-            'Real-world Application',
-            'Common Mistakes',
-            'Calculation/Analysis',
-            'Specific Detail Recall'
-        ];
-        const randomFocus = focusAngles[Math.floor(Math.random() * focusAngles.length)];
+        // 1. Fetch Lesson Content from DB
+        const lesson = await prisma.lesson.findUnique({
+            where: { id: lessonId },
+            select: {
+                title: true,
+                content: true,
+                questions: true
+            }
+        });
 
-        const completion = await openai.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
-Task: Generate a single multiple-choice question based on the provided topic or content context.
+        if (!lesson) {
+            return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+        }
+
+        try {
+            console.log("Calling Google AI Studio with lesson content...");
+
+            const completion = await openai.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
+Task: Generate a single multiple-choice question based STRICTLY on the provided lesson content.
 
 Output Format (Strict JSON):
 You must output valid JSON only. No conversational text before or after.
@@ -57,39 +64,64 @@ Content Rules:
 1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
 2. Difficulty: Match the level of the provided content.
 3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.`
-                },
-                {
-                    role: "user",
-                    content: `Generate a multiple-choice question about: ${topic}.
-                    
-                    Focus strictly on this angle: ${randomFocus}.
-                    
-                    Lesson Content:
-                    ${context ? context.substring(0, 2000) : 'No specific context provided. Generate a standard question based on the topic.'}`
-                }
-            ],
-            model: "gemini-2.5-flash",
-            response_format: { type: "json_object" },
-            temperature: 0.5,
-        });
+                    },
+                    {
+                        role: "user",
+                        content: `
+                        Lesson Title: ${lesson.title}
+                        Lesson Content:
+                        """
+                        ${lesson.content.slice(0, 15000)}
+                        """
+                        
+                        Generate a question that tests a specific concept mentioned in this text.
+                        `
+                    }
+                ],
+                model: "gemini-2.5-flash",
+                response_format: { type: "json_object" },
+                temperature: 0.5,
+            });
 
-        const content = completion.choices[0].message.content;
-        console.log("Google AI Response Content:", content);
-        if (!content) {
-            throw new Error("No content received from LLM");
+            console.log("Google AI Response:", completion);
+            const content = completion.choices[0].message.content;
+            console.log("Google AI Response Content:", content);
+
+            if (!content) {
+                throw new Error("No content received from LLM");
+            }
+
+            const quiz = JSON.parse(content);
+
+            // Map correctAnswerIndex to correctAnswer for frontend compatibility
+            if (typeof quiz.correctAnswerIndex === 'number') {
+                quiz.correctAnswer = quiz.correctAnswerIndex;
+            }
+
+            return NextResponse.json({ ...quiz, model: "gemini-2.5-flash" });
+
+        } catch (aiError) {
+            console.error("AI Generation Failed:", aiError);
+
+            // 3. Fallback: Use a random question from the database
+            if (lesson.questions && lesson.questions.length > 0) {
+                console.log("Using fallback question from database.");
+                const backupQuestion = lesson.questions[Math.floor(Math.random() * lesson.questions.length)];
+
+                return NextResponse.json({
+                    question: backupQuestion.question,
+                    options: backupQuestion.options,
+                    correctAnswer: backupQuestion.correctAnswer,
+                    explanation: backupQuestion.explanation || "Standard database question.",
+                    model: "Database Fallback"
+                });
+            }
+
+            return NextResponse.json({ error: 'Failed to generate quiz and no backup available', details: String(aiError) }, { status: 500 });
         }
-
-        const quiz = JSON.parse(content);
-
-        // Map correctAnswerIndex to correctAnswer for frontend compatibility
-        if (typeof quiz.correctAnswerIndex === 'number') {
-            quiz.correctAnswer = quiz.correctAnswerIndex;
-        }
-
-        return NextResponse.json({ ...quiz, model: "gemini-2.5-flash" });
 
     } catch (error) {
-        console.error('Error generating quiz:', error);
-        return NextResponse.json({ error: 'Failed to generate quiz', details: String(error) }, { status: 500 });
+        console.error('Error in quiz API:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 });
     }
 }
