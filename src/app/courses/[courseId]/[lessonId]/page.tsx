@@ -63,7 +63,10 @@ export default async function LessonPage({ params }: Props) {
     try {
         mdxSource = await serialize(lesson.content, {
             mdxOptions: {
-                remarkPlugins: [remarkGfm, remarkMath],
+                remarkPlugins: [
+                    remarkGfm,
+                    [remarkMath, { singleDollarTextMath: true }]
+                ],
                 rehypePlugins: [rehypeKatex],
             },
         });

@@ -60,7 +60,10 @@ export default async function BlogPost({ params }: Props) {
     try {
         mdxSource = await serialize(post.content, {
             mdxOptions: {
-                remarkPlugins: [remarkGfm, remarkMath],
+                remarkPlugins: [
+                    remarkGfm,
+                    [remarkMath, { singleDollarTextMath: true }]
+                ],
                 rehypePlugins: [rehypeKatex],
             },
         });

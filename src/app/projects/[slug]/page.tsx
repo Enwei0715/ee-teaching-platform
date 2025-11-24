@@ -52,7 +52,10 @@ export default async function ProjectPage({ params }: Props) {
     try {
         mdxSource = await serialize(project.content, {
             mdxOptions: {
-                remarkPlugins: [remarkGfm, remarkMath],
+                remarkPlugins: [
+                    remarkGfm,
+                    [remarkMath, { singleDollarTextMath: true }]
+                ],
                 rehypePlugins: [rehypeKatex],
             },
         });
