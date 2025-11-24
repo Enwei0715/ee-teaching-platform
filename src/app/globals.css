@@ -17,7 +17,7 @@
   }
 
   a {
-    @apply text-text-link hover:underline;
+    @apply text-text-link;
   }
 
   code, pre {

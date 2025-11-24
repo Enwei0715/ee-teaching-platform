@@ -34,6 +34,22 @@ export default function AITutor() {
         return () => window.removeEventListener('open-ai-tutor', handleOpen);
     }, []);
 
+    // Prevent horizontal swipe on mobile
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const preventDefault = (e: Event) => {
+            // Prevent horizontal swipe gestures
+            e.stopPropagation();
+        };
+
+        const chatWindow = document.querySelector('.ai-tutor-window');
+        if (chatWindow) {
+            chatWindow.addEventListener('touchstart', preventDefault, { passive: false });
+            return () => chatWindow.removeEventListener('touchstart', preventDefault);
+        }
+    }, [isOpen]);
+
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || loading) return;
@@ -86,7 +102,7 @@ export default function AITutor() {
         <div className="fixed bottom-6 right-6 z-50">
             {/* Chat Window */}
             {isOpen && (
-                <div className={`absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
+                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
                     {/* Header */}
                     <div className="bg-indigo-600 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">

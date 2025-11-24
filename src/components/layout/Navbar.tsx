@@ -68,12 +68,12 @@ export default function Navbar() {
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center gap-2">
-                                <div className="bg-accent-primary/10 p-1 rounded-lg relative w-10 h-10 flex items-center justify-center">
+                                <div className="bg-accent-primary/10 p-1 rounded-lg relative w-12 h-12 flex items-center justify-center">
                                     <Image
                                         src="/icon.png"
                                         alt="EE Master Logo"
-                                        width={32}
-                                        height={32}
+                                        width={40}
+                                        height={40}
                                         className="object-contain"
                                         priority
                                     />
