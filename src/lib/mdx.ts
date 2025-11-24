@@ -53,7 +53,6 @@ export type Course = {
         title: string;
         description: string;
         level: 'Beginner' | 'Intermediate' | 'Advanced';
-        image?: string;
     };
     modules?: number;
     duration?: string;
@@ -228,7 +227,6 @@ export const getAllCourses = async (): Promise<Course[]> => {
             title: course.title,
             description: course.description,
             level: (course.level as 'Beginner' | 'Intermediate' | 'Advanced') || 'Beginner',
-            image: course.image || undefined,
         },
         modules: course._count.lessons,
         duration: course.duration || undefined,
@@ -257,7 +255,6 @@ export const getCourseBySlug = async (slug: string): Promise<Course | null> => {
             title: course.title,
             description: course.description,
             level: (course.level as 'Beginner' | 'Intermediate' | 'Advanced') || 'Beginner',
-            image: course.image || undefined,
         },
         modules: course._count.lessons,
         duration: course.duration || undefined,

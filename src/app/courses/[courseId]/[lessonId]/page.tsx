@@ -55,8 +55,11 @@ export default async function LessonPage({ params }: Props) {
         notFound();
     }
 
-    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    // Defensive: Wrap MDX serialization in try-catch with smart recovery
     let mdxSource;
+    let serializationError = false;
+    let autoFormatted = false;
+
     try {
         mdxSource = await serialize(lesson.content, {
             mdxOptions: {
@@ -66,8 +69,24 @@ export default async function LessonPage({ params }: Props) {
         });
     } catch (error) {
         console.error('Error serializing MDX content for lesson:', params.lessonId, error);
-        // Return 404 if content is malformed
-        notFound();
+        serializationError = true;
+
+        // Retry: Wrap content in code block for safety
+        try {
+            const wrappedContent = '```text\n' + lesson.content + '\n```';
+            mdxSource = await serialize(wrappedContent, {
+                mdxOptions: {
+                    remarkPlugins: [remarkGfm],
+                },
+            });
+            autoFormatted = true;
+            serializationError = false;
+        } catch (retryError) {
+            console.error('Retry serialization also failed for lesson:', params.lessonId, retryError);
+            // Final fallback: display raw content with warning
+            mdxSource = await serialize('> **⚠️ Formatting Error:** Unable to render content properly.\n\n```text\n' + lesson.content.replace(/`/g, '\\`') + '\n```');
+            serializationError = false;
+        }
     }
 
     const courseStructure = await getCourseStructure(params.courseId);

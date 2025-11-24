@@ -131,7 +131,6 @@ model Course {
   title       String
   description String
   level       String
-  image       String?
   duration    String?
   published   Boolean  @default(false)
   lessons     Lesson[]

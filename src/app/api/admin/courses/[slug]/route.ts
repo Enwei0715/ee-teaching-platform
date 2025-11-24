@@ -168,7 +168,6 @@ export async function PATCH(
                 title: updates.title,
                 description: updates.description,
                 level: updates.level,
-                image: updates.image,
             }
         });
 
