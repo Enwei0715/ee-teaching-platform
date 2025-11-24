@@ -49,8 +49,16 @@ export default async function ProjectPage({ params }: Props) {
 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource;
+
+    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
+    let processedContent = project.content
+        .replace(/\\\(/g, '$')      // \( -> $
+        .replace(/\\\)/g, '$')      // \) -> $
+        .replace(/\\\[/g, '$$\n')   // \[ -> $$
+        .replace(/\\\]/g, '\n$$');  // \] -> $$
+
     try {
-        mdxSource = await serialize(project.content, {
+        mdxSource = await serialize(processedContent, {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,

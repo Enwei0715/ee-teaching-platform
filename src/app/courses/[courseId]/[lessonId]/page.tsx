@@ -60,8 +60,15 @@ export default async function LessonPage({ params }: Props) {
     let serializationError = false;
     let autoFormatted = false;
 
+    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
+    let processedContent = lesson.content
+        .replace(/\\\(/g, '$')      // \( -> $
+        .replace(/\\\)/g, '$')      // \) -> $
+        .replace(/\\\[/g, '$$\n')   // \[ -> $$
+        .replace(/\\\]/g, '\n$$');  // \] -> $$
+
     try {
-        mdxSource = await serialize(lesson.content, {
+        mdxSource = await serialize(processedContent, {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
@@ -77,7 +84,7 @@ export default async function LessonPage({ params }: Props) {
         // Retry 1: Try without math plugins (might have LaTeX syntax issues)
         try {
             console.log('Retry 1: Attempting serialization without math plugins...');
-            mdxSource = await serialize(lesson.content, {
+            mdxSource = await serialize(processedContent, {
                 mdxOptions: {
                     remarkPlugins: [remarkGfm],
                 },

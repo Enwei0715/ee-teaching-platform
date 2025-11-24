@@ -57,8 +57,16 @@ export default async function BlogPost({ params }: Props) {
 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
     let mdxSource;
+
+    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
+    let processedContent = post.content
+        .replace(/\\\(/g, '$')      // \( -> $
+        .replace(/\\\)/g, '$')      // \) -> $
+        .replace(/\\\[/g, '$$\n')   // \[ -> $$
+        .replace(/\\\]/g, '\n$$');  // \] -> $$
+
     try {
-        mdxSource = await serialize(post.content, {
+        mdxSource = await serialize(processedContent, {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
