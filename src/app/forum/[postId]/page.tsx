@@ -43,7 +43,10 @@ export default async function PostPage({ params }: { params: { postId: string } 
     }
 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
-    let mdxSource;
+    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    let mdxSource = null;
+    let serializationError = false;
+
     try {
         mdxSource = await serialize(post.content, {
             mdxOptions: {
@@ -52,13 +55,17 @@ export default async function PostPage({ params }: { params: { postId: string } 
         });
     } catch (error) {
         console.error('Error serializing MDX content for forum post:', params.postId, error);
-        // Return 404 if content is malformed
-        notFound();
+        serializationError = true;
     }
 
     return (
         <div className="min-h-screen bg-bg-primary">
-            <PostDetail post={post} mdxSource={mdxSource} />
+            <PostDetail
+                post={post}
+                mdxSource={mdxSource}
+                serializationError={serializationError}
+                rawContent={post.content}
+            />
         </div>
     );
 }

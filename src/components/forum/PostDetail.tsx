@@ -29,10 +29,12 @@ interface Post {
 
 interface PostDetailProps {
     post: Post;
-    mdxSource: MDXRemoteSerializeResult;
+    mdxSource: MDXRemoteSerializeResult | null;
+    serializationError?: boolean;
+    rawContent?: string;
 }
 
-export default function PostDetail({ post, mdxSource }: PostDetailProps) {
+export default function PostDetail({ post, mdxSource, serializationError, rawContent }: PostDetailProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const [replyContent, setReplyContent] = useState('');
@@ -121,7 +123,22 @@ export default function PostDetail({ post, mdxSource }: PostDetailProps) {
                     </div>
                 </div>
                 <div className="prose prose-invert max-w-none text-text-secondary text-lg leading-relaxed">
-                    <MDXContent source={mdxSource} />
+                    {serializationError ? (
+                        <div className="p-4 border border-red-900/50 bg-red-900/10 rounded-lg">
+                            <p className="text-red-400 mb-2 font-bold flex items-center gap-2">
+                                ⚠️ Preview unavailable due to formatting errors
+                            </p>
+                            <p className="text-sm text-red-300 mb-4">
+                                This usually happens when code blocks are not properly formatted.
+                                Displaying raw text instead:
+                            </p>
+                            <pre className="whitespace-pre-wrap font-mono text-sm bg-black/50 p-4 rounded border border-gray-800 text-gray-300 overflow-x-auto">
+                                {rawContent}
+                            </pre>
+                        </div>
+                    ) : (
+                        mdxSource && <MDXContent source={mdxSource} />
+                    )}
                 </div>
             </div>
 

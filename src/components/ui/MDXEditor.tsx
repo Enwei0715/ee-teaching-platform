@@ -61,10 +61,41 @@ export default function MDXEditor({
         }, 0);
     };
 
+    const insertLink = () => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = value.substring(start, end);
+
+        // If text is selected, wrap it. If not, insert placeholder.
+        const linkText = selectedText || 'Display Text';
+        const before = '[';
+        const after = '](https://example.com)';
+        const newText = value.substring(0, start) + before + linkText + after + value.substring(end);
+
+        onChange(newText);
+
+        setTimeout(() => {
+            textarea.focus();
+            if (selectedText) {
+                // If text was selected, place cursor at the end of the URL to allow editing URL
+                const newCursorPos = start + before.length + linkText.length + after.length;
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+            } else {
+                // If no text was selected, select "Display Text" so user can type over it
+                const selectionStart = start + before.length;
+                const selectionEnd = selectionStart + linkText.length;
+                textarea.setSelectionRange(selectionStart, selectionEnd);
+            }
+        }, 0);
+    };
+
     return (
-        <div className={className}>
+        <div className={`flex flex-col ${className}`}>
             {/* Toolbar */}
-            <div className="flex flex-wrap gap-1 p-2 border-b border-border-primary">
+            <div className="flex flex-wrap gap-1 p-2 border-b border-border-primary shrink-0">
                 <button
                     type="button"
                     onClick={() => insertMarkdown('**', '**')}
@@ -83,7 +114,7 @@ export default function MDXEditor({
                 </button>
                 <button
                     type="button"
-                    onClick={() => insertMarkdown('[', '](url)')}
+                    onClick={insertLink}
                     className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
                     title="Link"
                 >
@@ -128,7 +159,7 @@ export default function MDXEditor({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 rows={rows}
-                className="w-full bg-transparent py-3 px-4 text-text-primary focus:outline-none resize-none font-mono text-sm"
+                className="w-full h-full flex-1 bg-transparent py-3 px-4 text-text-primary focus:outline-none resize-none font-mono text-sm"
                 placeholder={placeholder}
             />
         </div>
