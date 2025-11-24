@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Save, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MDXEditor from "@/components/ui/MDXEditor";
+import TagInput from "@/components/ui/TagInput";
 
 interface BlogEditorProps {
     slug: string;
@@ -152,24 +153,13 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                             />
                         </div>
 
-                        {/* Category */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
-                            <input
-                                type="text"
-                                list="categories"
-                                value={meta.category || ''}
-                                onChange={(e) => setMeta({ ...meta, category: e.target.value })}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                placeholder="Select or type..."
-                            />
-                            <datalist id="categories">
-                                <option value="Tutorial" />
-                                <option value="News" />
-                                <option value="Project" />
-                                <option value="Career" />
-                            </datalist>
-                        </div>
+                        {/* Categories */}
+                        <TagInput
+                            label="Categories"
+                            value={meta.category || []}
+                            onChange={(val) => setMeta({ ...meta, category: val })}
+                            placeholder="Add category..."
+                        />
 
                         {/* Date */}
                         <div>
