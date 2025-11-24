@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { Bold, Italic, Link as LinkIcon, Image, Code, Video } from 'lucide-react';
+import { Bold, Italic, Link as LinkIcon, Image, Video } from 'lucide-react';
 
 interface MDXEditorProps {
     value: string;
@@ -127,14 +127,6 @@ export default function MDXEditor({
                     title="Image"
                 >
                     <Image size={16} />
-                </button>
-                <button
-                    type="button"
-                    onClick={() => insertMarkdown('`', '`')}
-                    className="p-2 hover:bg-bg-primary rounded transition-colors text-text-secondary hover:text-text-primary"
-                    title="Code"
-                >
-                    <Code size={16} />
                 </button>
                 <button
                     type="button"
