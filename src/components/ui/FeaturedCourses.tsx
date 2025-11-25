@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
 import prisma from '@/lib/prisma';
+import CourseCard from '@/components/courses/CourseCard';
 
 export default async function FeaturedCourses() {
-    // Fetch top 3 published courses from database
+    // Fetch top 4 published courses from database
     const courses = await prisma.course.findMany({
         where: { published: true },
-        take: 3,
+        take: 4,
         orderBy: { createdAt: 'desc' },
         select: {
             id: true,
@@ -14,6 +15,11 @@ export default async function FeaturedCourses() {
             title: true,
             description: true,
             level: true,
+            image: true,
+            duration: true,
+            _count: {
+                select: { lessons: true }
+            }
         }
     });
 
@@ -38,26 +44,18 @@ export default async function FeaturedCourses() {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {courses.map((course) => (
-                            <Link
+                            <CourseCard
                                 key={course.id}
-                                href={`/courses/${course.slug}`}
-                                className="block group bg-bg-primary border border-border-primary rounded-lg p-6 hover:border-accent-primary transition-colors"
-                            >
-                                <div className="mb-4">
-                                    <BookOpen className="w-10 h-10 text-accent-primary" />
-                                </div>
-                                <h3 className="text-xl font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
-                                    {course.title}
-                                </h3>
-                                <p className="text-text-secondary text-sm mb-4 line-clamp-3">
-                                    {course.description}
-                                </p>
-                                <span className="inline-block px-3 py-1 bg-bg-tertiary text-text-secondary text-xs rounded-full border border-border-primary">
-                                    {course.level}
-                                </span>
-                            </Link>
+                                title={course.title}
+                                description={course.description}
+                                slug={course.slug}
+                                level={course.level}
+                                duration={course.duration || undefined}
+                                image={course.image}
+                                lessonCount={course._count.lessons}
+                            />
                         ))}
                     </div>
                 )}
