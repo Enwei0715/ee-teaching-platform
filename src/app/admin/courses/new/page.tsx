@@ -12,7 +12,8 @@ export default function NewCoursePage() {
         slug: '',
         title: '',
         description: '',
-        level: 'Beginner'
+        level: 'Beginner',
+        image: ''
     });
 
     const handleSave = async () => {
@@ -31,7 +32,8 @@ export default function NewCoursePage() {
                     meta: {
                         title: formData.title,
                         description: formData.description,
-                        level: formData.level
+                        level: formData.level,
+                        image: formData.image
                     }
                 }),
             });
@@ -134,6 +136,23 @@ export default function NewCoursePage() {
                             <option value="Intermediate">Intermediate</option>
                             <option value="Advanced">Advanced</option>
                         </select>
+                    </div>
+
+                    {/* Logo */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                            Logo (Image URL or Emoji)
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.image || ''}
+                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                            className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                            placeholder="e.g. https://example.com/logo.png or ⚡"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                            Enter a URL for an image or paste an emoji.
+                        </p>
                     </div>
                 </div>
             </div>

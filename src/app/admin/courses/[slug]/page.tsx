@@ -141,7 +141,8 @@ export default function EditCoursePage() {
         title: '',
         slug: '',
         description: '',
-        level: 'Beginner'
+        level: 'Beginner',
+        image: ''
     });
 
     useEffect(() => {
@@ -155,7 +156,8 @@ export default function EditCoursePage() {
                             title: data.course.title,
                             slug: data.course.slug,
                             description: data.course.description,
-                            level: data.course.level
+                            level: data.course.level,
+                            image: data.course.image || ''
                         });
                     }
                 })
@@ -419,6 +421,16 @@ export default function EditCoursePage() {
                                     <option value="Intermediate">Intermediate</option>
                                     <option value="Advanced">Advanced</option>
                                 </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Logo (Image URL or Emoji)</label>
+                                <input
+                                    type="text"
+                                    value={courseDetails.image || ''}
+                                    onChange={(e) => setCourseDetails({ ...courseDetails, image: e.target.value })}
+                                    className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                                    placeholder="e.g. https://example.com/logo.png or ⚡"
+                                />
                             </div>
                             <div className="flex justify-end gap-3 mt-8">
                                 <button

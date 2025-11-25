@@ -15,8 +15,8 @@ export const metadata: Metadata = {
     title: "EE Master | Electronic Engineering Platform",
     description: "The ultimate resource for learning Electronic Engineering, from circuits to FPGAs.",
     icons: {
-        icon: '/icon.png',
-        apple: '/icon.png',
+        icon: '/icon_without_text.png',
+        apple: '/icon_without_text.png',
     },
 };
 

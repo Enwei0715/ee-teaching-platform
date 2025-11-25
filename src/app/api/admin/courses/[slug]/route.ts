@@ -72,7 +72,8 @@ export async function GET(
                 title: course.title,
                 slug: course.slug,
                 description: course.description,
-                level: course.level
+                level: course.level,
+                image: course.image
             }
         });
 
@@ -202,6 +203,7 @@ export async function PATCH(
                 description: updates.description,
                 level: updates.level,
                 slug: updates.slug, // Allow slug update
+                image: updates.image,
             }
         });
 

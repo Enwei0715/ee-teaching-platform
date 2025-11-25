@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Cpu, Zap, Radio, BookOpen, Wifi, Layout } from 'lucide-react';
 import prisma from '@/lib/prisma';
+import CourseCard from '@/components/courses/CourseCard';
 
 // Force dynamic rendering to disable caching
 export const dynamic = 'force-dynamic';
@@ -63,37 +64,18 @@ export default async function CoursesPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {courses.map((course) => {
-                        const Icon = iconMap[course.slug] || Cpu;
-                        const color = colorMap[course.slug] || 'text-indigo-500';
-
-                        return (
-                            <Link
-                                key={course.id}
-                                href={`/courses/${course.slug}`}
-                                className="block group bg-bg-secondary border border-border-primary rounded-lg overflow-hidden hover:border-accent-primary transition-colors"
-                            >
-                                <div className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <Icon className={`w-10 h-10 ${color}`} />
-                                        <span className="px-3 py-1 bg-bg-tertiary text-text-secondary text-xs rounded-full border border-border-primary">
-                                            {course.level}
-                                        </span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
-                                        {course.title}
-                                    </h3>
-                                    <p className="text-text-secondary text-sm mb-6">
-                                        {course.description}
-                                    </p>
-                                    <div className="flex items-center text-text-secondary text-sm">
-                                        <BookOpen size={16} className="mr-2" />
-                                        <span>{course._count.lessons || 0} Lessons</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
+                    {courses.map((course) => (
+                        <CourseCard
+                            key={course.id}
+                            title={course.title}
+                            description={course.description}
+                            slug={course.slug}
+                            level={course.level}
+                            duration={course.duration || undefined}
+                            image={course.image}
+                            lessonCount={course._count.lessons}
+                        />
+                    ))}
                 </div>
             </div>
         </main>

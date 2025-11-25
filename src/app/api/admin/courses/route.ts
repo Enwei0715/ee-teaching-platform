@@ -62,6 +62,7 @@ export async function POST(request: Request) {
                 title: meta.title,
                 description: meta.description,
                 level: meta.level || 'Beginner',
+                image: meta.image,
                 published: true,
             }
         });
