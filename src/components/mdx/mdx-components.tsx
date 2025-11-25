@@ -1,6 +1,7 @@
 import YouTubePlayer from "@/components/courses/YouTubePlayer";
 import { Callout } from './Callout';
 import TextMask from '@/components/ui/TextMask';
+import LessonImage from './LessonImage';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript';
@@ -52,13 +53,7 @@ export const mdxComponents = {
     table: (props: any) => <div className="overflow-x-auto my-8"><table className="min-w-full divide-y divide-border-primary text-left text-sm" {...props} /></div>,
     th: (props: any) => <th className="bg-bg-secondary p-4 font-semibold text-text-primary" {...props} />,
     td: (props: any) => <td className="p-4 border-t border-border-primary text-text-secondary" {...props} />,
-    img: (props: any) => (
-        <img
-            {...props}
-            className="rounded-lg shadow-md max-w-full h-auto my-6 border border-border-primary"
-            loading="lazy"
-        />
-    ),
+    img: LessonImage,
     YouTube: YouTubePlayer,
     code: (props: any) => {
         const { className, children } = props;
