@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { CheckCircle, Circle, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useProgress } from '@/hooks/useProgress';
 
 interface Lesson {
     id: string;
@@ -19,10 +20,29 @@ interface Props {
 
 export default function CourseSidebar({ courseId, lessons }: Props) {
     const pathname = usePathname();
-    const { isLessonComplete, getCourseProgress } = useProgress();
+    const { data: session } = useSession();
+    const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
-    const progress = getCourseProgress(courseId);
-    const completedCount = lessons.filter(l => isLessonComplete(courseId, l.id)).length;
+    // Fetch progress directly from DB to ensure sync with Course Curriculum
+    useEffect(() => {
+        async function fetchProgress() {
+            if (session?.user?.id) {
+                try {
+                    const response = await fetch(`/api/courses/${courseId}/progress`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setCompletedLessons(data.completedLessonIds || []);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch progress:', error);
+                }
+            }
+        }
+
+        fetchProgress();
+    }, [session, courseId]);
+
+    const completedCount = lessons.filter(l => completedLessons.includes(l.id)).length;
     const totalLessons = lessons.length;
     const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
@@ -46,7 +66,7 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                 <ul className="space-y-1">
                     {lessons.map((lesson, index) => {
                         const isActive = pathname === `/courses/${courseId}/${lesson.id}`;
-                        const isCompleted = isLessonComplete(courseId, lesson.id);
+                        const isCompleted = completedLessons.includes(lesson.id);
 
                         return (
                             <li key={lesson.id}>
