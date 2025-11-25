@@ -8,3 +8,4 @@ export * from './SkeletonAbout';
 export * from './SkeletonCoursesPage';
 export * from './SkeletonProjectsPage';
 export * from './SkeletonForm';
+export * from './SkeletonTable';

@@ -1,9 +1,84 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { serialize } from 'next-mdx-remote/serialize';
+import { ArrowLeft, Wrench, Clock, BarChart } from 'lucide-react';
+import { getProjectBySlug, getAllProjects } from '@/lib/mdx';
+import MDXContent from '@/components/mdx/MDXContent';
+import YouTubePlayer from '@/components/courses/YouTubePlayer';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
+import rehypeKatex from 'rehype-katex';
 import HexagonalBackground from '@/components/ui/HexagonalBackground';
 
-// ... (imports)
+interface Props {
+    params: { slug: string };
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    try {
+        const project = await getProjectBySlug(params.slug);
+        if (!project) {
+            return {
+                title: 'Project Not Found | EE Master',
+            };
+        }
+        return {
+            title: `${project.meta.title} | EE Master Projects`,
+            description: project.meta.description,
+        };
+    } catch (e) {
+        return {
+            title: 'Project Not Found | EE Master',
+        };
+    }
+}
+
+export async function generateStaticParams() {
+    const projects = await getAllProjects();
+    return projects.map((project) => ({
+        slug: project.slug,
+    }));
+}
 
 export default async function ProjectPage({ params }: Props) {
-    // ... (data fetching)
+    const project = await getProjectBySlug(params.slug);
+
+    if (!project) {
+        notFound();
+    }
+
+    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
+    let mdxSource;
+
+    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
+    let processedContent = project.content
+        .replace(/\\\(/g, '$')      // \( -> $
+        .replace(/\\\)/g, '$')      // \) -> $
+        .replace(/\\\[/g, '$$\n')   // \[ -> $$
+        .replace(/\\\]/g, '\n$$');  // \] -> $$
+
+    try {
+        mdxSource = await serialize(processedContent, {
+            mdxOptions: {
+                remarkPlugins: [
+                    remarkGfm,
+                    remarkBreaks,
+                    [remarkMath, { singleDollarTextMath: true }]
+                ],
+                rehypePlugins: [rehypeKatex],
+            },
+        });
+    } catch (error) {
+        console.error('Error serializing MDX content for project:', params.slug, error);
+        // Fallback: Try to render with basic formatting
+        try {
+            mdxSource = await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${project.content.replace(/`/g, '\\`')}`);
+        } catch (retryError) {
+            mdxSource = await serialize('Content unavailable.');
+        }
+    }
 
     return (
         <div className="min-h-screen relative overflow-hidden">
