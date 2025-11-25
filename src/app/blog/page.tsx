@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Calendar, User, Plus, FileText } from 'lucide-react';
+import { Calendar, User, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import InteractiveDotGrid from '@/components/ui/InteractiveDotGrid';
 
 interface BlogPost {
     slug: string;
@@ -42,8 +43,8 @@ export default function BlogPage() {
 
     if (loading) {
         return (
-            <div className="flex-1 py-12 px-6 bg-bg-primary flex flex-col">
-                <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
+            <div className="py-12 px-6 bg-bg-primary">
+                <div className="max-w-4xl mx-auto">
                     {/* Header skeleton */}
                     <div className="mb-12 text-center">
                         <div className="h-10 bg-gray-800 rounded w-64 mx-auto mb-4 animate-pulse"></div>
@@ -75,16 +76,16 @@ export default function BlogPage() {
     }
 
     return (
-        <div className="flex-1 py-12 px-6 bg-bg-primary flex flex-col">
-            <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
-                {/* Header */}
-                <div className="mb-12 text-center">
-                    <h1 className="text-4xl font-bold text-text-primary mb-4">Engineering Blog</h1>
+        <div className="flex-1 flex flex-col bg-transparent relative overflow-hidden">
+            <InteractiveDotGrid />
+            <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-12 flex flex-col relative z-10">
+                <div className="mb-12 text-center relative">
+                    <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">Engineering Blog</h1>
                     <p className="text-text-secondary text-lg mb-6">
                         Tutorials, guides, and insights from the world of electronics.
                     </p>
 
-                    {canCreatePost && blogPosts.length > 0 && (
+                    {canCreatePost && (
                         <div className="flex justify-center">
                             <Link
                                 href="/blog/new"
@@ -97,11 +98,10 @@ export default function BlogPage() {
                     )}
                 </div>
 
-                {/* Content Area */}
                 {blogPosts.length > 0 ? (
                     <div className="space-y-8">
                         {blogPosts.map((post) => (
-                            <article key={post.slug} className="bg-bg-secondary border border-border-primary rounded-lg p-8 hover:border-accent-primary transition-colors">
+                            <article key={post.slug} className="glass-panel shadow-xl rounded-lg p-8 hover:border-accent-primary transition-colors">
                                 <div className="flex items-center gap-4 text-sm text-text-secondary mb-4">
                                     <span className="text-accent-primary font-medium">{post.meta.category}</span>
                                     <span>•</span>
@@ -133,20 +133,14 @@ export default function BlogPage() {
                         ))}
                     </div>
                 ) : (
-                    // Empty State
-                    <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[400px]">
-                        <FileText size={64} className="text-gray-700 mb-6 opacity-50" />
-                        <h3 className="text-2xl font-semibold text-gray-300 mb-2">No posts published yet</h3>
-                        <p className="text-gray-500 text-lg mb-6">Check back later for engineering insights and tutorials.</p>
-                        {canCreatePost && (
-                            <Link
-                                href="/blog/new"
-                                className="inline-flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
-                            >
-                                <Plus size={18} />
-                                Write the first post
-                            </Link>
-                        )}
+                    <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[400px] border-2 border-dashed border-border-primary rounded-xl bg-bg-secondary/30">
+                        <div className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center mb-4">
+                            <Plus className="text-text-secondary w-8 h-8" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-text-primary mb-2">No posts published yet</h3>
+                        <p className="text-text-secondary max-w-md">
+                            Check back later for engineering insights, tutorials, and guides.
+                        </p>
                     </div>
                 )}
             </div>

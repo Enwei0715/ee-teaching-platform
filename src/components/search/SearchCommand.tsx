@@ -114,7 +114,7 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-lg bg-bg-secondary border border-border-primary rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-lg glass-heavy border border-border-primary rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center px-4 py-3 border-b border-border-primary">
                     <Search className="w-5 h-5 text-text-secondary mr-3" />
                     <input
@@ -139,19 +139,19 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                         <div className="p-4">
                             <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">Quick Links</h4>
                             <div className="grid grid-cols-1 gap-2">
-                                <button onClick={() => handleSelect('/courses')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
+                                <button onClick={() => handleSelect('/courses')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-text-primary text-sm">
                                     <BookOpen size={16} className="text-accent-primary" />
                                     Courses
                                 </button>
-                                <button onClick={() => handleSelect('/projects')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
+                                <button onClick={() => handleSelect('/projects')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-text-primary text-sm">
                                     <FolderKanban size={16} className="text-accent-primary" />
                                     Projects
                                 </button>
-                                <button onClick={() => handleSelect('/blog')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
+                                <button onClick={() => handleSelect('/blog')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-text-primary text-sm">
                                     <FileText size={16} className="text-accent-primary" />
                                     Blog
                                 </button>
-                                <button onClick={() => handleSelect('/forum')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-primary text-sm">
+                                <button onClick={() => handleSelect('/forum')} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-text-primary text-sm">
                                     <MessageSquare size={16} className="text-accent-primary" />
                                     Forum
                                 </button>
@@ -167,14 +167,14 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
 
                     {Object.entries(groupedResults).map(([type, items]) => (
                         <div key={type} className="mb-2">
-                            <h4 className="px-3 py-1 text-xs font-semibold text-text-secondary uppercase tracking-wider bg-bg-tertiary/50">
+                            <h4 className="px-3 py-1 text-xs font-semibold text-text-secondary uppercase tracking-wider glass-ghost">
                                 {getTypeLabel(type)}
                             </h4>
                             {items.map((result, index) => (
                                 <button
                                     key={`${type}-${index}`}
                                     onClick={() => handleSelect(result.url)}
-                                    className="w-full flex items-start p-3 rounded-lg hover:bg-bg-tertiary transition-colors text-left group"
+                                    className="w-full flex items-start p-3 rounded-lg hover:bg-white/5 transition-colors text-left group"
                                 >
                                     <div className="mt-1 mr-3 text-text-secondary group-hover:text-accent-primary">
                                         {getTypeIcon(result.type)}
@@ -202,7 +202,7 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                     ))}
                 </div>
 
-                <div className="px-4 py-2 bg-bg-tertiary border-t border-border-primary text-[10px] text-text-secondary flex justify-between">
+                <div className="px-4 py-2 glass-ghost border-t border-border-primary text-[10px] text-text-secondary flex justify-between">
                     <span>Press <kbd className="font-sans bg-bg-primary px-1 rounded border border-border-primary">ESC</kbd> to close</span>
                     <span>EE Master Search</span>
                 </div>

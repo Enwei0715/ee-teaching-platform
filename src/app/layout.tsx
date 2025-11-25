@@ -9,7 +9,6 @@ import AITutor from "@/components/ai/AITutor";
 import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
 import { EditModeProvider } from "@/context/EditModeContext";
-import NavigationProgress from "@/components/ui/NavigationProgress";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,15 +28,20 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="scroll-smooth">
-            <body className={`${inter.className} bg-gray-950 text-white antialiased`}>
-                <NavigationProgress />
+            <body className={`${inter.className} bg-gray-950 text-white antialiased overflow-x-hidden`}>
                 <AuthProvider>
                     <EditModeProvider>
                         <HotkeysProvider>
                             <div className="flex flex-col min-h-screen">
                                 <Navbar />
-                                <main className="flex-1 w-full">
-                                    {children}
+                                <main className="flex-1 w-full relative">
+                                    {/* Subtle Blueprint Grid Overlay */}
+                                    <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.03]"
+                                        style={{ backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}>
+                                    </div>
+                                    <div className="relative z-10">
+                                        {children}
+                                    </div>
                                 </main>
                                 <AITutor />
                                 <ShortcutsModal />

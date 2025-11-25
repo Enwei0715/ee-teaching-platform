@@ -231,7 +231,7 @@ export default function EditCoursePage() {
 
             <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-6 lg:overflow-hidden">
                 {/* File List */}
-                <div className="w-full lg:w-64 bg-gray-900 rounded-xl border border-gray-800 flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
+                <div className="w-full lg:w-64 glass-panel flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
                     <div className="p-4 border-b border-gray-800 flex justify-between items-center">
                         <h2 className="font-bold text-gray-400">Course Files</h2>
                         <span className="text-xs text-gray-500 lg:hidden">{files.length} files</span>
@@ -266,7 +266,7 @@ export default function EditCoursePage() {
                 {/* Editor & Sidebar */}
                 <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-6 lg:overflow-hidden">
                     {/* Main Content Editor */}
-                    <div className="flex-1 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col min-h-[50vh] lg:min-h-[400px]">
+                    <div className="flex-1 glass-panel overflow-hidden flex flex-col min-h-[50vh] lg:min-h-[400px]">
                         {selectedFile ? (
                             <>
                                 <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
@@ -291,7 +291,7 @@ export default function EditCoursePage() {
 
                     {/* Sidebar Settings */}
                     {selectedFile && (
-                        <div className="w-full lg:w-80 bg-gray-900 rounded-xl border border-gray-800 overflow-y-auto flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
+                        <div className="w-full lg:w-80 glass-panel overflow-y-auto flex flex-col max-h-[300px] lg:max-h-none lg:h-full">
                             <div className="p-4 border-b border-gray-800 font-semibold text-gray-300">
                                 Lesson Settings
                             </div>
@@ -333,8 +333,8 @@ export default function EditCoursePage() {
 
             {/* New Lesson Modal */}
             {showNewLessonModal && (
-                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 w-full max-w-md shadow-xl">
+                <div className="absolute inset-0 glass-heavy flex items-center justify-center z-50">
+                    <div className="glass-panel p-6 w-full max-w-md shadow-xl">
                         <h3 className="text-xl font-bold text-white mb-4">Add New Lesson</h3>
                         <div className="space-y-4">
                             <div>
@@ -379,8 +379,8 @@ export default function EditCoursePage() {
 
             {/* Edit Course Details Modal */}
             {showEditDetailsModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 glass-heavy flex items-center justify-center z-50 p-4">
+                    <div className="glass-panel p-6 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
                         <h3 className="text-xl font-bold text-white mb-6">Edit Course Details</h3>
                         <div className="space-y-6">
                             <div>

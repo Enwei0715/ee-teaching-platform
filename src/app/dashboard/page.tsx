@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen, Trophy, Clock, Activity, PlayCircle } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { getAllCourses, getCourseStructure } from "@/lib/mdx";
+import OscilloscopeBackground from "@/components/ui/OscilloscopeBackground";
 
 export const dynamic = 'force-dynamic';
 
@@ -120,8 +121,9 @@ export default async function DashboardPage() {
         .slice(0, 3);
 
     return (
-        <div className="bg-gray-950 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 w-full flex flex-col relative overflow-hidden bg-transparent py-8">
+            <OscilloscopeBackground />
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-white">Welcome back, {session.user.name}!</h1>
                     <p className="text-gray-400 mt-2">Here's an overview of your learning progress.</p>
@@ -129,7 +131,7 @@ export default async function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-                    <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-indigo-900/30 text-indigo-400 rounded-lg">
                                 <BookOpen size={24} />
@@ -140,7 +142,7 @@ export default async function DashboardPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-green-900/30 text-green-400 rounded-lg">
                                 <Trophy size={24} />
@@ -151,7 +153,7 @@ export default async function DashboardPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-blue-900/30 text-blue-400 rounded-lg">
                                 <Clock size={24} />
@@ -162,7 +164,7 @@ export default async function DashboardPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-purple-900/30 text-purple-400 rounded-lg">
                                 <Activity size={24} />
@@ -179,7 +181,7 @@ export default async function DashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         <h2 className="text-xl font-bold text-white">Continue Learning</h2>
-                        <div className="bg-gray-900 rounded-xl shadow-sm border border-gray-800 overflow-hidden">
+                        <div className="glass-panel rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80">
                             {activeCourses.length > 0 ? (
                                 activeCourses.map(course => {
                                     const progressData = courseProgressMap.get(course.id);
@@ -222,7 +224,7 @@ export default async function DashboardPage() {
 
                     <div className="space-y-6">
                         <h2 className="text-xl font-bold text-white">Recommended for You</h2>
-                        <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800">
+                        <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80">
                             <div className="space-y-4">
                                 {recommendedCourses.map(course => (
                                     <Link key={course.id} href={`/courses/${course.slug}`} className="flex gap-3 group cursor-pointer hover:bg-gray-800/50 p-2 rounded-lg transition-colors">

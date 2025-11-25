@@ -11,6 +11,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
+import InteractiveDotGrid from '@/components/ui/InteractiveDotGrid';
 
 interface Props {
     params: { courseId: string };
@@ -80,16 +81,19 @@ export default async function CoursePage({ params }: Props) {
     const totalDuration = calculateCourseTotalDuration(lessons);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            <InteractiveDotGrid />
             {/* Hero Section */}
-            <header className="relative py-20 px-6 bg-bg-secondary border-b border-border-primary overflow-hidden">
-                <div className="absolute inset-0 bg-accent-primary/5 pointer-events-none" />
+            <header className="relative py-12 px-4 md:py-20 md:px-6 bg-gradient-to-br from-gray-900 via-[#0f172a] to-gray-900 border-b border-border-primary overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L50 10 L50 50 L90 50 L90 90' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Cpath d='M30 30 L70 30 L70 70' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%23ffffff'/%3E%3C/svg%3E")`, backgroundSize: '150px 150px' }}>
+                </div>
                 <div className="max-w-7xl mx-auto relative z-10">
                     <Link href="/courses" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors mb-8 text-sm font-medium group">
                         <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back to Courses
                     </Link>
-                    <h1 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 leading-tight tracking-tight">{course.title}</h1>
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-6 leading-tight tracking-tight">{course.title}</h1>
 
                     <div className="flex flex-wrap items-center gap-6 text-sm text-text-secondary mb-10">
                         <span className="flex items-center gap-2 bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-primary">
@@ -120,7 +124,7 @@ export default async function CoursePage({ params }: Props) {
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="max-w-7xl mx-auto px-4 py-8 md:px-6 md:py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Main Content */}
                 <div className="lg:col-span-2">
                     <CurriculumHeader courseSlug={params.courseId} />
@@ -132,7 +136,7 @@ export default async function CoursePage({ params }: Props) {
 
                 {/* Sidebar */}
                 <aside className="lg:col-span-1 space-y-8">
-                    <div className="bg-bg-secondary border border-border-primary rounded-xl p-6">
+                    <div className="glass-panel shadow-xl rounded-xl p-6">
                         <h3 className="text-lg font-bold text-text-primary mb-4">Course Features</h3>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-text-secondary">

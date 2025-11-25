@@ -50,8 +50,8 @@ export default function ShortcutsModal() {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between p-6 border-b border-gray-800 bg-gray-900/50">
+            <div className="glass-heavy border border-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-6 border-b border-gray-800 glass-ghost">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
                             <Keyboard size={24} />
@@ -92,7 +92,7 @@ export default function ShortcutsModal() {
                     ))}
                 </div>
 
-                <div className="p-4 bg-gray-950/50 border-t border-gray-800 text-center text-xs text-gray-500">
+                <div className="p-4 glass-ghost border-t border-gray-800 text-center text-xs text-gray-500">
                     Press <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-gray-400 mx-1">?</kbd> to toggle this modal anytime
                 </div>
             </div>

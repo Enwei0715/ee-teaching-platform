@@ -64,10 +64,10 @@ export default function CourseCard({ id, title, description, slug, level, durati
 
             <Link
                 href={`/courses/${slug}`}
-                className="flex flex-col md:flex-row border border-gray-800 rounded-xl overflow-hidden bg-gray-900/50 hover:bg-gray-900 h-auto md:h-[180px] hover:border-accent-primary transition-all"
+                className="flex flex-col md:flex-row glass-panel rounded-xl overflow-hidden shadow-lg transition-all hover:border-gray-700 h-auto md:h-[180px]"
             >
                 {/* Visual Section: Top on Mobile, Left on Desktop */}
-                <div className="w-full h-48 md:w-[200px] md:h-auto shrink-0 relative bg-gray-800/50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-800">
+                <div className="w-full h-48 md:w-[200px] md:h-auto shrink-0 relative glass-ghost flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-800">
                     {hasImage ? (
                         isUrl(image) ? (
                             // Scenario A: Photo/Thumbnail

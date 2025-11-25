@@ -25,3 +25,22 @@
     @apply font-mono;
   }
 }
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-md border border-white/[0.05];
+  }
+
+  .glass-heavy {
+    @apply bg-slate-950/65 backdrop-blur-xl;
+  }
+
+  .glass-ghost {
+    @apply bg-white/[0.05] backdrop-blur-sm;
+  }
+
+  .skeleton-bone {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+  }
+}

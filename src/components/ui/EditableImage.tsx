@@ -9,6 +9,10 @@ interface EditableImageProps {
     width?: number;
     height?: number;
     priority?: boolean;
+    mode?: 'static' | 'entity';
+    apiEndpoint?: string;
+    fieldName?: string;
+    contentKey?: string;
 }
 
 export default function EditableImage({
@@ -18,6 +22,10 @@ export default function EditableImage({
     width,
     height,
     priority = false,
+    mode,
+    apiEndpoint,
+    fieldName,
+    contentKey,
 }: EditableImageProps) {
     // Simplified: Just render a static image
     // Removed all edit mode functionality

@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import EditableText from './EditableText';
-import CircuitBackground from './CircuitBackground';
+import ParticleBackground from './ParticleBackground';
 
 export default function Hero() {
     return (
         <section className="relative py-20 md:py-32 px-6 text-center max-w-5xl mx-auto overflow-hidden">
-            {/* Circuit Pattern Background */}
-            <CircuitBackground />
+            {/* Particle Network Background */}
+            <ParticleBackground />
 
             {/* Content - positioned above particles */}
             <div className="relative z-10">
@@ -32,6 +32,9 @@ export default function Hero() {
                     </Link>
                 </div>
             </div>
+
+            {/* Glowing Bottom Border for Hero */}
+            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-70"></div>
         </section>
     );
 }

@@ -1,5 +1,3 @@
-import ParticleBackground from "@/components/ui/ParticleBackground";
-
 export default function CoursesLayout({
     children,
 }: {
@@ -7,7 +5,6 @@ export default function CoursesLayout({
 }) {
     return (
         <div className="relative min-h-screen">
-            <ParticleBackground />
             <div className="relative z-10">
                 {children}
             </div>

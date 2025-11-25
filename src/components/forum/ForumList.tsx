@@ -83,7 +83,7 @@ export default function ForumList() {
                 <Link
                     key={post.id}
                     href={`/forum/${post.id}`}
-                    className="block bg-bg-secondary border border-border-primary rounded-xl p-6 hover:border-accent-primary transition-colors"
+                    className="block glass-panel rounded-xl overflow-hidden shadow-lg transition-all hover:border-gray-700 p-6 mb-4"
                 >
                     <h3 className="text-xl font-bold text-text-primary mb-2">{post.title}</h3>
                     <p className="text-text-secondary line-clamp-2 mb-4">{stripMarkdown(post.content, 120)}</p>

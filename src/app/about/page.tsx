@@ -5,8 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import Tilt from 'react-parallax-tilt';
-import ParticleBackground from '@/components/ui/ParticleBackground';
 import 'katex/dist/katex.min.css';
+import ParticleBackground from '@/components/ui/ParticleBackground';
 
 export default function AboutPage() {
     const [content, setContent] = useState('');
@@ -43,30 +43,34 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
     }, []);
 
     return (
-        <div className="min-h-screen bg-bg-primary relative">
+        <div className="min-h-screen bg-transparent relative overflow-hidden">
             <ParticleBackground />
-            <header className="py-20 px-6 text-center bg-bg-secondary border-b border-border-primary relative z-10">
+            <header className="py-20 px-6 text-center bg-bg-secondary/80 backdrop-blur-sm border-b border-border-primary relative z-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">Empowering the Next Generation of Hardware Engineers</h1>
                 <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
                     EE Master provides the tools, simulations, and community you need to go from theory to prototype.
                 </p>
             </header>
 
-            <div className="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-lg">
-                {loading ? (
-                    <div className="space-y-4">
-                        <div className="h-8 bg-gray-800 rounded w-2/3 animate-pulse"></div>
-                        <div className="h-4 bg-gray-800 rounded w-full animate-pulse"></div>
-                        <div className="h-4 bg-gray-800 rounded w-5/6 animate-pulse"></div>
+            <div className="max-w-4xl mx-auto px-6 py-16 relative z-10">
+                <div className="glass-panel rounded-xl overflow-hidden shadow-lg p-8 md:p-12">
+                    <div className="prose prose-invert prose-lg max-w-none">
+                        {loading ? (
+                            <div className="space-y-4">
+                                <div className="h-8 bg-gray-800 rounded w-2/3 animate-pulse"></div>
+                                <div className="h-4 bg-gray-800 rounded w-full animate-pulse"></div>
+                                <div className="h-4 bg-gray-800 rounded w-5/6 animate-pulse"></div>
+                            </div>
+                        ) : (
+                            <ReactMarkdown
+                                remarkPlugins={[remarkMath]}
+                                rehypePlugins={[rehypeKatex]}
+                            >
+                                {content}
+                            </ReactMarkdown>
+                        )}
                     </div>
-                ) : (
-                    <ReactMarkdown
-                        remarkPlugins={[remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
-                    >
-                        {content}
-                    </ReactMarkdown>
-                )}
+                </div>
             </div>
 
             <section className="max-w-4xl mx-auto px-6 pb-16">
@@ -82,7 +86,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
                         tiltMaxAngleX={10}
                         tiltMaxAngleY={10}
                     >
-                        <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full relative overflow-hidden backdrop-blur-sm">
+                        <div className="glass-panel border-gray-700 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full relative overflow-hidden">
                             {/* Gradient overlay for premium feel */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"></div>
 

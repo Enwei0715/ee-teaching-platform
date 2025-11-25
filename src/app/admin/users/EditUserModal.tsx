@@ -66,7 +66,7 @@ export default function EditUserModal({ user }: EditUserModalProps) {
 
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md shadow-2xl">
+                    <div className="glass-heavy border border-gray-800 rounded-xl w-full max-w-md shadow-2xl">
                         <div className="flex items-center justify-between p-6 border-b border-gray-800">
                             <h3 className="text-xl font-bold text-white">Edit User</h3>
                             <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white">

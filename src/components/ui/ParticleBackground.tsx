@@ -1,52 +1,96 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback } from "react";
+import type { Container, Engine } from "tsparticles-engine";
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
 
 export default function ParticleBackground() {
-    const vantaRef = useRef<HTMLDivElement>(null);
-    const vantaEffect = useRef<any>(null);
+    const particlesInit = useCallback(async (engine: Engine) => {
+        await loadSlim(engine);
+    }, []);
 
-    useEffect(() => {
-        if (!vantaRef.current || vantaEffect.current) return;
-
-        // Dynamically import Vanta and THREE
-        Promise.all([
-            import('vanta/dist/vanta.dots.min'),
-            import('three')
-        ]).then(([VANTA, THREE]) => {
-            vantaEffect.current = (VANTA as any).default({
-                el: vantaRef.current,
-                THREE: THREE,
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                scale: 1.00,
-                scaleMobile: 1.00,
-                color: 0xffffff,
-                color2: 0xffffff, // Ensure secondary color is also white if applicable
-                backgroundColor: 0x0f172a, // Match site bg, or try transparent
-                backgroundAlpha: 0.0, // Transparent background
-                size: 3.00, // Adjust dot size
-                spacing: 35.00, // Adjust spacing for wave look
-                showLines: false // Dots effect usually doesn't have lines, but just in case
-            });
-        }).catch(console.error);
-
-        return () => {
-            if (vantaEffect.current) {
-                vantaEffect.current.destroy();
-                vantaEffect.current = null;
-            }
-        };
+    const particlesLoaded = useCallback(async (container: Container | undefined) => {
+        // console.log(container);
     }, []);
 
     return (
-        <div
-            ref={vantaRef}
-            className="absolute top-0 left-0 w-full h-full"
-            style={{ zIndex: -1 }}
+        <Particles
+            id="tsparticles"
+            init={particlesInit}
+            loaded={particlesLoaded}
+            className="absolute inset-0 z-0"
+            options={{
+                background: {
+                    color: {
+                        value: "transparent",
+                    },
+                },
+                fpsLimit: 120,
+                interactivity: {
+                    events: {
+                        onClick: {
+                            enable: true,
+                            mode: "push",
+                        },
+                        onHover: {
+                            enable: true,
+                            mode: "grab",
+                        },
+                        resize: true,
+                    },
+                    modes: {
+                        push: {
+                            quantity: 4,
+                        },
+                        grab: {
+                            distance: 140,
+                            links: {
+                                opacity: 0.5
+                            }
+                        },
+                    },
+                },
+                particles: {
+                    color: {
+                        value: "#ffffff",
+                    },
+                    links: {
+                        color: "#ffffff",
+                        distance: 150,
+                        enable: true,
+                        opacity: 0.3,
+                        width: 1,
+                    },
+                    move: {
+                        direction: "none",
+                        enable: true,
+                        outModes: {
+                            default: "bounce",
+                        },
+                        random: false,
+                        speed: 1,
+                        straight: false,
+                    },
+                    number: {
+                        density: {
+                            enable: true,
+                            area: 800,
+                        },
+                        value: 80,
+                    },
+                    opacity: {
+                        value: 0.3,
+                    },
+                    shape: {
+                        type: "circle",
+                    },
+                    size: {
+                        value: { min: 1, max: 3 },
+                    },
+                },
+                detectRetina: true,
+            }}
         />
     );
 }

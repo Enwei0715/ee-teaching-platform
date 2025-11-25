@@ -1,11 +1,11 @@
-'use client';
-
 import Link from 'next/link';
 import { Cpu, Zap, Radio, BookOpen, Wifi, Layout } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import prisma from '@/lib/prisma';
 import CourseCard from '@/components/courses/CourseCard';
 import EditableText from '@/components/ui/EditableText';
 
+// Force dynamic rendering to disable caching
+export const dynamic = 'force-dynamic';
 
 const iconMap: any = {
     'circuit-theory': Zap,
@@ -28,69 +28,48 @@ const colorMap: any = {
     'signals-systems': 'text-orange-500',
 };
 
-export default function CoursesPage() {
-    const [courses, setCourses] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+export default async function CoursesPage() {
+    // Direct database query with Prisma
+    const courses = await prisma.course.findMany({
+        where: {
+            published: true, // Only fetch published courses
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        include: {
+            _count: {
+                select: { lessons: true } // To show lesson count on card
+            }
+        }
+    });
 
-    useEffect(() => {
-        fetch('/api/courses')
-            .then(res => res.json())
-            .then(data => {
-                setCourses(data);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="py-8 px-6 relative overflow-hidden">
-                {/* Background handled by layout */}
-                <div className="max-w-7xl mx-auto relative z-10">
-                    {/* Header Skeleton */}
-                    <div className="mb-12 animate-pulse">
-                        <div className="h-10 bg-gray-800 rounded w-64 mb-4"></div>
-                        <div className="h-6 bg-gray-800 rounded w-96 max-w-full"></div>
-                    </div>
-
-                    {/* Course Cards Skeleton */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="flex flex-col md:flex-row border border-gray-800 bg-gray-900 rounded-xl overflow-hidden h-56 animate-pulse">
-                                {/* Thumbnail Skeleton */}
-                                <div className="w-full md:w-56 bg-gray-800 h-full"></div>
-                                {/* Content Skeleton */}
-                                <div className="flex-1 p-6 space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-8 w-8 bg-gray-800 rounded"></div>
-                                        <div className="h-6 bg-gray-800 rounded w-32"></div>
-                                    </div>
-                                    <div className="h-7 bg-gray-800 rounded w-3/4"></div>
-                                    <div className="h-4 bg-gray-800 rounded w-full"></div>
-                                    <div className="h-4 bg-gray-800 rounded w-2/3"></div>
-                                    <div className="flex gap-3 mt-4">
-                                        <div className="h-6 bg-gray-800 rounded w-20"></div>
-                                        <div className="h-6 bg-gray-800 rounded w-24"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // Debug logging - check terminal/console to see what's fetched
+    console.log('Fetched Courses:', courses);
+    console.log('Number of courses:', courses.length);
 
     return (
-        <div className="py-8 px-6 relative overflow-hidden">
-            {/* Background handled by layout */}
+        <div className="px-4 py-6 md:px-8 md:py-12 flex-1 relative overflow-hidden min-h-screen bg-transparent">
+            {/* Static Engineering Grid Background */}
+            <div className="absolute inset-0 z-0 pointer-events-none"
+                style={{
+                    backgroundImage: `
+                        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '60px 60px'
+                }}
+            >
+                {/* Radial gradient fade for softer edges */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+            </div>
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="mb-12">
                     <EditableText
                         contentKey="courses_header_title"
                         defaultText="All Courses"
                         tag="h1"
-                        className="text-4xl font-bold text-text-primary mb-4"
+                        className="text-3xl md:text-4xl font-bold text-text-primary mb-4"
                     />
                     <EditableText
                         contentKey="courses_header_description"
@@ -99,6 +78,7 @@ export default function CoursesPage() {
                         className="text-text-secondary text-lg max-w-3xl"
                         multiline
                     />
+                    {/* Debug info - remove this after fixing */}
                     {courses.length === 0 && (
                         <p className="text-red-500 mt-4">
                             No courses found. Check that courses in the database have published=true.
@@ -106,7 +86,7 @@ export default function CoursesPage() {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {courses.map((course) => (
                         <CourseCard
                             key={course.id}

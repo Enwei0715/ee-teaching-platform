@@ -85,8 +85,10 @@ export default async function BlogPost({ params }: Props) {
     return (
         <article className="min-h-screen bg-bg-primary">
             {/* Hero Section */}
-            <header className="relative py-20 px-6 bg-bg-secondary border-b border-border-primary overflow-hidden">
-                <div className="absolute inset-0 bg-accent-primary/5 pointer-events-none" />
+            <header className="relative py-20 px-6 bg-gradient-to-br from-gray-900 via-[#0f172a] to-gray-900 border-b border-border-primary overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L50 10 L50 50 L90 50 L90 90' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Cpath d='M30 30 L70 30 L70 70' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%23ffffff'/%3E%3C/svg%3E")`, backgroundSize: '150px 150px' }}>
+                </div>
                 <div className="max-w-3xl mx-auto relative z-10">
                     <div className="flex items-center justify-between mb-8">
                         <Link href="/blog" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm font-medium group">

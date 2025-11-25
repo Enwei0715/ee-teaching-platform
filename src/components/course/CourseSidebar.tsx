@@ -47,8 +47,8 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
     const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
     return (
-        <aside className="hidden lg:block w-72 bg-bg-secondary border-r border-border-primary h-[calc(100vh-64px)] overflow-y-auto sticky top-16">
-            <div className="p-6 border-b border-border-primary bg-bg-secondary/50 backdrop-blur-sm sticky top-0 z-10">
+        <aside className="hidden lg:block w-72 glass-heavy border-r border-gray-800/80 h-[calc(100vh-64px)] overflow-y-auto sticky top-16 rounded-xl overflow-hidden">
+            <div className="p-6 border-b border-border-primary glass-ghost sticky top-0 z-10">
                 <h2 className="font-bold text-text-primary text-lg tracking-tight">Course Content</h2>
                 <div className="mt-4 w-full bg-bg-tertiary h-1.5 rounded-full overflow-hidden">
                     <div
