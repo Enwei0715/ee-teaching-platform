@@ -146,7 +146,7 @@ export default async function LessonPage({ params }: Props) {
     const nextLesson = currentIndex < courseStructure.length - 1 ? courseStructure[currentIndex + 1] : null;
 
     return (
-        <div className="flex flex-col lg:flex-row min-h-screen bg-bg-primary">
+        <div className="flex flex-col lg:flex-row min-h-screen">
             {/* Mobile Sidebar Toggle could go here */}
 
             <CourseSidebar courseId={params.courseId} lessons={courseStructure} />

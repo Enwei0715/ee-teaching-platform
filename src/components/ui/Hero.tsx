@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import EditableText from './EditableText';
-import NetBackground from './NetBackground';
+import CircuitBackground from './CircuitBackground';
 
 export default function Hero() {
     return (
         <section className="relative py-20 md:py-32 px-6 text-center max-w-5xl mx-auto overflow-hidden">
-            {/* NET Background - Fixed positioning for parallax scroll */}
-            <NetBackground />
+            {/* Circuit Pattern Background */}
+            <CircuitBackground />
 
             {/* Content - positioned above particles */}
             <div className="relative z-10">

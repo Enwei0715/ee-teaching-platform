@@ -5,7 +5,7 @@ import { Cpu, Zap, Radio, BookOpen, Wifi, Layout } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CourseCard from '@/components/courses/CourseCard';
 import EditableText from '@/components/ui/EditableText';
-import DotGridBackground from '@/components/ui/DotGridBackground';
+
 
 const iconMap: any = {
     'circuit-theory': Zap,
@@ -45,7 +45,7 @@ export default function CoursesPage() {
     if (loading) {
         return (
             <div className="py-8 px-6 relative overflow-hidden">
-                <DotGridBackground />
+                {/* Background handled by layout */}
                 <div className="max-w-7xl mx-auto relative z-10">
                     {/* Header Skeleton */}
                     <div className="mb-12 animate-pulse">
@@ -83,7 +83,7 @@ export default function CoursesPage() {
 
     return (
         <div className="py-8 px-6 relative overflow-hidden">
-            <DotGridBackground />
+            {/* Background handled by layout */}
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="mb-12">
                     <EditableText

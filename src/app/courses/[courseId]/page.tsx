@@ -80,7 +80,7 @@ export default async function CoursePage({ params }: Props) {
     const totalDuration = calculateCourseTotalDuration(lessons);
 
     return (
-        <div className="min-h-screen bg-bg-primary">
+        <div className="min-h-screen">
             {/* Hero Section */}
             <header className="relative py-20 px-6 bg-bg-secondary border-b border-border-primary overflow-hidden">
                 <div className="absolute inset-0 bg-accent-primary/5 pointer-events-none" />

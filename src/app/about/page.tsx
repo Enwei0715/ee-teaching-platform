@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import Tilt from 'react-parallax-tilt';
+import ParticleBackground from '@/components/ui/ParticleBackground';
 import 'katex/dist/katex.min.css';
 
 export default function AboutPage() {
@@ -42,8 +43,9 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
     }, []);
 
     return (
-        <div className="min-h-screen bg-bg-primary">
-            <header className="py-20 px-6 text-center bg-bg-secondary border-b border-border-primary">
+        <div className="min-h-screen bg-bg-primary relative">
+            <ParticleBackground />
+            <header className="py-20 px-6 text-center bg-bg-secondary border-b border-border-primary relative z-10">
                 <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">Empowering the Next Generation of Hardware Engineers</h1>
                 <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
                     EE Master provides the tools, simulations, and community you need to go from theory to prototype.
