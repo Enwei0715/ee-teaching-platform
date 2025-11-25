@@ -14,6 +14,7 @@ import LessonNavigation from '@/components/course/LessonNavigation';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
+import remarkUnwrapImages from 'remark-unwrap-images';
 import rehypeKatex from 'rehype-katex';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
@@ -74,6 +75,7 @@ export default async function LessonPage({ params }: Props) {
                 remarkPlugins: [
                     remarkGfm,
                     remarkBreaks,
+                    remarkUnwrapImages,
                     [remarkMath, { singleDollarTextMath: true }]
                 ],
                 rehypePlugins: [rehypeKatex],

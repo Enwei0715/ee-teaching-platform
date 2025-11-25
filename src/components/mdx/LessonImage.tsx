@@ -7,7 +7,7 @@ interface LessonImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 export const LessonImage: React.FC<LessonImageProps> = ({ alt, className, ...props }) => {
     return (
         <figure className="my-8 flex flex-col items-center">
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 w-full max-w-fit overflow-hidden">
+            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 inline-block max-w-full overflow-hidden">
                 <img
                     alt={alt}
                     className={`max-w-full h-auto mx-auto rounded-md ${className || ''}`}
