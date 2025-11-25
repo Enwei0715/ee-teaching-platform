@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
 import { Users, BookOpen, FileText, Activity } from "lucide-react";
+import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
     // Fetch real stats in parallel
@@ -58,6 +61,19 @@ export default async function AdminDashboard() {
                     <h3 className="text-2xl font-bold text-white">{postCount}</h3>
                     <p className="text-gray-400 text-sm">Forum Posts</p>
                 </div>
+            </div>
+
+            {/* Quick Actions / Management Links */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <Link href="/admin/content" className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-indigo-500 transition-colors group">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-indigo-500/10 rounded-lg text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                            <FileText size={24} />
+                        </div>
+                        <h2 className="text-xl font-bold text-white">Content Management</h2>
+                    </div>
+                    <p className="text-gray-400">Manage footer text, links, and About Us page content.</p>
+                </Link>
             </div>
 
             {/* System Status */}

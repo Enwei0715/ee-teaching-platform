@@ -172,3 +172,19 @@ model QuizQuestion {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+model SiteSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model FooterLink {
+  id         String   @id @default(cuid())
+  category   String   // 'resources' or 'community'
+  label      String
+  url        String
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
