@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import CourseCard from '@/components/courses/CourseCard';
+import EditableText from './EditableText';
 
 export default async function FeaturedCourses() {
     // Fetch top 4 published courses from database
@@ -27,10 +28,19 @@ export default async function FeaturedCourses() {
         <section className="py-20 bg-bg-secondary">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl font-bold text-text-primary mb-4">Popular Courses</h2>
-                    <p className="text-text-secondary max-w-2xl mx-auto">
-                        Start your journey with our most popular engineering tracks.
-                    </p>
+                    <EditableText
+                        contentKey="featured_courses_title"
+                        defaultText="Popular Courses"
+                        tag="h2"
+                        className="text-3xl font-bold text-text-primary mb-4"
+                    />
+                    <EditableText
+                        contentKey="featured_courses_description"
+                        defaultText="Start your journey with our most popular engineering tracks."
+                        tag="p"
+                        className="text-text-secondary max-w-2xl mx-auto"
+                        multiline
+                    />
                 </div>
 
                 {courses.length === 0 ? (
@@ -48,6 +58,7 @@ export default async function FeaturedCourses() {
                         {courses.map((course) => (
                             <CourseCard
                                 key={course.id}
+                                id={course.id}
                                 title={course.title}
                                 description={course.description}
                                 slug={course.slug}

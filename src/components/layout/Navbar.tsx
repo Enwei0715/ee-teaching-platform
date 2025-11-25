@@ -3,15 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import EditableImage from '@/components/ui/EditableImage';
+import EditableText from '@/components/ui/EditableText';
 import { Menu, X, Search, User, LogOut, Bot, PenTool } from 'lucide-react';
 import SearchCommand from '@/components/search/SearchCommand';
 import { useSession, signOut } from 'next-auth/react';
+import { useEditMode } from '@/context/EditModeContext';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { data: session } = useSession();
+    const { isEditMode, toggleEditMode } = useEditMode();
     const userMenuRef = useRef<HTMLDivElement>(null);
 
     // Keyboard shortcut to open search
@@ -68,8 +72,10 @@ export default function Navbar() {
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center gap-2">
-                                <div className="bg-accent-primary/10 rounded-lg relative w-12 h-12 flex items-center justify-center">
-                                    <Image
+                                <div className="bg-black rounded-lg relative w-12 h-12 flex items-center justify-center">
+                                    <EditableImage
+                                        mode="static"
+                                        contentKey="navbar.logo"
                                         src="/icon_without_text.png"
                                         alt="EE Master Logo"
                                         width={32}
@@ -86,20 +92,20 @@ export default function Navbar() {
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-8">
                                 <Link href="/courses" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Courses
+                                    <EditableText mode="static" contentKey="navbar.link.courses" defaultText="Courses" tag="span" />
                                 </Link>
                                 <Link href="/projects" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Projects
+                                    <EditableText mode="static" contentKey="navbar.link.projects" defaultText="Projects" tag="span" />
                                 </Link>
                                 <Link href="/blog" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Blog
+                                    <EditableText mode="static" contentKey="navbar.link.blog" defaultText="Blog" tag="span" />
                                 </Link>
                                 <Link href="/forum" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    Forum
+                                    <EditableText mode="static" contentKey="navbar.link.forum" defaultText="Forum" tag="span" />
                                 </Link>
                                 {session && (
                                     <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                        Dashboard
+                                        <EditableText mode="static" contentKey="navbar.link.dashboard" defaultText="Dashboard" tag="span" />
                                     </Link>
                                 )}
                             </div>
@@ -117,6 +123,19 @@ export default function Navbar() {
                                     <kbd className="hidden lg:inline-block font-sans text-[10px] bg-bg-primary border border-border-primary rounded px-1">Ctrl K</kbd>
                                 </div>
                             </button>
+
+                            {/* Edit Mode Toggle (Admin Only) */}
+                            {session?.user?.role === 'ADMIN' && (
+                                <div className="flex items-center gap-2 flex-shrink-0 z-50">
+                                    <span className="text-xs text-text-secondary">Edit</span>
+                                    <button
+                                        onClick={toggleEditMode}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isEditMode ? 'bg-indigo-600' : 'bg-gray-700'}`}
+                                    >
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEditMode ? 'translate-x-6' : 'translate-x-1'}`} />
+                                    </button>
+                                </div>
+                            )}
 
                             {session ? (
                                 <div className="relative" ref={userMenuRef}>

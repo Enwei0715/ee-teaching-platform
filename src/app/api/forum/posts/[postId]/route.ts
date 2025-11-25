@@ -34,6 +34,51 @@ export async function GET(req: Request, { params }: { params: { postId: string }
     }
 }
 
+export async function PATCH(
+    request: Request,
+    { params }: { params: { postId: string } }
+) {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { title, content } = await request.json();
+
+        const post = await prisma.post.findUnique({
+            where: { id: params.postId },
+        });
+
+        if (!post) {
+            return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+        }
+
+        // Check if user is author or admin
+        if (post.authorId !== session.user.id && session.user.role !== 'ADMIN') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        const updatedPost = await prisma.post.update({
+            where: { id: params.postId },
+            data: {
+                title: title || undefined,
+                content: content || undefined,
+                // Explicitly NOT updating slug or other fields
+            },
+        });
+
+        return NextResponse.json(updatedPost);
+    } catch (error) {
+        console.error('Error updating post:', error);
+        return NextResponse.json(
+            { error: 'Internal Server Error' },
+            { status: 500 }
+        );
+    }
+}
+
 export async function DELETE(
     request: Request,
     { params }: { params: { postId: string } }

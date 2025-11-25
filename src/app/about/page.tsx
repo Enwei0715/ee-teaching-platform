@@ -1,20 +1,25 @@
-import { Metadata } from 'next';
-import prisma from '@/lib/prisma';
-import { MDXRemote } from 'next-mdx-remote/rsc';
+'use client';
 
-export const dynamic = 'force-dynamic';
+import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import Tilt from 'react-parallax-tilt';
+import 'katex/dist/katex.min.css';
 
-export const metadata: Metadata = {
-    title: 'About Us | EE Master',
-    description: 'Empowering the Next Generation of Hardware Engineers.',
-};
+export default function AboutPage() {
+    const [content, setContent] = useState('');
+    const [loading, setLoading] = useState(true);
 
-export default async function AboutPage() {
-    const settings = await prisma.siteSettings.findUnique({
-        where: { key: 'about_us_content' }
-    });
-
-    const content = settings?.value || `
+    useEffect(() => {
+        fetch('/api/site-content?key=about_us_content')
+            .then(res => res.json())
+            .then(data => {
+                if (data?.content) {
+                    setContent(data.content);
+                } else {
+                    // Default content
+                    setContent(`
 # Our Mission
 
 At EE Master, our mission is simple: **Demystifying Electronics for Everyone.**
@@ -26,7 +31,15 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
 *   **Interactive Courses:** Dive deep into MDX-based curriculum covering everything from Diode fundamentals to BJT amplifiers and beyond.
 *   **Real-World Projects:** Don't just read about it—build it. Our project-based learning approach focuses on real-world circuit design and simulation.
 *   **Community Forum:** Join a growing community of engineers. Ask questions, share your knowledge, and collaborate on the next big thing.
-    `;
+                    `);
+                }
+                setLoading(false);
+            })
+            .catch(() => {
+                setContent('# About Us\n\nContent loading failed.');
+                setLoading(false);
+            });
+    }, []);
 
     return (
         <div className="min-h-screen bg-bg-primary">
@@ -38,8 +51,58 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
             </header>
 
             <div className="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-lg">
-                <MDXRemote source={content} />
+                {loading ? (
+                    <div className="space-y-4">
+                        <div className="h-8 bg-gray-800 rounded w-2/3 animate-pulse"></div>
+                        <div className="h-4 bg-gray-800 rounded w-full animate-pulse"></div>
+                        <div className="h-4 bg-gray-800 rounded w-5/6 animate-pulse"></div>
+                    </div>
+                ) : (
+                    <ReactMarkdown
+                        remarkPlugins={[remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                    >
+                        {content}
+                    </ReactMarkdown>
+                )}
             </div>
+
+            <section className="max-w-4xl mx-auto px-6 pb-16">
+                <h2 className="text-3xl font-bold text-text-primary mb-8 text-center">The Team</h2>
+                <div className="flex justify-center">
+                    <Tilt
+                        className="parallax-effect-glare-scale"
+                        perspective={1000}
+                        glareEnable={true}
+                        glareMaxOpacity={0.45}
+                        scale={1.02}
+                        transitionSpeed={1500}
+                        tiltMaxAngleX={10}
+                        tiltMaxAngleY={10}
+                    >
+                        <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full relative overflow-hidden backdrop-blur-sm">
+                            {/* Gradient overlay for premium feel */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"></div>
+
+                            <div className="relative z-10">
+                                <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-blue-500/30 shadow-lg shadow-blue-500/20">
+                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                            <circle cx="12" cy="7" r="4" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div className="font-bold text-white text-2xl mb-1">Lorry</div>
+                                <div className="text-blue-400 font-medium mb-4">Electronic Engineering Educator</div>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    Passionate about making complex engineering concepts accessible to everyone.
+                                </p>
+                            </div>
+                        </div>
+                    </Tilt>
+                </div>
+            </section>
         </div>
     );
 }

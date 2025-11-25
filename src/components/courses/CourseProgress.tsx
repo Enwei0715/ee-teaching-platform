@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Edit2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
-import { PlayCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { calculateReadingTime } from '@/lib/utils';
+import { useEditMode } from '@/context/EditModeContext';
 
 interface Lesson {
     id: string;
@@ -22,6 +23,8 @@ interface CourseProgressProps {
 
 export default function CourseProgress({ courseId, lessons }: CourseProgressProps) {
     const { data: session } = useSession();
+    const { isEditMode } = useEditMode();
+    const router = useRouter();
     const [completedLessons, setCompletedLessons] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -55,38 +58,57 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
     return (
         <div className="divide-y divide-border-primary">
             {lessons.map((lesson, index) => (
-                <Link
+                <div
                     key={lesson.id}
-                    href={`/courses/${courseId}/${lesson.id}`}
-                    className="flex items-center gap-4 p-5 hover:bg-bg-tertiary transition-colors group"
+                    className="flex items-center gap-4 p-5 hover:bg-bg-tertiary transition-colors group relative"
                 >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-accent-primary/50 group-hover:bg-accent-primary/10 transition-colors shrink-0">
-                        {completedLessons.includes(lesson.id) ? (
-                            <CheckCircle size={20} className="text-accent-success" />
-                        ) : (
-                            <span className="font-mono text-sm text-text-secondary group-hover:text-accent-primary font-medium">
-                                {String(index + 1).padStart(2, '0')}
-                            </span>
-                        )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
-                            {lesson.title}
-                        </h3>
-                        <div className="text-xs text-text-secondary mt-1 prose prose-invert prose-sm max-w-none [&>p]:text-xs [&>p]:m-0 [&>p]:leading-normal">
-                            {lesson.descriptionNode ? (
-                                lesson.descriptionNode
+                    <Link
+                        href={`/courses/${courseId}/${lesson.id}`}
+                        className="flex items-center gap-4 flex-1 min-w-0"
+                    >
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-accent-primary/50 group-hover:bg-accent-primary/10 transition-colors shrink-0">
+                            {completedLessons.includes(lesson.id) ? (
+                                <CheckCircle size={20} className="text-accent-success" />
                             ) : (
-                                lesson.description || calculateReadingTime(lesson.content)
+                                <span className="font-mono text-sm text-text-secondary group-hover:text-accent-primary font-medium">
+                                    {String(index + 1).padStart(2, '0')}
+                                </span>
                             )}
                         </div>
-                    </div>
 
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
-                        <PlayCircle size={20} />
-                    </div>
-                </Link>
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-text-primary font-medium group-hover:text-accent-primary transition-colors truncate">
+                                {lesson.title}
+                            </h3>
+                            <div className="text-xs text-text-secondary mt-1 prose prose-invert prose-sm max-w-none [&>p]:text-xs [&>p]:m-0 [&>p]:leading-normal">
+                                {lesson.descriptionNode ? (
+                                    lesson.descriptionNode
+                                ) : (
+                                    lesson.description || calculateReadingTime(lesson.content)
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
+                            <PlayCircle size={20} />
+                        </div>
+                    </Link>
+
+                    {/* Edit Shortcut Icon (Admin Edit Mode Only) */}
+                    {isEditMode && session?.user?.role === 'ADMIN' && (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                router.push(`/admin/courses/${courseId}?file=${lesson.id}`);
+                            }}
+                            className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors"
+                            title="Edit this lesson"
+                        >
+                            <Edit2 size={16} />
+                        </button>
+                    )}
+                </div>
             ))}
         </div>
     );

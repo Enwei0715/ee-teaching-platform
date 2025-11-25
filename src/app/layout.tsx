@@ -8,6 +8,8 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import AITutor from "@/components/ai/AITutor";
 import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
+import { EditModeProvider } from "@/context/EditModeContext";
+import NavigationProgress from "@/components/ui/NavigationProgress";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,18 +30,21 @@ export default function RootLayout({
     return (
         <html lang="en" className="scroll-smooth">
             <body className={`${inter.className} bg-gray-950 text-white antialiased`}>
+                <NavigationProgress />
                 <AuthProvider>
-                    <HotkeysProvider>
-                        <div className="flex flex-col min-h-screen">
-                            <Navbar />
-                            <main className="flex-grow">
-                                {children}
-                            </main>
-                            <AITutor />
-                            <ShortcutsModal />
-                            <Footer />
-                        </div>
-                    </HotkeysProvider>
+                    <EditModeProvider>
+                        <HotkeysProvider>
+                            <div className="flex flex-col min-h-screen">
+                                <Navbar />
+                                <main className="flex-1 w-full">
+                                    {children}
+                                </main>
+                                <AITutor />
+                                <ShortcutsModal />
+                                <Footer />
+                            </div>
+                        </HotkeysProvider>
+                    </EditModeProvider>
                 </AuthProvider>
             </body>
         </html>

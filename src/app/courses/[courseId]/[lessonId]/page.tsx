@@ -18,6 +18,7 @@ import remarkUnwrapImages from 'remark-unwrap-images';
 import rehypeKatex from 'rehype-katex';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
+import LessonEditButton from '@/components/course/LessonEditButton';
 
 
 interface Props {
@@ -164,7 +165,10 @@ export default async function LessonPage({ params }: Props) {
                             <span className="text-text-primary font-medium line-clamp-1">{lesson.meta.title}</span>
                         </nav>
 
-                        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{lesson.meta.title}</h1>
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                            <h1 className="text-3xl md:text-4xl font-bold text-text-primary flex-1">{lesson.meta.title}</h1>
+                            <LessonEditButton courseSlug={params.courseId} lessonSlug={params.lessonId} />
+                        </div>
                         <div className="flex items-center gap-4 text-sm text-text-secondary">
                             <span>Module {Math.floor(currentIndex / 5) + 1}</span>
                             <span>•</span>

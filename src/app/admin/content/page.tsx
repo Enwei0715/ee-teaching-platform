@@ -38,8 +38,23 @@ export default function ContentManagementPage() {
             const data = await res.json();
 
             if (data.settings) {
-                setFooterDescription(data.settings.footer_description || '');
-                setAboutContent(data.settings.about_us_content || '');
+                // Use defaults if DB is empty, matching the public pages
+                const defaultFooter = "An open-source platform dedicated to teaching electronic engineering.\nFrom basic circuits to advanced FPGA design.";
+                const defaultAbout = `
+# Our Mission
+
+At EE Master, our mission is simple: **Demystifying Electronics for Everyone.**
+
+We believe that hardware engineering shouldn't be hidden behind expensive tools or impenetrable theory. Whether you're a student just starting out or a professional looking to sharpen your skills, we're here to help you understand the "why" and "how" behind every circuit.
+
+# What We Offer
+
+*   **Interactive Courses:** Dive deep into MDX-based curriculum covering everything from Diode fundamentals to BJT amplifiers and beyond.
+*   **Real-World Projects:** Don't just read about it—build it. Our project-based learning approach focuses on real-world circuit design and simulation.
+*   **Community Forum:** Join a growing community of engineers. Ask questions, share your knowledge, and collaborate on the next big thing.
+`;
+                setFooterDescription(data.settings.footer_description || defaultFooter);
+                setAboutContent(data.settings.about_us_content || defaultAbout);
             }
             if (data.links) {
                 setLinks(data.links);
@@ -103,6 +118,36 @@ export default function ContentManagementPage() {
             fetchData();
         } catch (error) {
             console.error('Failed to delete link', error);
+        }
+    };
+
+    const DEFAULT_LINKS = [
+        { category: 'resources', label: 'Courses', url: '/courses', orderIndex: 0 },
+        { category: 'resources', label: 'Blog', url: '/blog', orderIndex: 1 },
+        { category: 'resources', label: 'Projects', url: '/projects', orderIndex: 2 },
+        { category: 'resources', label: 'Forum', url: '/forum', orderIndex: 3 },
+        { category: 'community', label: 'GitHub', url: 'https://github.com/Enwei0715/ee-teaching-platform', orderIndex: 0 },
+        { category: 'community', label: 'About Us', url: '/about', orderIndex: 1 },
+    ];
+
+    const handleInitializeDefaults = async () => {
+        if (!confirm('This will seed the database with default links. Continue?')) return;
+        setLoading(true);
+        try {
+            for (const link of DEFAULT_LINKS) {
+                await fetch('/api/admin/footer-links', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(link)
+                });
+            }
+            await fetchData();
+            alert('Default links initialized successfully!');
+        } catch (error) {
+            console.error('Failed to initialize defaults', error);
+            alert('Failed to initialize defaults');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -272,6 +317,17 @@ export default function ContentManagementPage() {
                     <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
                         <h2 className="text-xl font-bold text-white mb-4">Existing Links</h2>
                         <div className="space-y-4">
+                            {links.length === 0 && (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-400 mb-4">No links found in database.</p>
+                                    <button
+                                        onClick={handleInitializeDefaults}
+                                        className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                                    >
+                                        Initialize Default Links
+                                    </button>
+                                </div>
+                            )}
                             {['resources', 'community'].map(category => (
                                 <div key={category}>
                                     <h3 className="text-sm font-bold text-gray-500 uppercase mb-2">{category}</h3>

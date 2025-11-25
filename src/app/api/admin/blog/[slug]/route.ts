@@ -51,17 +51,22 @@ export async function PATCH(
     }
 
     try {
-        const { content, meta } = await request.json();
+        const body = await request.json();
+        const { content, meta } = body;
         const slug = decodeURIComponent(params.slug);
+
+        // Handle both nested meta and flat updates (from EditableText)
+        const title = meta?.title || body.title;
+        const description = meta?.description || body.description;
+        const category = meta?.category || body.category;
 
         await prisma.blogPost.update({
             where: { slug },
             data: {
-                title: meta.title,
-                content: content,
-                description: meta.description,
-
-                category: meta.category,
+                title: title,
+                content: content, // Content might be undefined if only updating title
+                description: description,
+                category: category,
             }
         });
 

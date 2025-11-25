@@ -5,6 +5,7 @@ import { getCourseStructure, getCourseBySlug, getAllCourses } from '@/lib/mdx';
 import { calculateCourseTotalDuration, calculateReadingTime } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 import CourseProgress from '@/components/courses/CourseProgress';
+import CurriculumHeader from '@/components/courses/CurriculumHeader';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -122,10 +123,7 @@ export default async function CoursePage({ params }: Props) {
             <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Main Content */}
                 <div className="lg:col-span-2">
-                    <h2 className="text-2xl font-bold text-text-primary mb-6 flex items-center gap-3">
-                        <BookOpen className="text-accent-primary" />
-                        Course Curriculum
-                    </h2>
+                    <CurriculumHeader courseSlug={params.courseId} />
 
                     <div className="bg-bg-secondary border border-border-primary rounded-xl overflow-hidden shadow-sm">
                         <CourseProgress courseId={params.courseId} lessons={lessonsWithDescription} />

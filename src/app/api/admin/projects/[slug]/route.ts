@@ -54,22 +54,33 @@ export async function PATCH(
     }
 
     try {
-        const { content, meta } = await request.json();
+        const body = await request.json();
+        const { content, meta } = body;
         const slug = params.slug;
+
+        // Handle both nested meta and flat updates (from EditableText)
+        const title = meta?.title || body.title;
+        const description = meta?.description || body.description;
+        const image = meta?.image || body.image;
+        const level = meta?.level || body.level;
+        const tools = meta?.tools || body.tools;
+        const materials = meta?.materials || body.materials;
+        const technologies = meta?.technologies || body.technologies;
+        const features = meta?.features || body.features;
 
         await prisma.project.update({
             where: { slug },
             data: {
-                title: meta.title,
-                description: meta.description,
+                title: title,
+                description: description,
                 content: content,
-                image: meta.image,
+                image: image,
 
-                level: meta.level,
-                tools: meta.tools,
-                materials: meta.materials,
-                technologies: meta.technologies,
-                features: meta.features,
+                level: level,
+                tools: tools,
+                materials: materials,
+                technologies: technologies,
+                features: features,
             }
         });
 

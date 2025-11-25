@@ -188,3 +188,10 @@ model FooterLink {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  content   String   @db.Text
+  updatedAt DateTime @updatedAt
+}
