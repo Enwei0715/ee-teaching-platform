@@ -1,52 +1,68 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Sparkles } from 'lucide-react';
 
 export default function TextSelectionToolbar() {
     const [selectedText, setSelectedText] = useState('');
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [show, setShow] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    const handleSelection = useCallback(() => {
-        const selection = window.getSelection();
-        const text = selection?.toString().trim();
-
-        if (text && text.length > 3) {
-            const range = selection!.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-
-            // Position the toolbar above the selection
-            setPosition({
-                top: rect.top + window.scrollY - 50,
-                left: rect.left + window.scrollX + rect.width / 2,
-            });
-
-            setSelectedText(text);
-            setShow(true);
-        } else {
-            setShow(false);
-        }
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
     }, []);
 
-    const handleClickOutside = useCallback((e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        if (!target.closest('.text-selection-toolbar')) {
-            setShow(false);
-        }
+    const handleSelection = useCallback(() => {
+        // Small delay to allow browser to update selection state
+        setTimeout(() => {
+            const selection = window.getSelection();
+            const text = selection?.toString().trim();
+
+            if (selection && text && text.length > 2) { // Changed to > 2 for slightly better sensitivity
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+
+                // Check if selection is actually visible/valid
+                if (rect.width === 0 || rect.height === 0) {
+                    setShow(false);
+                    return;
+                }
+
+                // Position the toolbar above the selection
+                setPosition({
+                    top: rect.top + window.scrollY - 50,
+                    left: rect.left + window.scrollX + rect.width / 2,
+                });
+
+                setSelectedText(text);
+                setShow(true);
+            } else {
+                setShow(false);
+            }
+        }, 10);
     }, []);
 
     useEffect(() => {
+        // Listen for both mouseup (mouse selection) and keyup (keyboard selection)
         document.addEventListener('mouseup', handleSelection);
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keyup', handleSelection);
+
+        // Also listen for selectionchange, but debounce it or rely on mouseup/keyup for final state
+        // For simplicity and performance, mouseup/keyup is usually sufficient for "finished" selection
 
         return () => {
             document.removeEventListener('mouseup', handleSelection);
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keyup', handleSelection);
         };
-    }, [handleSelection, handleClickOutside]);
+    }, [handleSelection]);
 
-    const handleAskClick = () => {
+    const handleAskClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         // Dispatch custom event to open AI Tutor with text
         window.dispatchEvent(new CustomEvent('open-ai-tutor', {
             detail: { text: `Explain this: "${selectedText}"` }
@@ -57,16 +73,23 @@ export default function TextSelectionToolbar() {
         window.getSelection()?.removeAllRanges();
     };
 
-    if (!show) return null;
+    const handleMouseDown = (e: React.MouseEvent) => {
+        // Prevent the toolbar click from triggering document mousedown (which might clear selection)
+        e.preventDefault();
+        e.stopPropagation();
+    };
 
-    return (
+    if (!mounted || !show) return null;
+
+    return createPortal(
         <div
-            className="text-selection-toolbar fixed z-50 animate-in fade-in zoom-in-95 duration-200"
+            className="text-selection-toolbar fixed z-[9999] animate-in fade-in zoom-in-95 duration-200"
             style={{
                 top: `${position.top}px`,
                 left: `${position.left}px`,
                 transform: 'translateX(-50%)',
             }}
+            onMouseDown={handleMouseDown}
         >
             <button
                 onClick={handleAskClick}
@@ -75,6 +98,7 @@ export default function TextSelectionToolbar() {
                 <Sparkles size={16} className="animate-pulse" />
                 <span>Ask AI</span>
             </button>
-        </div>
+        </div>,
+        document.body
     );
 }
