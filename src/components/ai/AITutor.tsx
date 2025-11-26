@@ -151,7 +151,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="p-1 hover:bg-white/20 rounded transition-colors"
+                                className="hidden md:block p-1 hover:bg-white/20 rounded transition-colors"
                                 title={isExpanded ? "Minimize" : "Expand"}
                             >
                                 {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
