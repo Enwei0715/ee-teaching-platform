@@ -74,7 +74,7 @@ export default function CourseCard({ id, title, description, slug, level, durati
                             <EditableImage
                                 src={image!}
                                 alt={title}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 mode="entity"
                                 apiEndpoint={`/api/courses/${id}`}
                                 fieldName="image"
@@ -117,7 +117,7 @@ export default function CourseCard({ id, title, description, slug, level, durati
                             <div className="text-xs text-gray-500 font-medium">
                                 {duration || 'Self-paced'}
                             </div>
-                            <div className="flex items-center text-accent-primary text-xs font-medium">
+                            <div className="flex items-center text-accent-primary text-xs font-medium group-hover:scale-110 transition-transform duration-200 origin-right">
                                 Start Learning <ArrowRight size={14} className="ml-1" />
                             </div>
                         </div>

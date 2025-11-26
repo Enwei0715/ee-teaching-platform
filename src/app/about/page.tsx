@@ -13,26 +13,14 @@ export default function AboutPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/api/site-content?key=about_us_content')
+        fetch('/api/site-settings', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
-                if (data?.content) {
-                    setContent(data.content);
+                if (data?.settings?.about_us_content) {
+                    setContent(data.settings.about_us_content);
                 } else {
-                    // Default content
-                    setContent(`
-# Our Mission
-
-At EE Master, our mission is simple: **Demystifying Electronics for Everyone.**
-
-We believe that hardware engineering shouldn't be hidden behind expensive tools or impenetrable theory. Whether you're a student just starting out or a professional looking to sharpen your skills, we're here to help you understand the "why" and "how" behind every circuit.
-
-# What We Offer
-
-*   **Interactive Courses:** Dive deep into MDX-based curriculum covering everything from Diode fundamentals to BJT amplifiers and beyond.
-*   **Real-World Projects:** Don't just read about it—build it. Our project-based learning approach focuses on real-world circuit design and simulation.
-*   **Community Forum:** Join a growing community of engineers. Ask questions, share your knowledge, and collaborate on the next big thing.
-                    `);
+                    // No content found
+                    setContent('');
                 }
                 setLoading(false);
             })
@@ -85,10 +73,11 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
                         transitionSpeed={1500}
                         tiltMaxAngleX={10}
                         tiltMaxAngleY={10}
+                        glareBorderRadius="16px"
                     >
                         <div className="glass-panel border-gray-700 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full relative overflow-hidden">
                             {/* Gradient overlay for premium feel */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"></div>
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"></div>
 
                             <div className="relative z-10">
                                 <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-blue-500/30 shadow-lg shadow-blue-500/20">

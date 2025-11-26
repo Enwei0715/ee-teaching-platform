@@ -45,7 +45,7 @@ export default function CreatePostForm() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="w-full bg-accent-primary text-white font-bold py-3 rounded-lg hover:bg-accent-primary/90 transition-colors"
+                className="w-full bg-accent-primary text-white font-bold py-3 rounded-lg hover:bg-accent-primary/90 transition-all duration-200 hover:scale-[1.02]"
             >
                 Start a New Discussion
             </button>

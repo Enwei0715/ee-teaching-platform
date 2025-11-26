@@ -4,12 +4,12 @@ import ParticleBackground from './ParticleBackground';
 
 export default function Hero() {
     return (
-        <section className="relative py-20 md:py-32 px-6 text-center max-w-5xl mx-auto overflow-hidden">
+        <section className="relative w-full overflow-hidden">
             {/* Particle Network Background */}
             <ParticleBackground />
 
             {/* Content - positioned above particles */}
-            <div className="relative z-10">
+            <div className="relative z-10 py-20 md:py-32 px-6 text-center max-w-5xl mx-auto">
                 <EditableText
                     contentKey="home_hero_title"
                     defaultText="Master Electronic Engineering"
@@ -24,10 +24,10 @@ export default function Hero() {
                     multiline
                 />
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Link href="/courses" className="px-8 py-3 bg-accent-primary text-white rounded-md font-medium hover:bg-blue-600 transition-colors w-full sm:w-auto">
+                    <Link href="/courses" className="px-8 py-3 bg-accent-primary text-white rounded-md font-medium hover:bg-blue-600 transition-all duration-200 hover:scale-105 w-full sm:w-auto">
                         Start Learning
                     </Link>
-                    <Link href="/projects" className="px-8 py-3 bg-bg-tertiary text-text-primary border border-border-primary rounded-md font-medium hover:bg-bg-secondary transition-colors w-full sm:w-auto">
+                    <Link href="/projects" className="px-8 py-3 bg-bg-tertiary text-text-primary border border-border-primary rounded-md font-medium hover:bg-bg-secondary transition-all duration-200 hover:scale-105 w-full sm:w-auto">
                         View Projects
                     </Link>
                 </div>

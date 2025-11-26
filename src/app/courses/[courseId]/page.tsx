@@ -11,7 +11,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
-import InteractiveDotGrid from '@/components/ui/InteractiveDotGrid';
+
 
 interface Props {
     params: { courseId: string };
@@ -82,7 +82,7 @@ export default async function CoursePage({ params }: Props) {
 
     return (
         <div className="min-h-screen relative overflow-hidden">
-            <InteractiveDotGrid />
+
             {/* Hero Section */}
             <header className="relative py-12 px-4 md:py-20 md:px-6 bg-gradient-to-br from-gray-900 via-[#0f172a] to-gray-900 border-b border-border-primary overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"

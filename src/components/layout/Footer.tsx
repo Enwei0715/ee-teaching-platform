@@ -14,7 +14,7 @@ export default function Footer() {
     const [links, setLinks] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch('/api/site-settings')
+        fetch('/api/site-settings', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 setSettings(data.settings || {});
@@ -36,13 +36,9 @@ export default function Footer() {
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="col-span-1 md:col-span-2">
                         <h3 className="text-text-primary font-bold text-lg mb-4">EE Master</h3>
-                        <EditableText
-                            defaultText={settings.description || 'Master Electrical Engineering with our comprehensive teaching platform.'}
-                            contentKey="footer_description"
-                            mode="static"
-                            className="text-text-secondary mb-4"
-                            multiline
-                        />
+                        <p className="text-text-secondary mb-4 whitespace-pre-wrap">
+                            {settings.footer_description}
+                        </p>
                     </div>
                     <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
                         {/* Resources Column */}

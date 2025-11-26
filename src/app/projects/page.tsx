@@ -60,7 +60,7 @@ export default function ProjectsPage() {
                         multiline
                     />
                     <div className="flex justify-center gap-4">
-                        <Link href="#all-projects" className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-900/20">
+                        <Link href="#all-projects" className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-500 transition-all duration-200 hover:scale-105 shadow-lg shadow-indigo-900/20">
                             Explore Projects
                         </Link>
                     </div>
@@ -124,7 +124,7 @@ export default function ProjectsPage() {
                                     <p className="text-gray-400 text-sm mb-6 line-clamp-3 flex-1 leading-relaxed">
                                         {project.description}
                                     </p>
-                                    <div className="flex items-center text-indigo-400 text-sm font-bold mt-auto pt-4 border-t border-gray-800">
+                                    <div className="flex items-center text-indigo-400 text-sm font-bold mt-auto pt-4 border-t border-gray-800 group-hover:scale-105 transition-transform duration-200 origin-left">
                                         Start Building <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 </div>

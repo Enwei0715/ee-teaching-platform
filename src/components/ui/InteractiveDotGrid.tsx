@@ -17,7 +17,7 @@ export default function InteractiveDotGrid() {
         let isMounted = true;
 
         const GRID_SPACING = 45;
-        const BASE_RADIUS = 1.5;
+        const BASE_RADIUS = 3;
         let dots: { x: number; y: number; baseOpacity: number }[] = [];
         let animationFrameId: number;
         let mouseX = -1000;

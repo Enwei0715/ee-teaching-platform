@@ -89,7 +89,7 @@ export default function BlogPage() {
                         <div className="flex justify-center">
                             <Link
                                 href="/blog/new"
-                                className="inline-flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+                                className="inline-flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-105"
                             >
                                 <Plus size={18} />
                                 Create Blog Post

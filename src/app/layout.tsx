@@ -9,6 +9,7 @@ import AITutor from "@/components/ai/AITutor";
 import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
 import { EditModeProvider } from "@/context/EditModeContext";
+import BackgroundGrid from "@/components/layout/BackgroundGrid";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -36,9 +37,8 @@ export default function RootLayout({
                                 <Navbar />
                                 <main className="flex-1 w-full relative">
                                     {/* Subtle Blueprint Grid Overlay */}
-                                    <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.03]"
-                                        style={{ backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}>
-                                    </div>
+                                    {/* Subtle Blueprint Grid Overlay */}
+                                    <BackgroundGrid />
                                     <div className="relative z-10">
                                         {children}
                                     </div>
