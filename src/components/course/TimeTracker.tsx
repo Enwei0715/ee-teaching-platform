@@ -72,10 +72,12 @@ export default function TimeTracker({ courseId, lessonId }: TimeTrackerProps) {
             const now = Date.now();
             const secondsSinceLastSync = Math.floor((now - lastSyncTimeRef.current) / 1000);
 
-            // Use sendBeacon for reliability on unload if possible, otherwise fetch
-            // Note: sendBeacon sends POST with text/plain by default or Blob, JSON needs Blob
-            const blob = new Blob([JSON.stringify({ courseId, lessonId, seconds: secondsSinceLastSync })], { type: 'application/json' });
-            navigator.sendBeacon('/api/tracking/time', blob);
+            if (secondsSinceLastSync > 0) {
+                // Use sendBeacon for reliability on unload if possible, otherwise fetch
+                // Note: sendBeacon sends POST with text/plain by default or Blob, JSON needs Blob
+                const blob = new Blob([JSON.stringify({ courseId, lessonId, seconds: secondsSinceLastSync })], { type: 'application/json' });
+                navigator.sendBeacon('/api/tracking/time', blob);
+            }
         };
     }, [courseId, lessonId, session]);
 

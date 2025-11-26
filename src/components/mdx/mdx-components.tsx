@@ -7,13 +7,26 @@ import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript';
 import python from 'react-syntax-highlighter/dist/cjs/languages/prism/python';
 import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash';
+import c from 'react-syntax-highlighter/dist/cjs/languages/prism/c';
+import cpp from 'react-syntax-highlighter/dist/cjs/languages/prism/cpp';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import CodeBlock from './CodeBlock';
+import { Tabs, Tab } from './Tabs';
+import { Accordion } from './Accordion';
+import { Badge } from './Badge';
+import { Highlight } from './Highlight';
+import { Terminal } from './Terminal';
+import { Grid } from './Grid';
+import { Card } from './Card';
+import { Diff } from './Diff';
 
 // Register languages for syntax highlighting
 SyntaxHighlighter.registerLanguage('tsx', tsx);
 SyntaxHighlighter.registerLanguage('typescript', typescript);
 SyntaxHighlighter.registerLanguage('python', python);
 SyntaxHighlighter.registerLanguage('bash', bash);
+SyntaxHighlighter.registerLanguage('c', c);
+SyntaxHighlighter.registerLanguage('cpp', cpp);
 
 export const mdxComponents = {
     h1: (props: any) => <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-text-primary tracking-tight" {...props} />,
@@ -59,21 +72,7 @@ export const mdxComponents = {
         const { className, children } = props;
         const match = /language-(\w+)/.exec(className || '');
         return match ? (
-            <div className="relative group">
-                <div className="absolute right-2 top-2 text-xs text-text-secondary/50 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
-                    {match[1]}
-                </div>
-                <SyntaxHighlighter
-                    style={vscDarkPlus}
-                    language={match[1]}
-                    PreTag="div"
-                    className="rounded-lg my-6 !bg-[#1e1e1e] !p-6 border border-border-primary shadow-lg overflow-hidden text-sm md:text-base"
-                    showLineNumbers={true}
-                    lineNumberStyle={{ minWidth: '2em', paddingRight: '1em', color: '#6e7681', textAlign: 'right' }}
-                >
-                    {String(children).replace(/\n$/, '')}
-                </SyntaxHighlighter>
-            </div>
+            <CodeBlock language={match[1]} code={String(children).replace(/\n$/, '')} />
         ) : (
             <code className="bg-bg-tertiary text-accent-primary px-1.5 py-0.5 rounded-md font-mono text-sm border border-border-primary" {...props}>
                 {children}
@@ -83,4 +82,14 @@ export const mdxComponents = {
     pre: (props: any) => <div {...props} />,
     Callout,
     TextMask,
+    CodeBlock,
+    Tabs,
+    Tab,
+    Accordion,
+    Badge,
+    Highlight,
+    Terminal,
+    Grid,
+    Card,
+    Diff,
 };

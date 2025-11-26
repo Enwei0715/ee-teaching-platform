@@ -65,15 +65,8 @@ export default async function LessonPage({ params }: Props) {
     let serializationError = false;
     let autoFormatted = false;
 
-    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
-    let processedContent = lesson.content
-        .replace(/\\\(/g, '$')      // \( -> $
-        .replace(/\\\)/g, '$')      // \) -> $
-        .replace(/\\\[/g, '$$\n')   // \[ -> $$
-        .replace(/\\\]/g, '\n$$');  // \] -> $$
-
     try {
-        mdxSource = await serialize(processedContent, {
+        mdxSource = await serialize(lesson.content, {
             mdxOptions: {
                 remarkPlugins: [
                     remarkGfm,
@@ -85,13 +78,14 @@ export default async function LessonPage({ params }: Props) {
             },
         });
     } catch (error) {
+        console.error('❌ MDX Serialization Failed (Attempt 1 - Standard):', error);
         console.error('Error serializing MDX content for lesson:', params.lessonId, error);
         serializationError = true;
 
         // Retry 1: Try without math plugins (might have LaTeX syntax issues)
         try {
             console.log('Retry 1: Attempting serialization without math plugins...');
-            mdxSource = await serialize(processedContent, {
+            mdxSource = await serialize(lesson.content, {
                 mdxOptions: {
                     remarkPlugins: [remarkGfm],
                 },
@@ -99,6 +93,7 @@ export default async function LessonPage({ params }: Props) {
             console.log('Retry 1: Success - rendered without math support');
             serializationError = false;
         } catch (retryError1) {
+            console.error('❌ MDX Serialization Failed (Attempt 2 - No Math):', retryError1);
             console.error('Retry 1 failed:', retryError1);
 
             // Retry 2: Try with just basic GFM, escaping potential problematic characters
@@ -118,16 +113,35 @@ export default async function LessonPage({ params }: Props) {
                 console.log('Retry 2: Success - rendered with escaped content');
                 serializationError = false;
             } catch (retryError2) {
+                console.error('❌ MDX Serialization Failed (Attempt 3 - Escaped):', retryError2);
                 console.error('Retry 2 failed:', retryError2);
 
                 // Final fallback: Wrap in code block
                 try {
+                    console.warn('⚠️ Triggering Final Fallback: Wrapping content in Code Block.');
                     console.log('Final fallback: Wrapping in code block...');
-                    const wrappedContent = '```text\n' + lesson.content + '\n```';
-                    mdxSource = await serialize(wrappedContent, {
+                    // Calculate N+1 backticks to safely wrap content
+                    const maxBackticks = (lesson.content.match(/`+/g) || [])
+                        .reduce((max, match) => Math.max(max, match.length), 0);
+                    const fence = '`'.repeat(Math.max(3, maxBackticks + 1));
+
+                    // Inject error message
+                    const errorMessage = retryError2 instanceof Error ? retryError2.message : String(retryError2);
+
+                    const debugContent = `
+> 🛑 **MDX RENDER ERROR DETECTED**
+> **Reason:** ${errorMessage}
+
+${fence}text
+${lesson.content}
+${fence}
+`;
+
+                    mdxSource = await serialize(debugContent, {
                         mdxOptions: {
                             remarkPlugins: [remarkGfm],
                         },
+                        parseFrontmatter: false
                     });
                     autoFormatted = true;
                     serializationError = false;

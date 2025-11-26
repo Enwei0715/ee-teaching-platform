@@ -2,7 +2,7 @@ import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CalloutProps {
-    type?: 'info' | 'warning' | 'success' | 'error';
+    type?: 'info' | 'warning' | 'success' | 'error' | 'tip';
     title?: string;
     children: React.ReactNode;
 }
@@ -12,6 +12,7 @@ const icons = {
     warning: AlertCircle,
     success: CheckCircle,
     error: XCircle,
+    tip: Info,
 };
 
 const styles = {
@@ -19,10 +20,17 @@ const styles = {
     warning: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-200',
     success: 'bg-green-500/10 border-green-500/20 text-green-200',
     error: 'bg-red-500/10 border-red-500/20 text-red-200',
+    tip: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-200',
 };
 
 export function Callout({ type = 'info', title, children }: CalloutProps) {
     const Icon = icons[type];
+
+    // Defensive: ensure Icon exists
+    if (!Icon) {
+        console.warn(`Callout: Invalid type "${type}"`);
+        return <div className="my-6 p-4 rounded-lg border">{children}</div>;
+    }
 
     return (
         <div className={cn('my-6 p-4 rounded-lg border flex gap-3', styles[type])}>

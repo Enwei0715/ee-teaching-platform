@@ -47,6 +47,7 @@ export async function GET(
                     title: lesson.title,
                     description: lesson.description,
                     order: lesson.order,
+                    slug: lesson.slug,
                 };
                 return NextResponse.json({ content: lesson.content, meta });
             }
@@ -124,6 +125,7 @@ export async function POST(
                     description: meta.description,
                     content: content,
                     order: meta.order || existingLesson.order,
+                    slug: meta.slug || existingLesson.slug,
                 }
             });
 

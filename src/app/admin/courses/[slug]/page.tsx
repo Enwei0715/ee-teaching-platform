@@ -57,6 +57,14 @@ export default function EditCoursePage() {
                 body: JSON.stringify({ file: selectedFile, content, meta }),
             });
             if (res.ok) {
+                // Check if slug changed
+                if (meta.slug && meta.slug !== selectedFile.replace(/\.mdx$/, '')) {
+                    const newFilename = `${meta.slug}.mdx`;
+                    setSelectedFile(newFilename);
+                    // Update URL without reloading page
+                    // window.history.replaceState(null, '', `?file=${newFilename}`);
+                }
+
                 router.refresh();
                 // Refresh file list to update order if changed
                 const listRes = await fetch(`/api/admin/courses/${courseId}`);
@@ -297,13 +305,23 @@ export default function EditCoursePage() {
                             </div>
                             <div className="p-6 space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
                                     <input
                                         type="text"
                                         value={meta.title || ''}
                                         onChange={(e) => setMeta({ ...meta, title: e.target.value })}
                                         className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Slug (URL)</label>
+                                    <input
+                                        type="text"
+                                        value={meta.slug || ''}
+                                        onChange={(e) => setMeta({ ...meta, slug: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
+                                    />
+                                    <p className="text-xs text-yellow-500/50 mt-1">Changing this changes the URL.</p>
                                 </div>
 
                                 <div>
