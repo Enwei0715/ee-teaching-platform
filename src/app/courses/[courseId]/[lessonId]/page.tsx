@@ -19,6 +19,7 @@ import rehypeKatex from 'rehype-katex';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
 import LessonEditButton from '@/components/course/LessonEditButton';
+import TextSelectionToolbar from '@/components/ai/TextSelectionToolbar';
 
 
 interface Props {
@@ -178,7 +179,15 @@ export default async function LessonPage({ params }: Props) {
 
 
 
-                    <div className="prose prose-invert prose-blue max-w-none mb-16">
+                    <div className="prose prose-invert prose-blue max-w-none mb-16" id="lesson-content">
+                        <TextSelectionToolbar
+                            onAskAI={(text) => {
+                                // Dispatch custom event to open AI Tutor with text
+                                window.dispatchEvent(new CustomEvent('open-ai-tutor', {
+                                    detail: { text: `Explain this: "${text}"` }
+                                }));
+                            }}
+                        />
                         <MDXContent
                             source={mdxSource}
                             courseId={params.courseId}
@@ -206,7 +215,10 @@ export default async function LessonPage({ params }: Props) {
                     />
                 </div>
             </main>
-            <AITutor />
+            <AITutor
+                lessonTitle={lesson.meta.title}
+                lessonContent={lesson.content}
+            />
         </div>
     );
 }

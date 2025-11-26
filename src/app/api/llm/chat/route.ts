@@ -19,14 +19,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
         }
 
-        const systemPrompt = `You are a helpful physics and engineering tutor. 
-The student is asking a follow-up question about a quiz problem they just solved.
-Here is the context of the problem:
+        const systemPrompt = context && context.trim() !== "General context: The user is asking questions about electronics engineering."
+            ? `You are a helpful physics and engineering tutor.
 ${context}
 
-Answer the student's question clearly and concisely. 
-Focus on explaining the concepts related to the problem.
-Do not give away answers to other potential questions if not asked.`;
+Answer the student's questions clearly and concisely with reference to the lesson content when relevant.
+Focus on explaining concepts in an educational way. Use examples and analogies to aid understanding.
+If the question is about specific content in the lesson, quote or reference it directly.`
+            : `You are a helpful physics and engineering tutor.
+Answer the student's questions clearly and concisely about electronics, physics, and engineering topics.
+Focus on explaining concepts in an educational way. Use examples and analogies to aid understanding.`;
 
         const completion = await openai.chat.completions.create({
             messages: [

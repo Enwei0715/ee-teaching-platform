@@ -9,7 +9,12 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
-export default function AITutor() {
+interface AITutorProps {
+    lessonTitle?: string;
+    lessonContent?: string;
+}
+
+export default function AITutor({ lessonTitle, lessonContent }: AITutorProps = {}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
@@ -29,7 +34,13 @@ export default function AITutor() {
     }, [messages, isOpen, isExpanded]);
 
     useEffect(() => {
-        const handleOpen = () => setIsOpen(true);
+        const handleOpen = (e?: any) => {
+            setIsOpen(true);
+            // If event has detail with text, populate input
+            if (e?.detail?.text) {
+                setInput(e.detail.text);
+            }
+        };
         window.addEventListener('open-ai-tutor', handleOpen);
         return () => window.removeEventListener('open-ai-tutor', handleOpen);
     }, []);
@@ -67,7 +78,18 @@ export default function AITutor() {
                 content: m.content
             }));
 
-            const reply = await askQuestion(chatHistory, "General context: The user is asking questions about electronics engineering.");
+            // Build context string
+            let contextStr = "General context: The user is asking questions about electronics engineering.";
+            if (lessonTitle || lessonContent) {
+                contextStr = `The user is currently reading the lesson: "${lessonTitle || 'N/A'}".`;
+                if (lessonContent) {
+                    // Provide a summary of content (first 1500 chars)
+                    const contentSummary = lessonContent.substring(0, 1500);
+                    contextStr += `\n\nHere is the content of the lesson:\n${contentSummary}${lessonContent.length > 1500 ? '...' : ''}`;
+                }
+            }
+
+            const reply = await askQuestion(chatHistory, contextStr);
 
             setMessages(prev => [...prev, {
                 role: 'assistant',
