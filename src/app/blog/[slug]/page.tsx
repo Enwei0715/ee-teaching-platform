@@ -51,7 +51,7 @@ export default async function BlogPost({ params }: Props) {
     const readingTime = calculateReadingTime(post.content);
 
     return (
-        <article className="min-h-screen bg-bg-primary relative">
+        <article className="min-h-screen bg-transparent relative z-0">
             <InteractiveDotGrid />
             {/* Hero Section */}
             <header className="glass-panel border-b border-white/10">
@@ -85,7 +85,7 @@ export default async function BlogPost({ params }: Props) {
                 </div>
             </header>
 
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <div className="max-w-3xl mx-auto px-6 pt-12 pb-6">
                 {/* Content */}
                 <div className="prose prose-invert prose-blue max-w-none prose-lg">
 

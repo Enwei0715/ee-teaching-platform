@@ -35,15 +35,14 @@ export default function ShortcutsModal() {
         {
             category: "Actions", items: [
                 { keys: ["Ctrl", "K"], desc: "Search" },
-                { keys: ["Ctrl", "S"], desc: "Save Changes" },
-                { keys: ["Ctrl", "Enter"], desc: "Submit Form" },
-                { keys: ["Esc"], desc: "Close Modals" },
+                { keys: ["Ctrl", "Enter"], desc: "Publish Post / Send" },
+                { keys: ["Esc"], desc: "Close Window" },
             ]
         },
         {
             category: "Lessons", items: [
-                { keys: ["J"], desc: "Next Lesson" },
-                { keys: ["K"], desc: "Previous Lesson" },
+                { keys: ["→"], desc: "Next Lesson" },
+                { keys: ["←"], desc: "Previous Lesson" },
             ]
         },
     ];

@@ -72,7 +72,7 @@ export default async function AdminDashboard() {
                         </div>
                         <h2 className="text-xl font-bold text-white">Content Management</h2>
                     </div>
-                    <p className="text-gray-400">Manage footer text, links, and About Us page content.</p>
+                    <p className="text-gray-400">Manage footer text, links, and About Me page content.</p>
                 </Link>
             </div>
 

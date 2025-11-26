@@ -76,9 +76,9 @@ export default function BlogPage() {
     }
 
     return (
-        <div className="flex-1 flex flex-col bg-transparent relative overflow-hidden">
+        <div className="flex-1 flex flex-col bg-transparent relative z-0 overflow-hidden">
             <InteractiveDotGrid />
-            <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-12 flex flex-col relative z-10">
+            <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 md:px-6 md:pt-12 md:pb-6 flex flex-col relative z-10">
                 <div className="mb-12 text-center relative">
                     <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">Engineering Blog</h1>
                     <p className="text-text-secondary text-lg mb-6">

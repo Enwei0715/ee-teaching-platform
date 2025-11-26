@@ -49,12 +49,12 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                         onClick={() => handleSelect(index)}
                         disabled={selectedOption !== null}
                         className={`w-full text-left px-4 py-3 rounded-md border transition-colors ${selectedOption === index
-                                ? index === quiz.correctAnswer
-                                    ? 'bg-green-500/20 border-green-400 text-green-300'
-                                    : 'bg-red-500/20 border-red-400 text-red-300'
-                                : selectedOption !== null && index === quiz.correctAnswer
-                                    ? 'bg-green-500/20 border-green-400 text-green-300'
-                                    : 'border-white/20 hover:bg-white/5 text-text-primary hover:border-indigo-400/50'
+                            ? index === quiz.correctAnswer
+                                ? 'bg-green-500/20 border-green-400 text-green-300'
+                                : 'bg-red-500/20 border-red-400 text-red-300'
+                            : selectedOption !== null && index === quiz.correctAnswer
+                                ? 'bg-green-500/20 border-green-400 text-green-300'
+                                : 'border-white/20 hover:bg-white/5 text-text-primary hover:border-indigo-400/50'
                             }`}
                     >
                         <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
@@ -74,9 +74,12 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
             </div>
 
             {showExplanation && (
-                <div className="mt-6 p-4 glass-ghost rounded-md border border-blue-400/30">
-                    <h4 className="text-sm font-semibold text-blue-300 mb-2">AI Explanation:</h4>
-                    <div className="text-sm text-text-secondary prose prose-sm prose-invert max-w-none">
+                <div className="mt-6 p-4 glass-panel border border-indigo-500/30 rounded-lg shadow-inner bg-slate-900/40">
+                    <h4 className="text-sm font-semibold text-indigo-300 mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                        AI Explanation:
+                    </h4>
+                    <div className="text-sm text-gray-200 prose prose-sm prose-invert max-w-none leading-relaxed">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkMath]}
                             rehypePlugins={[rehypeKatex]}
@@ -84,7 +87,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                             {quiz.explanation}
                         </ReactMarkdown>
                     </div>
-                    <p className="text-xs text-blue-400 mt-2 italic">
+                    <p className="text-xs text-indigo-400/80 mt-3 italic border-t border-indigo-500/20 pt-2">
                         (Review this explanation carefully. Is it 100% correct?)
                     </p>
 

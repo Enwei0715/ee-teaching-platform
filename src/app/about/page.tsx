@@ -25,7 +25,7 @@ export default function AboutPage() {
                 setLoading(false);
             })
             .catch(() => {
-                setContent('# About Us\n\nContent loading failed.');
+                setContent('# About Me\n\nContent loading failed.');
                 setLoading(false);
             });
     }, []);
@@ -33,15 +33,24 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-transparent relative overflow-hidden">
             <ParticleBackground />
-            <header className="py-20 px-6 text-center bg-bg-secondary/80 backdrop-blur-sm border-b border-border-primary relative z-10">
-                <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">Empowering the Next Generation of Hardware Engineers</h1>
-                <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
-                    EE Master provides the tools, simulations, and community you need to go from theory to prototype.
-                </p>
+            <header className="py-20 px-6 text-center bg-transparent relative z-10">
+                <div className="bg-transparent">
+                    <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-4">Empowering the Next Generation of Hardware Engineers</h1>
+                    <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+                        EE Master provides the tools, simulations, and community you need to go from theory to prototype.
+                    </p>
+                </div>
             </header>
 
-            <div className="max-w-4xl mx-auto px-6 py-16 relative z-10">
-                <div className="glass-panel rounded-xl overflow-hidden shadow-lg p-8 md:p-12">
+            <div className="w-full relative py-12 my-0 mb-24">
+                {/* Full Width Glass & Lines - Light Reading Window */}
+                <div className="absolute inset-0 w-full bg-slate-900/20 backdrop-blur-sm z-0">
+                    <div className="absolute top-0 w-full h-[1px] border-t border-gray-700/50"></div>
+                    <div className="absolute bottom-0 w-full h-[1px] border-b border-gray-700/50"></div>
+                </div>
+
+                {/* Content Area */}
+                <div className="max-w-6xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8">
                     <div className="prose prose-invert prose-lg max-w-none">
                         {loading ? (
                             <div className="space-y-4">
@@ -62,7 +71,7 @@ export default function AboutPage() {
             </div>
 
             <section className="max-w-4xl mx-auto px-6 pb-16">
-                <h2 className="text-3xl font-bold text-text-primary mb-8 text-center">The Team</h2>
+                <h2 className="text-3xl font-bold text-text-primary mb-8 text-center">The Instructor</h2>
                 <div className="flex justify-center">
                     <Tilt
                         className="parallax-effect-glare-scale touch-none"

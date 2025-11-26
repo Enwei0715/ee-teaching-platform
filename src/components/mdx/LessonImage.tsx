@@ -12,7 +12,7 @@ export const LessonImage: React.FC<LessonImageProps> = ({ alt, className, ...pro
 
     return (
         <figure className="my-8 w-full flex flex-col items-center">
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 w-full max-w-2xl overflow-hidden flex justify-center">
+            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 w-full max-w-2xl overflow-hidden flex justify-center relative z-10">
                 <img
                     alt={alt}
                     className={`w-full h-auto max-w-full object-contain mx-auto rounded-md ${className || ''}`}

@@ -29,13 +29,7 @@ export default function HotkeysProvider({
                 return;
             }
 
-            // Ctrl + S or Cmd + S: Trigger Save
-            if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-                e.preventDefault();
-                window.dispatchEvent(new CustomEvent("trigger-save"));
-                setChord(null);
-                return;
-            }
+
 
             // Ctrl + Enter or Cmd + Enter: Trigger Submit
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -89,14 +83,14 @@ export default function HotkeysProvider({
                     return;
                 }
 
-                // Lesson Navigation (J/K) - K for Next, J for Previous
+                // Lesson Navigation (Arrows or J/K)
                 if (!e.metaKey && !e.ctrlKey && !e.altKey) {
-                    if (e.key === "k") {
+                    if (e.key === "k" || e.key === "ArrowRight") {
                         e.preventDefault();
                         window.dispatchEvent(new CustomEvent("nav-next-lesson"));
                         setChord(null);
                         return;
-                    } else if (e.key === "j") {
+                    } else if (e.key === "j" || e.key === "ArrowLeft") {
                         e.preventDefault();
                         window.dispatchEvent(new CustomEvent("nav-prev-lesson"));
                         setChord(null);

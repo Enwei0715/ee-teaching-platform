@@ -132,7 +132,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
         { category: 'resources', label: 'Projects', url: '/projects', orderIndex: 2 },
         { category: 'resources', label: 'Forum', url: '/forum', orderIndex: 3 },
         { category: 'community', label: 'GitHub', url: 'https://github.com/Enwei0715/ee-teaching-platform', orderIndex: 0 },
-        { category: 'community', label: 'About Us', url: '/about', orderIndex: 1 },
+        { category: 'community', label: 'About Me', url: '/about', orderIndex: 1 },
     ];
 
     const handleInitializeDefaults = async () => {
@@ -199,7 +199,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
                             : 'text-gray-400 hover:text-white'
                             }`}
                     >
-                        {tab === 'links' ? 'Footer Links' : tab === 'about' ? 'About Us' : 'General'}
+                        {tab === 'links' ? 'Footer Links' : tab === 'about' ? 'About Me' : 'General'}
                     </button>
                 ))}
             </div>
@@ -231,14 +231,14 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
             {/* About Tab */}
             {activeTab === 'about' && (
                 <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
-                    <h2 className="text-xl font-bold text-white mb-4">About Us Content</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">About Me Content</h2>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-400 mb-2">Content (Markdown supported)</label>
                         <textarea
                             value={aboutContent}
                             onChange={(e) => setAboutContent(e.target.value)}
                             className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white h-[500px] font-mono"
-                            placeholder="# About Us\n\nWrite your content here..."
+                            placeholder="# About Me\n\nWrite your content here..."
                         />
                     </div>
                     <button

@@ -56,6 +56,7 @@ export default function TextSelectionToolbar() {
         // Listen for both mouseup (mouse selection) and keyup (keyboard selection)
         document.addEventListener('mouseup', handleSelection);
         document.addEventListener('keyup', handleSelection);
+        document.addEventListener('touchend', handleSelection); // Add touch support
 
         // Also listen for selectionchange, but debounce it or rely on mouseup/keyup for final state
         // For simplicity and performance, mouseup/keyup is usually sufficient for "finished" selection
@@ -63,6 +64,7 @@ export default function TextSelectionToolbar() {
         return () => {
             document.removeEventListener('mouseup', handleSelection);
             document.removeEventListener('keyup', handleSelection);
+            document.removeEventListener('touchend', handleSelection);
         };
     }, [handleSelection]);
 

@@ -220,7 +220,7 @@ export default function InteractiveDotGrid() {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div ref={containerRef} className="absolute inset-0 z-[-1] pointer-events-none overflow-hidden">
             <canvas
                 ref={canvasRef}
                 className="block w-full h-full"

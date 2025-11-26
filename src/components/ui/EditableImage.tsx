@@ -43,5 +43,5 @@ export default function EditableImage({
         return <Image {...commonProps} width={width} height={height} />;
     }
 
-    return <img {...imgProps} />;
+    return <img {...imgProps} className={`${className} relative z-10`} />;
 }

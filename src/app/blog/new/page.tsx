@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import BlogEditor from "@/components/blog/BlogEditor";
+import DigitalGridBackground from "@/components/ui/DigitalGridBackground";
 
 export default function NewBlogPostPage() {
     const router = useRouter();
@@ -43,23 +44,15 @@ export default function NewBlogPostPage() {
     }
 
     return (
-        <div className="min-h-screen bg-bg-primary">
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                <div className="mb-6">
-                    <Link href="/blog" className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2">
-                        <ArrowLeft size={20} />
-                        Back to Blog
-                    </Link>
-                </div>
-                <div className="bg-bg-secondary rounded-xl border border-border-primary p-8">
-                    <h1 className="text-3xl font-bold text-white mb-8">Create New Blog Post</h1>
-                    <BlogEditor
-                        slug="new"
-                        isNew={true}
-                        baseApiUrl="/api/engineer/blog"
-                        redirectUrl="/blog/{slug}"
-                    />
-                </div>
+        <div className="min-h-screen bg-slate-950 relative">
+            <DigitalGridBackground />
+            <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+                <BlogEditor
+                    slug="new"
+                    isNew={true}
+                    baseApiUrl="/api/engineer/blog"
+                    redirectUrl="/blog/{slug}"
+                />
             </div>
         </div>
     );

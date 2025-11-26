@@ -1,6 +1,7 @@
 import { checkAdmin } from "@/lib/admin-auth";
 import Link from "next/link";
 import { LayoutDashboard, BookOpen, FileText, Users, Settings, LogOut, FolderKanban, MessageSquare } from "lucide-react";
+import DigitalGridBackground from "@/components/ui/DigitalGridBackground";
 
 export default async function AdminLayout({
     children,
@@ -12,7 +13,7 @@ export default async function AdminLayout({
     return (
         <div className="min-h-screen bg-black flex flex-col lg:flex-row">
             {/* Sidebar */}
-            <aside className="w-full lg:w-64 bg-gray-950 border-b lg:border-b-0 lg:border-r border-gray-800 text-white flex flex-col shrink-0">
+            <aside className="w-full lg:w-64 bg-gray-950 border-b lg:border-b-0 lg:border-r border-gray-800 text-white flex flex-col shrink-0 relative z-20">
                 <div className="p-4 lg:p-6 border-b border-gray-800 flex items-center justify-between lg:block">
                     <h1 className="text-xl font-bold flex items-center gap-2">
                         <Settings className="text-indigo-500" />
@@ -56,8 +57,9 @@ export default async function AdminLayout({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-black h-[calc(100dvh-60px)] lg:h-screen">
-                <div className="p-4 lg:p-8 pb-40">
+            <main className="flex-1 overflow-y-auto bg-black h-[calc(100dvh-60px)] lg:h-screen relative">
+                <DigitalGridBackground />
+                <div className="p-4 lg:p-8 pb-40 relative z-10">
                     {children}
                 </div>
             </main>

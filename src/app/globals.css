@@ -32,11 +32,15 @@
   }
 
   .glass-heavy {
-    @apply bg-slate-950/65 backdrop-blur-xl;
+    @apply bg-slate-950/40 backdrop-blur-xl border border-white/10 shadow-2xl;
   }
 
   .glass-ghost {
     @apply bg-white/[0.05] backdrop-blur-sm;
+  }
+
+  .glass-light {
+    @apply bg-black/30 backdrop-blur-md;
   }
 
   .skeleton-bone {
