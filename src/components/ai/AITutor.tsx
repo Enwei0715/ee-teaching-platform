@@ -132,7 +132,11 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         <div className="fixed bottom-6 right-6 z-50">
             {/* Chat Window */}
             {isOpen && (
-                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-slate-950/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
+                <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
+                    ${isExpanded
+                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-[600px] md:h-[700px]'
+                        : 'fixed bottom-24 left-4 right-4 h-[60vh] z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-96 md:h-[500px]'
+                    }`}>
                     {/* Header */}
                     <div className="bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">
