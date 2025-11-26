@@ -31,10 +31,17 @@ export default function TextSelectionToolbar() {
                     return;
                 }
 
-                // Position the toolbar above the selection
+                // Position the toolbar above the selection using FIXED positioning (viewport coordinates)
+                // We do NOT add window.scrollY because the container is fixed
+                const top = rect.top - 50;
+                const left = rect.left + (rect.width / 2);
+
+                // Boundary Check: If selection is too close to top of screen, flip below
+                const finalTop = top < 60 ? rect.bottom + 10 : top;
+
                 setPosition({
-                    top: rect.top + window.scrollY - 50,
-                    left: rect.left + window.scrollX + rect.width / 2,
+                    top: finalTop,
+                    left: left,
                 });
 
                 setSelectedText(text);
