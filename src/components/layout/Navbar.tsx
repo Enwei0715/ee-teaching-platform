@@ -334,7 +334,7 @@ export default function Navbar() {
 
                         {/* 3. User Section */}
                         {session ? (
-                            <div className="bg-slate-950/60 rounded-xl p-5 border border-white/10 backdrop-blur-md">
+                            <div className="bg-slate-950/60 rounded-xl p-5 pb-6 border border-white/10 backdrop-blur-md">
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="w-12 h-12 rounded-full bg-accent-primary/20 flex items-center justify-center text-accent-primary border border-accent-primary/30">
                                         <User size={24} />
