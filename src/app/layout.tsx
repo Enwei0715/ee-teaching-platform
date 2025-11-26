@@ -10,6 +10,7 @@ import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
 import { EditModeProvider } from "@/context/EditModeContext";
 import BackgroundGrid from "@/components/layout/BackgroundGrid";
+import prisma from "@/lib/prisma";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,11 +23,16 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    // Fetch footer data server-side
+    const settingsData = await prisma.siteSettings.findMany();
+    const settings = settingsData.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {});
+    const links = await prisma.footerLink.findMany({ orderBy: { orderIndex: 'asc' } });
+
     return (
         <html lang="en" className="scroll-smooth">
             <body className={`${inter.className} bg-gray-950 text-white antialiased overflow-x-hidden`}>
@@ -37,14 +43,13 @@ export default function RootLayout({
                                 <Navbar />
                                 <main className="flex-1 w-full relative">
                                     {/* Subtle Blueprint Grid Overlay */}
-                                    {/* Subtle Blueprint Grid Overlay */}
                                     <BackgroundGrid />
                                     <div className="relative z-10">
                                         {children}
                                     </div>
                                 </main>
                                 <ShortcutsModal />
-                                <Footer />
+                                <Footer settings={settings} links={links} />
                             </div>
                         </HotkeysProvider>
                     </EditModeProvider>

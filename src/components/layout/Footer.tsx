@@ -1,27 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useEditMode } from '@/context/EditModeContext';
 import EditableText from '@/components/ui/EditableText';
 import { Settings } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+    settings: any;
+    links: any[];
+}
+
+export default function Footer({ settings = {}, links = [] }: FooterProps) {
     const pathname = usePathname();
     const { isEditMode } = useEditMode();
-    const [settings, setSettings] = useState<any>({});
-    const [links, setLinks] = useState<any[]>([]);
-
-    useEffect(() => {
-        fetch('/api/site-settings', { cache: 'no-store' })
-            .then(res => res.json())
-            .then(data => {
-                setSettings(data.settings || {});
-                setLinks(data.links || []);
-            })
-            .catch(console.error);
-    }, []);
 
     // Hide Footer on Admin pages
     if (pathname?.startsWith('/admin')) {
@@ -35,7 +27,18 @@ export default function Footer() {
             <footer className="relative z-10 w-full border-t border-gray-800 bg-gray-950/70 backdrop-blur-md py-12 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="col-span-1 md:col-span-2">
-                        <h3 className="text-text-primary font-bold text-lg mb-4">EE Master</h3>
+                        <div className="flex items-center gap-3 mb-4">
+                            <h3 className="text-text-primary font-bold text-lg">EE Master</h3>
+                            {isEditMode && (
+                                <Link
+                                    href="/admin/content"
+                                    className="text-xs bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-500 flex items-center gap-1"
+                                >
+                                    <Settings size={12} />
+                                    Manage Footer
+                                </Link>
+                            )}
+                        </div>
                         <p className="text-text-secondary mb-4 whitespace-pre-wrap">
                             {settings.footer_description}
                         </p>
@@ -43,18 +46,7 @@ export default function Footer() {
                     <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
                         {/* Resources Column */}
                         <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <h4 className="text-text-primary font-bold">Resources</h4>
-                                {isEditMode && (
-                                    <Link
-                                        href="/admin/content"
-                                        className="text-xs bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-500 flex items-center gap-1"
-                                    >
-                                        <Settings size={12} />
-                                        Manage
-                                    </Link>
-                                )}
-                            </div>
+                            <h4 className="text-text-primary font-bold mb-4">Resources</h4>
                             <ul className="space-y-2">
                                 {links
                                     .filter((link: any) => link.category === 'resources' || !link.category)

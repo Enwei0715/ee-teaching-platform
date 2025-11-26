@@ -19,9 +19,9 @@ const OscilloscopeBackground = () => {
 
         // Configuration for waves
         const waves = [
-            { amplitude: 50, frequency: 0.01, speed: 0.02, color: 'rgba(56, 189, 248, 0.1)' }, // Light Blue
-            { amplitude: 30, frequency: 0.02, speed: 0.03, color: 'rgba(14, 165, 233, 0.08)' }, // Sky Blue
-            { amplitude: 70, frequency: 0.005, speed: 0.01, color: 'rgba(99, 102, 241, 0.05)' }, // Indigo (Deep)
+            { amplitude: 60, frequency: 0.005, speed: 0.015, color: 'rgba(56, 189, 248, 0.15)' }, // Light Blue
+            { amplitude: 40, frequency: 0.01, speed: 0.02, color: 'rgba(14, 165, 233, 0.1)' }, // Sky Blue
+            { amplitude: 80, frequency: 0.003, speed: 0.01, color: 'rgba(99, 102, 241, 0.05)' }, // Indigo (Deep)
         ];
 
         const handleResize = () => {
@@ -32,23 +32,38 @@ const OscilloscopeBackground = () => {
 
         const animate = () => {
             if (!isMounted) return;
-            // Create a trail effect or clear completely
             ctx.clearRect(0, 0, width, height);
             increment += 1;
 
-            const centerY = height / 2;
+            const centerY = height * 0.6; // Move waves slightly down
 
             waves.forEach((wave) => {
                 ctx.beginPath();
-                ctx.strokeStyle = wave.color;
-                ctx.lineWidth = 2;
 
-                for (let x = 0; x < width; x++) {
+                // Create gradient for the fill
+                const gradient = ctx.createLinearGradient(0, centerY - wave.amplitude, 0, height);
+                gradient.addColorStop(0, wave.color);
+                gradient.addColorStop(1, 'rgba(15, 23, 42, 0)'); // Fade to transparent at bottom
+
+                ctx.fillStyle = gradient;
+                ctx.strokeStyle = wave.color.replace(/[\d.]+\)$/, '0.3)'); // Slightly more opaque line
+
+                // Start path at bottom left
+                ctx.moveTo(0, height);
+                ctx.lineTo(0, centerY);
+
+                for (let x = 0; x <= width; x++) {
                     // Sine wave formula: y = amplitude * sin(frequency * x + moving_offset)
                     const y = centerY + wave.amplitude * Math.sin(x * wave.frequency + increment * wave.speed);
-                    if (x === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
+                    ctx.lineTo(x, y);
                 }
+
+                // Close path at bottom right
+                ctx.lineTo(width, height);
+                ctx.closePath();
+
+                ctx.fill();
+                // Optional: Draw the top line for better definition
                 ctx.stroke();
             });
 

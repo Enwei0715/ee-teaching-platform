@@ -50,19 +50,7 @@ export default async function CoursesPage() {
 
     return (
         <div className="px-4 py-6 md:px-8 md:py-12 flex-1 relative overflow-hidden min-h-screen bg-transparent">
-            {/* Static Engineering Grid Background */}
-            <div className="absolute inset-0 z-0 pointer-events-none"
-                style={{
-                    backgroundImage: `
-                        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-                    `,
-                    backgroundSize: '60px 60px'
-                }}
-            >
-                {/* Radial gradient fade for softer edges */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
-            </div>
+
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="mb-12">
                     <EditableText

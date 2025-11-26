@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import InteractiveGridPattern from '../ui/InteractiveGridPattern';
 
 export default function BackgroundGrid() {
     const pathname = usePathname();
@@ -8,6 +9,11 @@ export default function BackgroundGrid() {
     // Hide on Blog and Forum pages
     if (pathname?.startsWith('/blog') || pathname?.startsWith('/forum')) {
         return null;
+    }
+
+    // Use interactive grid for Course pages
+    if (pathname?.startsWith('/courses')) {
+        return <InteractiveGridPattern />;
     }
 
     return (

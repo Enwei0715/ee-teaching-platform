@@ -119,7 +119,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
         if (!confirm('Are you sure?')) return;
         try {
             await fetch(`/api/admin/footer-links?id=${id}`, { method: 'DELETE' });
-            fetchData();
+            await fetchData();
             router.refresh();
         } catch (error) {
             console.error('Failed to delete link', error);
