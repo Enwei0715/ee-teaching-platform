@@ -87,6 +87,7 @@ export default function TextSelectionToolbar() {
     };
 
     if (!mounted || !show) return null;
+    if (typeof document === 'undefined') return null;
 
     return createPortal(
         <div

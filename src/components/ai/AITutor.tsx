@@ -9,12 +9,20 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+interface LessonContext {
+    courseTitle: string;
+    lessonTitle: string;
+    content: string;
+}
+
 interface AITutorProps {
     lessonTitle?: string;
     lessonContent?: string;
+    lessonContext?: LessonContext;
 }
 
-export default function AITutor({ lessonTitle, lessonContent }: AITutorProps = {}) {
+export default function AITutor({ lessonTitle, lessonContent, lessonContext }: AITutorProps = {}) {
+    console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
@@ -89,7 +97,7 @@ export default function AITutor({ lessonTitle, lessonContent }: AITutorProps = {
                 }
             }
 
-            const reply = await askQuestion(chatHistory, contextStr);
+            const reply = await askQuestion(chatHistory, contextStr, lessonContext);
 
             setMessages(prev => [...prev, {
                 role: 'assistant',
@@ -124,16 +132,16 @@ export default function AITutor({ lessonTitle, lessonContent }: AITutorProps = {
         <div className="fixed bottom-6 right-6 z-50">
             {/* Chat Window */}
             {isOpen && (
-                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
+                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-slate-950/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
                     {/* Header */}
-                    <div className="bg-indigo-600 p-4 flex justify-between items-center text-white">
+                    <div className="bg-slate-900/50 border-b border-gray-700 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 rounded-full">
+                            <div className="p-1.5 bg-white/10 rounded-full">
                                 <Bot size={20} />
                             </div>
                             <div>
                                 <h3 className="font-bold text-sm">AI Tutor</h3>
-                                <p className="text-xs text-indigo-200">Always here to help</p>
+                                <p className="text-xs text-gray-400">Always here to help</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -154,60 +162,63 @@ export default function AITutor({ lessonTitle, lessonContent }: AITutorProps = {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gray-50">
-                        {messages.map((msg, idx) => (
-                            <div
-                                key={idx}
-                                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
+                    {/* Messages */}
+                    <div className="flex-1 relative min-h-0 bg-transparent">
+                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth">
+                            {messages.map((msg, idx) => (
                                 <div
-                                    className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                        ? 'bg-indigo-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
-                                        : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm prose prose-sm max-w-none'
-                                        }`}
+                                    key={idx}
+                                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                 >
-                                    {msg.role === 'user' ? (
-                                        msg.content
-                                    ) : (
-                                        <ReactMarkdown
-                                            remarkPlugins={[remarkGfm, remarkMath]}
-                                            rehypePlugins={[rehypeKatex]}
-                                        >
-                                            {msg.content}
-                                        </ReactMarkdown>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                        {loading && (
-                            <div className="flex justify-start">
-                                <div className="bg-white border border-gray-200 p-3 rounded-2xl rounded-bl-none shadow-sm">
-                                    <div className="flex gap-1">
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                    <div
+                                        className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
+                                            ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
+                                            : 'bg-slate-800 border border-gray-700 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
+                                            }`}
+                                    >
+                                        {msg.role === 'user' ? (
+                                            msg.content
+                                        ) : (
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm, remarkMath]}
+                                                rehypePlugins={[rehypeKatex]}
+                                            >
+                                                {msg.content}
+                                            </ReactMarkdown>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
+                            ))}
+                            {loading && (
+                                <div className="flex justify-start">
+                                    <div className="bg-slate-800 border border-gray-700 p-3 rounded-2xl rounded-bl-none shadow-sm">
+                                        <div className="flex gap-1">
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
                     </div>
 
                     {/* Input */}
-                    <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-200">
+                    <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-gray-700">
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Ask a question..."
-                                className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-black"
+                                className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 disabled={loading}
                             />
                             <button
                                 type="submit"
                                 disabled={!input.trim() || loading}
-                                className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <Send size={18} />
                             </button>

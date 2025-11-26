@@ -11,6 +11,8 @@ const HexagonalBackground = () => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        let isMounted = true;
+
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
         let animationFrameId: number;
@@ -67,6 +69,7 @@ const HexagonalBackground = () => {
         };
 
         const animate = () => {
+            if (!isMounted) return;
             ctx.clearRect(0, 0, width, height);
             time += 0.01;
 
@@ -99,6 +102,7 @@ const HexagonalBackground = () => {
         animate();
 
         return () => {
+            isMounted = false;
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('mousemove', handleMouseMove);
             cancelAnimationFrame(animationFrameId);

@@ -1,3 +1,9 @@
+import { cache } from 'react';
+import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
+import rehypeKatex from 'rehype-katex';
 import prisma from '@/lib/prisma';
 
 export type Post = {
@@ -110,6 +116,44 @@ export const getAllBlogPosts = async (): Promise<Post[]> => {
         }));
     } catch (error) {
         console.error('Error fetching all blog posts:', error);
+        return [];
+    }
+};
+
+export const getBlogPostList = async (): Promise<Omit<Post, 'content'>[]> => {
+    try {
+        const posts = await prisma.blogPost.findMany({
+            where: { published: true },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                slug: true,
+                title: true,
+                description: true,
+                category: true,
+                createdAt: true,
+                authorId: true,
+                author: {
+                    select: {
+                        name: true,
+                        image: true
+                    }
+                }
+            }
+        });
+
+        return posts.map(post => ({
+            slug: post.slug,
+            meta: {
+                title: post.title,
+                date: post.createdAt.toISOString().split('T')[0],
+                description: post.description || '',
+                author: post.author?.name || 'EE Master Team',
+                category: post.category || 'General',
+            },
+            authorId: post.authorId,
+        }));
+    } catch (error) {
+        console.error('Error fetching blog post list:', error);
         return [];
     }
 };
@@ -280,4 +324,34 @@ export const getCourseBySlug = async (slug: string): Promise<Course | null> => {
         duration: course.duration || undefined,
     };
 };
+
+export const compileMdx = cache(async (content: string) => {
+    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
+    let processedContent = content
+        .replace(/\\\(/g, '$')      // \( -> $
+        .replace(/\\\)/g, '$')      // \) -> $
+        .replace(/\\\[/g, '$$\n')   // \[ -> $$
+        .replace(/\\\]/g, '\n$$');  // \] -> $$
+
+    try {
+        return await serialize(processedContent, {
+            mdxOptions: {
+                remarkPlugins: [
+                    remarkGfm,
+                    remarkBreaks,
+                    [remarkMath, { singleDollarTextMath: true }]
+                ],
+                rehypePlugins: [rehypeKatex],
+            },
+        });
+    } catch (error) {
+        console.error('Error serializing MDX content:', error);
+        // Fallback to displaying raw content or a friendly error if serialization fails
+        try {
+            return await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${content.replace(/`/g, '\\`')}`);
+        } catch (retryError) {
+            return await serialize('Content unavailable.');
+        }
+    }
+});
 

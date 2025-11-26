@@ -211,6 +211,11 @@ export default async function LessonPage({ params }: Props) {
             <AITutor
                 lessonTitle={lesson.meta.title}
                 lessonContent={lesson.content}
+                lessonContext={{
+                    courseTitle: params.courseId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                    lessonTitle: lesson.meta.title,
+                    content: lesson.content.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n') // Strip HTML tags and reduce excessive newlines
+                }}
             />
         </div>
     );

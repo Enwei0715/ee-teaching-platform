@@ -10,6 +10,8 @@ const OscilloscopeBackground = () => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        let isMounted = true;
+
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
         let frameId: number;
@@ -29,6 +31,7 @@ const OscilloscopeBackground = () => {
         window.addEventListener('resize', handleResize);
 
         const animate = () => {
+            if (!isMounted) return;
             // Create a trail effect or clear completely
             ctx.clearRect(0, 0, width, height);
             increment += 1;
@@ -55,6 +58,7 @@ const OscilloscopeBackground = () => {
         animate();
 
         return () => {
+            isMounted = false;
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(frameId);
         };

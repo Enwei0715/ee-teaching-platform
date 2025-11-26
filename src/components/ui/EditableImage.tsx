@@ -37,9 +37,11 @@ export default function EditableImage({
         priority,
     };
 
+    const { priority: _priority, ...imgProps } = commonProps;
+
     if (width && height) {
         return <Image {...commonProps} width={width} height={height} />;
     }
 
-    return <img {...commonProps} />;
+    return <img {...imgProps} />;
 }

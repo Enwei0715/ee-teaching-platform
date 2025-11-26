@@ -43,7 +43,6 @@ export default function RootLayout({
                                         {children}
                                     </div>
                                 </main>
-                                <AITutor />
                                 <ShortcutsModal />
                                 <Footer />
                             </div>

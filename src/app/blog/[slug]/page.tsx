@@ -1,15 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { serialize } from 'next-mdx-remote/serialize';
 import { ArrowLeft, Calendar, Clock, User, Share2, Tag } from 'lucide-react';
-import { getPostBySlug, getAllBlogPosts } from '@/lib/mdx';
+import { getPostBySlug, getAllBlogPosts, compileMdx } from '@/lib/mdx';
 import MDXContent from '@/components/mdx/MDXContent';
 import { calculateReadingTime } from '@/lib/utils';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import remarkBreaks from 'remark-breaks';
-import rehypeKatex from 'rehype-katex';
 import BlogAdminControls from '@/components/blog/BlogAdminControls';
 
 interface Props {
@@ -49,36 +44,8 @@ export default async function BlogPost({ params }: Props) {
         notFound();
     }
 
-    // Defensive: Wrap MDX serialization in try-catch to prevent crashes
-    let mdxSource;
-
-    // Preprocess: Convert LaTeX parentheses syntax to dollar signs for MDX compatibility
-    let processedContent = post.content
-        .replace(/\\\(/g, '$')      // \( -> $
-        .replace(/\\\)/g, '$')      // \) -> $
-        .replace(/\\\[/g, '$$\n')   // \[ -> $$
-        .replace(/\\\]/g, '\n$$');  // \] -> $$
-
-    try {
-        mdxSource = await serialize(processedContent, {
-            mdxOptions: {
-                remarkPlugins: [
-                    remarkGfm,
-                    remarkBreaks,
-                    [remarkMath, { singleDollarTextMath: true }]
-                ],
-                rehypePlugins: [rehypeKatex],
-            },
-        });
-    } catch (error) {
-        console.error('Error serializing MDX content for blog post:', params.slug, error);
-        // Fallback to displaying raw content or a friendly error if serialization fails
-        try {
-            mdxSource = await serialize(`> **Warning:** Content preview unavailable due to formatting errors.\n\n${post.content.replace(/`/g, '\\`')}`);
-        } catch (retryError) {
-            mdxSource = await serialize('Content unavailable.');
-        }
-    }
+    // Use cached MDX compilation
+    const mdxSource = await compileMdx(post.content);
 
     const readingTime = calculateReadingTime(post.content);
 

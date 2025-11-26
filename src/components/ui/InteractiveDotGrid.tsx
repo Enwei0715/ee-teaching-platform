@@ -14,6 +14,8 @@ export default function InteractiveDotGrid() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        let isMounted = true;
+
         const GRID_SPACING = 45;
         const BASE_RADIUS = 1.5;
         let dots: { x: number; y: number; baseOpacity: number }[] = [];
@@ -55,6 +57,7 @@ export default function InteractiveDotGrid() {
         resizeObserver.observe(container);
 
         const animate = () => {
+            if (!isMounted) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             dots.forEach(dot => {
@@ -92,6 +95,7 @@ export default function InteractiveDotGrid() {
         window.addEventListener('mousemove', handleMouseMove);
 
         return () => {
+            isMounted = false;
             resizeObserver.disconnect();
             window.removeEventListener('mousemove', handleMouseMove);
             cancelAnimationFrame(animationFrameId);
