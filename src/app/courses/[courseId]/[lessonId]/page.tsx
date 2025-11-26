@@ -180,14 +180,7 @@ export default async function LessonPage({ params }: Props) {
 
 
                     <div className="prose prose-invert prose-blue max-w-none mb-16" id="lesson-content">
-                        <TextSelectionToolbar
-                            onAskAI={(text) => {
-                                // Dispatch custom event to open AI Tutor with text
-                                window.dispatchEvent(new CustomEvent('open-ai-tutor', {
-                                    detail: { text: `Explain this: "${text}"` }
-                                }));
-                            }}
-                        />
+                        <TextSelectionToolbar />
                         <MDXContent
                             source={mdxSource}
                             courseId={params.courseId}
