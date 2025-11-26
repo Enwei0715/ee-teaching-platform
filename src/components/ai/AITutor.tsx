@@ -132,9 +132,9 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         <div className="fixed bottom-6 right-6 z-50">
             {/* Chat Window */}
             {isOpen && (
-                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-slate-950/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
+                <div className={`ai-tutor-window absolute bottom-16 right-0 bg-slate-950/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none ${isExpanded ? 'w-[80vw] h-[80vh] md:w-[600px] md:h-[700px]' : 'w-80 md:w-96 h-[500px]'}`}>
                     {/* Header */}
-                    <div className="bg-slate-900/50 border-b border-gray-700 p-4 flex justify-between items-center text-white">
+                    <div className="bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">
                             <div className="p-1.5 bg-white/10 rounded-full">
                                 <Bot size={20} />
@@ -173,7 +173,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                                     <div
                                         className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
                                             ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
-                                            : 'bg-slate-800 border border-gray-700 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
+                                            : 'bg-slate-800 border border-white/10 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
                                             }`}
                                     >
                                         {msg.role === 'user' ? (
@@ -191,7 +191,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                             ))}
                             {loading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-slate-800 border border-gray-700 p-3 rounded-2xl rounded-bl-none shadow-sm">
+                                    <div className="bg-slate-800 border border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
                                         <div className="flex gap-1">
                                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
@@ -205,7 +205,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                     </div>
 
                     {/* Input */}
-                    <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-gray-700">
+                    <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
                         <div className="flex gap-2">
                             <input
                                 type="text"
