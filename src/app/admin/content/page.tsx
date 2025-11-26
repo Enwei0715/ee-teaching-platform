@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, ArrowUp, ArrowDown, Edit2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface FooterLink {
@@ -13,6 +14,7 @@ interface FooterLink {
 }
 
 export default function ContentManagementPage() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<'general' | 'about' | 'links'>('general');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -79,6 +81,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
                     }
                 })
             });
+            router.refresh(); // Refresh server components (Footer)
             alert('Settings saved successfully!');
         } catch (error) {
             alert('Failed to save settings');
@@ -103,6 +106,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
 
             if (res.ok) {
                 fetchData();
+                router.refresh();
                 setEditingLink(null);
                 setNewLink({ category: 'resources', label: '', url: '', orderIndex: 0 });
             }
@@ -116,6 +120,7 @@ We believe that hardware engineering shouldn't be hidden behind expensive tools 
         try {
             await fetch(`/api/admin/footer-links?id=${id}`, { method: 'DELETE' });
             fetchData();
+            router.refresh();
         } catch (error) {
             console.error('Failed to delete link', error);
         }
