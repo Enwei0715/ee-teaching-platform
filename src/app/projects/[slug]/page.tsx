@@ -81,34 +81,46 @@ export default async function ProjectPage({ params }: Props) {
     }
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
+        <div className="min-h-screen bg-transparent flex flex-col relative">
             <HexagonalBackground />
-            <header className="relative py-12 px-4 md:py-16 md:px-6 border-b border-border-primary overflow-hidden z-10">
-                <div className="max-w-4xl mx-auto">
-                    <Link href="/projects" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors mb-8 text-sm font-medium">
-                        <ArrowLeft size={16} className="mr-2" />
+
+            {/* Project Header */}
+            <div className="glass-panel border-b border-white/10">
+                <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 relative z-10">
+                    <Link
+                        href="/projects"
+                        className="inline-flex items-center text-accent-primary hover:text-accent-secondary transition-colors mb-6 group"
+                    >
+                        <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back to Projects
                     </Link>
-                    <div className="flex items-center gap-6 text-sm text-text-secondary mb-6">
-                        <span className="flex items-center gap-2">
-                            <BarChart size={16} />
-                            {project.meta.difficulty || 'All Levels'}
-                        </span>
-                        <span className="flex items-center gap-2">
-                            <Clock size={16} />
-                            Weekend Build
-                        </span>
-                    </div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-text-primary mb-6 leading-tight">{project.meta.title}</h1>
-                    <p className="text-xl text-text-secondary leading-relaxed max-w-2xl">
+
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
+                        {project.meta.title}
+                    </h1>
+
+                    <p className="text-lg text-text-secondary mb-6">
                         {project.meta.description}
                     </p>
-                </div>
-            </header>
 
+                    <div className="flex flex-wrap gap-4 text-sm text-text-secondary">
+                        <div className="flex items-center">
+                            <BarChart size={18} className="mr-2 text-accent-primary" />
+                            <span className="font-semibold">{project.meta.level || 'All Levels'}</span>
+                        </div>
+                        {project.meta.duration && (
+                            <div className="flex items-center">
+                                <Clock size={18} className="mr-2 text-accent-primary" />
+                                <span>{project.meta.duration}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
             <div className="max-w-4xl mx-auto px-4 py-8 md:px-6 md:py-12 grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10">
                 <div className="lg:col-span-2">
-
                     <div className="prose prose-invert prose-blue max-w-none">
                         <MDXContent source={mdxSource} />
                     </div>

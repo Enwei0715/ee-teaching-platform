@@ -60,24 +60,84 @@ export default function InteractiveDotGrid() {
             if (!isMounted) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            const maxDistance = 200; // Increased interaction range
+
+            // First pass: Draw connections between nearby dots
+            dots.forEach((dot, i) => {
+                dots.forEach((otherDot, j) => {
+                    if (i >= j) return; // Avoid duplicate lines
+
+                    const dx = dot.x - otherDot.x;
+                    const dy = dot.y - otherDot.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) { // Connect nearby dots
+                        const opacity = (100 - distance) / 100 * 0.15;
+                        ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(dot.x, dot.y);
+                        ctx.lineTo(otherDot.x, otherDot.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            // Second pass: Draw dots with enhanced effects
             dots.forEach(dot => {
                 const dx = mouseX - dot.x;
                 const dy = mouseY - dot.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                const maxDistance = 150;
 
                 let opacity = dot.baseOpacity;
                 let scale = 1;
+                let hue = 0; // Color shift
 
                 if (distance < maxDistance) {
                     const factor = (maxDistance - distance) / maxDistance;
-                    opacity = dot.baseOpacity + factor * 0.5;
+                    opacity = Math.min(0.8, dot.baseOpacity + factor * 0.6);
                     scale = 1 + factor * 1.5;
+                    hue = factor * 180; // Blue to purple gradient
+
+                    // Draw connection line to mouse
+                    if (distance < 120) {
+                        ctx.strokeStyle = `rgba(99, 102, 241, ${factor * 0.25})`;
+                        ctx.lineWidth = factor * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(dot.x, dot.y);
+                        ctx.lineTo(mouseX, mouseY);
+                        ctx.stroke();
+                    }
                 }
 
+                const finalRadius = BASE_RADIUS * scale;
+
+                // Outer glow when scaled
+                if (scale > 1.2) {
+                    const glowGradient = ctx.createRadialGradient(
+                        dot.x, dot.y, 0,
+                        dot.x, dot.y, finalRadius * 3
+                    );
+                    glowGradient.addColorStop(0, `hsla(${220 + hue}, 100%, 65%, ${opacity * 0.3})`);
+                    glowGradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+                    ctx.fillStyle = glowGradient;
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, finalRadius * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Main dot with gradient
+                const dotGradient = ctx.createRadialGradient(
+                    dot.x, dot.y, 0,
+                    dot.x, dot.y, finalRadius
+                );
+                dotGradient.addColorStop(0, `hsla(${220 + hue}, 100%, 75%, ${opacity})`);
+                dotGradient.addColorStop(1, `hsla(${220 + hue}, 100%, 60%, ${opacity * 0.7})`);
+
+                ctx.fillStyle = dotGradient;
                 ctx.beginPath();
-                ctx.arc(dot.x, dot.y, BASE_RADIUS * scale, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(100, 149, 237, ${opacity})`; // CornflowerBlue
+                ctx.arc(dot.x, dot.y, finalRadius, 0, Math.PI * 2);
                 ctx.fill();
             });
 

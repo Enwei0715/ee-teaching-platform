@@ -37,8 +37,8 @@ export default function InteractiveGridPattern() {
         const drawGrid = () => {
             ctx.clearRect(0, 0, width, height);
 
-            // Draw base grid
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            // Draw base grid with increased visibility
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // Increased from 0.05 to 0.15
             ctx.lineWidth = 1;
             ctx.beginPath();
 
@@ -53,26 +53,45 @@ export default function InteractiveGridPattern() {
             }
             ctx.stroke();
 
-            // Highlight cell under mouse
+            // Enhanced mouse interaction
             const { x, y } = mouseRef.current;
             if (x >= 0 && y >= 0) {
                 const cellX = Math.floor(x / gridSize) * gridSize;
                 const cellY = Math.floor(y / gridSize) * gridSize;
 
-                ctx.fillStyle = 'rgba(99, 102, 241, 0.15)'; // Indigo highlight
+                // Glow effect around mouse
+                const maxDistance = 220; // Increased interaction range
+                for (let gx = 0; gx <= width; gx += gridSize) {
+                    for (let gy = 0; gy <= height; gy += gridSize) {
+                        const dx = gx - x;
+                        const dy = gy - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < maxDistance) {
+                            const intensity = (maxDistance - distance) / maxDistance;
+                            const alpha = intensity * 0.25; // Increased glow intensity
+                            ctx.fillStyle = `rgba(99, 102, 241, ${alpha})`;
+                            ctx.fillRect(gx, gy, gridSize, gridSize);
+                        }
+                    }
+                }
+
+                // Highlight cell directly under mouse with stronger effect
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.15)'; // Increased from 0.05
                 ctx.fillRect(cellX, cellY, gridSize, gridSize);
 
-                // Optional: Add a subtle glow/border to the highlighted cell
-                ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+                // Bright border for highlighted cell
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)'; // Increased from 0.1 to 0.4
+                ctx.lineWidth = 2;
                 ctx.strokeRect(cellX, cellY, gridSize, gridSize);
 
-                // Optional: Light up neighbors slightly
+                // Light up immediate neighbors more visibly
                 const neighbors = [
                     { dx: 0, dy: -1 }, { dx: 0, dy: 1 },
                     { dx: -1, dy: 0 }, { dx: 1, dy: 0 }
                 ];
 
-                ctx.fillStyle = 'rgba(99, 102, 241, 0.05)';
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.08)'; // Increased from 0.02
                 neighbors.forEach(({ dx, dy }) => {
                     ctx.fillRect(cellX + dx * gridSize, cellY + dy * gridSize, gridSize, gridSize);
                 });

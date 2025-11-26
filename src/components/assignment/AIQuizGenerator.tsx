@@ -43,13 +43,13 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
     };
 
     return (
-        <div className="my-12 p-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
+        <div className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10">
             <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-sm mb-4 text-indigo-600">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-500/20 backdrop-blur-sm rounded-full shadow-lg mb-4 text-indigo-400">
                     <Sparkles size={24} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Test Your Knowledge</h2>
-                <p className="text-gray-600 max-w-md mx-auto">
+                <h2 className="text-2xl font-bold text-text-primary mb-2">Test Your Knowledge</h2>
+                <p className="text-text-secondary max-w-md mx-auto">
                     Ready to check your understanding? Generate a personalized quiz based on this lesson using AI.
                 </p>
             </div>

@@ -31,9 +31,9 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
     };
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm my-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quiz Time!</h3>
-            <div className="text-gray-800 mb-6 prose prose-lg max-w-none">
+        <div className="glass-panel border border-white/10 rounded-lg p-6 shadow-lg my-4">
+            <h3 className="text-lg font-semibold text-text-primary mb-4">Quiz Time!</h3>
+            <div className="text-text-primary mb-6 prose prose-invert prose-lg max-w-none">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm, remarkMath]}
                     rehypePlugins={[rehypeKatex]}
@@ -49,12 +49,12 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                         onClick={() => handleSelect(index)}
                         disabled={selectedOption !== null}
                         className={`w-full text-left px-4 py-3 rounded-md border transition-colors ${selectedOption === index
-                            ? index === quiz.correctAnswer
-                                ? 'bg-green-50 border-green-500 text-green-900'
-                                : 'bg-red-50 border-red-500 text-red-900'
-                            : selectedOption !== null && index === quiz.correctAnswer
-                                ? 'bg-green-50 border-green-500 text-green-900'
-                                : 'border-gray-300 hover:bg-gray-50 text-gray-900'
+                                ? index === quiz.correctAnswer
+                                    ? 'bg-green-500/20 border-green-400 text-green-300'
+                                    : 'bg-red-500/20 border-red-400 text-red-300'
+                                : selectedOption !== null && index === quiz.correctAnswer
+                                    ? 'bg-green-500/20 border-green-400 text-green-300'
+                                    : 'border-white/20 hover:bg-white/5 text-text-primary hover:border-indigo-400/50'
                             }`}
                     >
                         <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
@@ -74,9 +74,9 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
             </div>
 
             {showExplanation && (
-                <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-100">
-                    <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Explanation:</h4>
-                    <div className="text-sm text-gray-900 prose prose-sm max-w-none">
+                <div className="mt-6 p-4 glass-ghost rounded-md border border-blue-400/30">
+                    <h4 className="text-sm font-semibold text-blue-300 mb-2">AI Explanation:</h4>
+                    <div className="text-sm text-text-secondary prose prose-sm prose-invert max-w-none">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkMath]}
                             rehypePlugins={[rehypeKatex]}
@@ -84,7 +84,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                             {quiz.explanation}
                         </ReactMarkdown>
                     </div>
-                    <p className="text-xs text-blue-600 mt-2 italic">
+                    <p className="text-xs text-blue-400 mt-2 italic">
                         (Review this explanation carefully. Is it 100% correct?)
                     </p>
 

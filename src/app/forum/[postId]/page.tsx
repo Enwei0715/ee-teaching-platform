@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import InteractiveDotGrid from '@/components/ui/InteractiveDotGrid';
 
 async function getPost(id: string) {
     const prisma = require('@/lib/prisma').default;
@@ -67,7 +68,8 @@ export default async function PostPage({ params }: { params: { postId: string } 
     }
 
     return (
-        <div className="min-h-screen bg-bg-primary">
+        <div className="min-h-screen bg-bg-primary relative">
+            <InteractiveDotGrid />
             <PostDetail
                 post={post}
                 mdxSource={mdxSource}

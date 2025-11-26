@@ -84,11 +84,8 @@ export default async function CoursePage({ params }: Props) {
         <div className="min-h-screen relative overflow-hidden">
 
             {/* Hero Section */}
-            <header className="relative py-12 px-4 md:py-20 md:px-6 bg-gradient-to-br from-gray-900 via-[#0f172a] to-gray-900 border-b border-border-primary overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L50 10 L50 50 L90 50 L90 90' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Cpath d='M30 30 L70 30 L70 70' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%23ffffff'/%3E%3C/svg%3E")`, backgroundSize: '150px 150px' }}>
-                </div>
-                <div className="max-w-7xl mx-auto relative z-10">
+            <header className="glass-panel border-b border-white/10">
+                <div className="max-w-7xl mx-auto px-4 py-12 md:px-6 md:py-20 relative z-10">
                     <Link href="/courses" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors mb-8 text-sm font-medium group">
                         <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back to Courses

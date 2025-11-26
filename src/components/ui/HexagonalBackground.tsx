@@ -57,15 +57,18 @@ const HexagonalBackground = () => {
                 const angle = (Math.PI / 3) * i;
                 const hx = x + HEX_SIZE * Math.cos(angle);
                 const hy = y + HEX_SIZE * Math.sin(angle);
-                if (i === 0) ctx.moveTo(hx, hy);
-                else ctx.lineTo(hx, hy);
+                if (i === 0) {
+                    ctx.moveTo(hx, hy);
+                } else {
+                    ctx.lineTo(hx, hy);
+                }
             }
             ctx.closePath();
-            // --- Enhanced Glow Effect ---
-            // Base opacity 0.1, max brightness adds 0.5 for a strong glow
-            ctx.strokeStyle = `rgba(14, 165, 233, ${0.1 + brightness * 0.5})`;
-            ctx.lineWidth = 1 + brightness; // Slightly thicken line on hover
+            ctx.strokeStyle = `rgba(148, 163, 184, ${brightness * 0.3})`;
+            ctx.lineWidth = 1;
             ctx.stroke();
+            ctx.fillStyle = `rgba(148, 163, 184, ${brightness * 0.05})`;
+            ctx.fill();
         };
 
         const animate = () => {
