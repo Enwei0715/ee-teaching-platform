@@ -18,11 +18,36 @@ const HexagonalBackground = () => {
         let animationFrameId: number;
         let time = 0;
 
+        // Check for touch device
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
         const mouse = { x: -1000, y: -1000 };
+        const ripples: { x: number; y: number; time: number }[] = [];
+
         const handleMouseMove = (e: MouseEvent) => {
+            if (isTouchDevice) return; // Disable hover on touch devices
             const rect = canvas.getBoundingClientRect();
             mouse.x = e.clientX - rect.left;
             mouse.y = e.clientY - rect.top;
+        };
+
+        const handleClick = (e: MouseEvent | TouchEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+
+            if ('touches' in e) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = (e as MouseEvent).clientX;
+                clientY = (e as MouseEvent).clientY;
+            }
+
+            ripples.push({
+                x: clientX - rect.left,
+                y: clientY - rect.top,
+                time: 0
+            });
         };
 
         // --- Adjusted Parameters ---
@@ -76,17 +101,44 @@ const HexagonalBackground = () => {
             ctx.clearRect(0, 0, width, height);
             time += 0.01;
 
+            // Update ripples
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                ripples[i].time += 0.02;
+                if (ripples[i].time > 1) {
+                    ripples.splice(i, 1);
+                }
+            }
+
             cubics.forEach(hex => {
                 const pulse = Math.sin(hex.q * 0.1 + hex.r * 0.1 + time) * 0.5 + 0.5;
 
-                const dx = hex.x - mouse.x;
-                const dy = hex.y - mouse.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                // Increased radius to 300px
-                const mouseGlow = Math.max(0, 1 - dist / 300);
+                // Mouse interaction
+                let interactionBrightness = 0;
 
-                // Mouse glow has much stronger influence (1.2)
-                const totalBrightness = Math.min(1, pulse * 0.2 + mouseGlow * 1.2);
+                if (!isTouchDevice) {
+                    const dx = hex.x - mouse.x;
+                    const dy = hex.y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    interactionBrightness = Math.max(0, 1 - dist / 300);
+                }
+
+                // Ripple interaction
+                let rippleBrightness = 0;
+                ripples.forEach(ripple => {
+                    const dx = hex.x - ripple.x;
+                    const dy = hex.y - ripple.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const rippleRadius = ripple.time * 500; // Expanding radius
+                    const distFromRippleEdge = Math.abs(dist - rippleRadius);
+
+                    if (distFromRippleEdge < 100) {
+                        const rippleIntensity = (1 - ripple.time) * (1 - distFromRippleEdge / 100);
+                        rippleBrightness = Math.max(rippleBrightness, rippleIntensity);
+                    }
+                });
+
+                // Combine sources
+                const totalBrightness = Math.min(1, pulse * 0.2 + interactionBrightness * 1.2 + rippleBrightness * 1.5);
                 drawHexagon(hex.x, hex.y, totalBrightness);
             });
 
@@ -100,14 +152,23 @@ const HexagonalBackground = () => {
         };
 
         window.addEventListener('resize', handleResize);
-        window.addEventListener('mousemove', handleMouseMove);
+        if (!isTouchDevice) {
+            window.addEventListener('mousemove', handleMouseMove);
+        }
+        // Use click for both, or touchstart for faster mobile response if needed.
+        // Click is usually sufficient and avoids ghost clicks issues.
+        window.addEventListener('click', handleClick as any);
+
         initGrid();
         animate();
 
         return () => {
             isMounted = false;
             window.removeEventListener('resize', handleResize);
-            window.removeEventListener('mousemove', handleMouseMove);
+            if (!isTouchDevice) {
+                window.removeEventListener('mousemove', handleMouseMove);
+            }
+            window.removeEventListener('click', handleClick as any);
             cancelAnimationFrame(animationFrameId);
         };
     }, []);

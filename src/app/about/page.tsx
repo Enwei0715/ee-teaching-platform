@@ -65,7 +65,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold text-text-primary mb-8 text-center">The Team</h2>
                 <div className="flex justify-center">
                     <Tilt
-                        className="parallax-effect-glare-scale"
+                        className="parallax-effect-glare-scale touch-none"
                         perspective={1000}
                         glareEnable={true}
                         glareMaxOpacity={0.45}

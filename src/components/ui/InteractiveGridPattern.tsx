@@ -17,12 +17,18 @@ export default function InteractiveGridPattern() {
         const gridSize = 40;
         let frameId: number;
 
+        // Check for touch device
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+        const ripples: { x: number; y: number; time: number }[] = [];
+
         const handleResize = () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
         };
 
         const handleMouseMove = (e: MouseEvent) => {
+            if (isTouchDevice) return;
             mouseRef.current = { x: e.clientX, y: e.clientY };
         };
 
@@ -30,12 +36,41 @@ export default function InteractiveGridPattern() {
             mouseRef.current = { x: -1, y: -1 };
         };
 
+        const handleClick = (e: MouseEvent | TouchEvent) => {
+            let clientX, clientY;
+
+            if ('touches' in e) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = (e as MouseEvent).clientX;
+                clientY = (e as MouseEvent).clientY;
+            }
+
+            ripples.push({
+                x: clientX,
+                y: clientY,
+                time: 0
+            });
+        };
+
         window.addEventListener('resize', handleResize);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseleave', handleMouseLeave);
+        if (!isTouchDevice) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseleave', handleMouseLeave);
+        }
+        window.addEventListener('click', handleClick as any);
 
         const drawGrid = () => {
             ctx.clearRect(0, 0, width, height);
+
+            // Update ripples
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                ripples[i].time += 0.02;
+                if (ripples[i].time > 1) {
+                    ripples.splice(i, 1);
+                }
+            }
 
             // Draw base grid with increased visibility
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // Increased from 0.05 to 0.15
@@ -55,7 +90,7 @@ export default function InteractiveGridPattern() {
 
             // Enhanced mouse interaction
             const { x, y } = mouseRef.current;
-            if (x >= 0 && y >= 0) {
+            if (!isTouchDevice && x >= 0 && y >= 0) {
                 const cellX = Math.floor(x / gridSize) * gridSize;
                 const cellY = Math.floor(y / gridSize) * gridSize;
 
@@ -97,6 +132,30 @@ export default function InteractiveGridPattern() {
                 });
             }
 
+            // Ripple Interaction
+            ripples.forEach(ripple => {
+                const maxRippleSize = 300;
+                const currentRadius = ripple.time * maxRippleSize;
+                const rippleX = ripple.x;
+                const rippleY = ripple.y;
+
+                for (let gx = 0; gx <= width; gx += gridSize) {
+                    for (let gy = 0; gy <= height; gy += gridSize) {
+                        const dx = gx - rippleX;
+                        const dy = gy - rippleY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const distFromRippleEdge = Math.abs(distance - currentRadius);
+
+                        if (distFromRippleEdge < 60) {
+                            const intensity = (1 - ripple.time) * (1 - distFromRippleEdge / 60);
+                            const alpha = intensity * 0.3;
+                            ctx.fillStyle = `rgba(99, 102, 241, ${alpha})`;
+                            ctx.fillRect(gx, gy, gridSize, gridSize);
+                        }
+                    }
+                }
+            });
+
             frameId = requestAnimationFrame(drawGrid);
         };
 
@@ -104,8 +163,11 @@ export default function InteractiveGridPattern() {
 
         return () => {
             window.removeEventListener('resize', handleResize);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseleave', handleMouseLeave);
+            if (!isTouchDevice) {
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('mouseleave', handleMouseLeave);
+            }
+            window.removeEventListener('click', handleClick as any);
             cancelAnimationFrame(frameId);
         };
     }, []);
