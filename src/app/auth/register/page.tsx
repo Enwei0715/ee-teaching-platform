@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
+import ParticleBackground from '@/components/ui/ParticleBackground';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -17,23 +18,30 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Register form submitted');
         setLoading(true);
         setError('');
 
         try {
+            console.log('Sending registration request...');
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, major, occupation }),
             });
 
+            console.log('Response status:', res.status);
+
             if (res.ok) {
+                console.log('Registration successful, redirecting...');
                 router.push('/auth/signin?registered=true');
             } else {
                 const data = await res.json();
+                console.error('Registration failed:', data);
                 setError(data.message || 'Registration failed');
             }
         } catch (error) {
+            console.error('Registration error:', error);
             setError('An error occurred. Please try again.');
         } finally {
             setLoading(false);
@@ -41,14 +49,15 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-primary flex items-center justify-center px-6">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen bg-bg-primary flex items-center justify-center px-6 relative overflow-hidden">
+            <ParticleBackground />
+            <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-text-primary mb-2">Create Account</h1>
                     <p className="text-text-secondary">Join EE Master to start your learning journey</p>
                 </div>
 
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-8 shadow-lg">
+                <div className="bg-bg-secondary/80 backdrop-blur-md border border-border-primary rounded-xl p-8 shadow-lg">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
                             <div className="bg-accent-error/10 border border-accent-error/20 text-accent-error px-4 py-3 rounded-lg flex items-center gap-2 text-sm">
@@ -66,7 +75,7 @@ export default function RegisterPage() {
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                                    className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -81,7 +90,7 @@ export default function RegisterPage() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                                    className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -92,7 +101,7 @@ export default function RegisterPage() {
                             <select
                                 value={occupation}
                                 onChange={(e) => setOccupation(e.target.value)}
-                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors appearance-none"
+                                className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors appearance-none"
                             >
                                 <option value="Student">Student</option>
                                 <option value="Teacher">Teacher</option>
@@ -106,7 +115,7 @@ export default function RegisterPage() {
                             <select
                                 value={major}
                                 onChange={(e) => setMajor(e.target.value)}
-                                className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors appearance-none"
+                                className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 px-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors appearance-none"
                             >
                                 <option value="Electrical Engineering">Electrical Engineering</option>
                                 <option value="Computer Engineering">Computer Engineering</option>
@@ -125,7 +134,7 @@ export default function RegisterPage() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                                    className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -143,7 +152,7 @@ export default function RegisterPage() {
 
                     <div className="mt-6 text-center text-sm text-text-secondary">
                         Already have an account?{' '}
-                        <Link href="/auth/signin" className="text-accent-primary hover:underline font-medium">
+                        <Link href="/auth/signin" className="text-accent-primary hover:underline font-medium relative z-20">
                             Sign in
                         </Link>
                     </div>

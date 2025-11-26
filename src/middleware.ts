@@ -22,6 +22,7 @@ export default withAuth(
         const publicPaths = [
           "/auth/signin",
           "/auth/signup",
+          "/auth/register",
           "/auth/error",
           "/courses/circuit-theory" // Free course
         ];

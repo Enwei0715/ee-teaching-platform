@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Github } from 'lucide-react';
+import ParticleBackground from '@/components/ui/ParticleBackground';
 
 function SignInContent() {
     const router = useRouter();
@@ -49,14 +50,15 @@ function SignInContent() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-primary flex items-center justify-center px-6">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen bg-bg-primary flex items-center justify-center px-6 relative overflow-hidden">
+            <ParticleBackground />
+            <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-text-primary mb-2">Welcome Back</h1>
                     <p className="text-text-secondary">Sign in to access your courses and dashboard</p>
                 </div>
 
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-8 shadow-lg">
+                <div className="bg-bg-secondary/80 backdrop-blur-md border border-border-primary rounded-xl p-8 shadow-lg">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
                             <div className="bg-accent-error/10 border border-accent-error/20 text-accent-error px-4 py-3 rounded-lg flex items-center gap-2 text-sm">
@@ -74,7 +76,7 @@ function SignInContent() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                                    className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -89,7 +91,7 @@ function SignInContent() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-bg-tertiary border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                                    className="w-full bg-bg-tertiary/50 border border-border-primary rounded-lg py-3 pl-10 pr-4 text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -117,7 +119,7 @@ function SignInContent() {
                             <button
                                 type="button"
                                 onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
-                                className="flex items-center justify-center gap-2 bg-bg-tertiary hover:bg-bg-primary border border-border-primary text-text-primary font-medium py-3 rounded-lg transition-colors"
+                                className="flex items-center justify-center gap-2 bg-bg-tertiary/50 hover:bg-bg-primary border border-border-primary text-text-primary font-medium py-3 rounded-lg transition-colors"
                             >
                                 <Github size={20} />
                                 GitHub
@@ -125,7 +127,7 @@ function SignInContent() {
                             <button
                                 type="button"
                                 onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-                                className="flex items-center justify-center gap-2 bg-bg-tertiary hover:bg-bg-primary border border-border-primary text-text-primary font-medium py-3 rounded-lg transition-colors"
+                                className="flex items-center justify-center gap-2 bg-bg-tertiary/50 hover:bg-bg-primary border border-border-primary text-text-primary font-medium py-3 rounded-lg transition-colors"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path
@@ -152,7 +154,7 @@ function SignInContent() {
 
                     <div className="mt-6 text-center text-sm text-text-secondary">
                         Don't have an account?{' '}
-                        <Link href="/auth/register" className="text-accent-primary hover:underline font-medium">
+                        <Link href="/auth/register" className="text-accent-primary hover:underline font-medium relative z-20">
                             Sign up
                         </Link>
                     </div>
