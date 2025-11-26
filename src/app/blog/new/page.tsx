@@ -53,7 +53,12 @@ export default function NewBlogPostPage() {
                 </div>
                 <div className="bg-bg-secondary rounded-xl border border-border-primary p-8">
                     <h1 className="text-3xl font-bold text-white mb-8">Create New Blog Post</h1>
-                    <BlogEditor slug="new" isNew={true} />
+                    <BlogEditor
+                        slug="new"
+                        isNew={true}
+                        baseApiUrl="/api/engineer/blog"
+                        redirectUrl="/blog/{slug}"
+                    />
                 </div>
             </div>
         </div>

@@ -27,7 +27,7 @@ export async function POST(request: Request) {
                     content: content || "",
                     description: meta.description,
 
-                    category: meta.category,
+                    category: Array.isArray(meta.category) ? meta.category[0] : meta.category,
                     published: true, // Default to published for now, or use meta.published
                     authorId: session.user.id,
                 }
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
                 content: content || "",
                 description: meta.description,
 
-                category: meta.category,
+                category: Array.isArray(meta.category) ? meta.category[0] : meta.category,
                 published: true, // Default to published for now, or use meta.published
                 authorId: session.user.id,
             }
