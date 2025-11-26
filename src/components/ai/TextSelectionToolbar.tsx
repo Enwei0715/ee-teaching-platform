@@ -3,11 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 
-interface TextSelectionToolbarProps {
-    onAskAI: (selectedText: string) => void;
-}
-
-export default function TextSelectionToolbar({ onAskAI }: TextSelectionToolbarProps) {
+export default function TextSelectionToolbar() {
     const [selectedText, setSelectedText] = useState('');
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [show, setShow] = useState(false);
@@ -51,7 +47,11 @@ export default function TextSelectionToolbar({ onAskAI }: TextSelectionToolbarPr
     }, [handleSelection, handleClickOutside]);
 
     const handleAskClick = () => {
-        onAskAI(selectedText);
+        // Dispatch custom event to open AI Tutor with text
+        window.dispatchEvent(new CustomEvent('open-ai-tutor', {
+            detail: { text: `Explain this: "${selectedText}"` }
+        }));
+
         setShow(false);
         // Clear selection
         window.getSelection()?.removeAllRanges();
