@@ -21,6 +21,9 @@ import LessonNavigationListener from '@/components/courses/LessonNavigationListe
 import LessonEditButton from '@/components/course/LessonEditButton';
 import TextSelectionToolbar from '@/components/ai/TextSelectionToolbar';
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
+import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 
 interface Props {
@@ -49,6 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LessonPage({ params }: Props) {
+    const session = await getServerSession(authOptions);
     let lesson;
     try {
         lesson = await getCourseLesson(params.courseId, params.lessonId);
@@ -231,6 +235,10 @@ ${fence}
                     lessonTitle: lesson.meta.title,
                     content: lesson.content.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n') // Strip HTML tags and reduce excessive newlines
                 }}
+            />
+            <ResumeLearningTracker
+                userId={session?.user?.id}
+                lessonTitle={lesson.meta.title}
             />
         </div>
     );

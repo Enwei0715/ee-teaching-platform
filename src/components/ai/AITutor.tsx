@@ -289,63 +289,28 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         onInput={(e) => {
                             const target = e.target as HTMLTextAreaElement;
                             target.style.height = 'auto';
-                            target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                        }}
-                    />
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || loading}
-                        className="p-2 mb-1 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
-                    >
-                        <Send size={18} />
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
-
-    return (
-        <>
-            {/* Bounds Container for Rnd */}
-            <div id="ai-tutor-bounds" className="fixed left-0 right-0 top-16 bottom-0 pointer-events-none z-0" />
-
-            {isOpen && (
-                isMobile ? (
-                    <div className={`fixed bottom-24 left-4 right-4 z-[60] ${isExpanded ? 'top-20' : 'h-[60vh]'}`}>
-                        {renderChatContent()}
-                    </div>
-                ) : (
-                    rndDefaults && (
-                        <Rnd
-                            default={rndDefaults}
-                            minWidth={300}
-                            minHeight={400}
-                            bounds="#ai-tutor-bounds"
-                            dragHandleClassName="ai-tutor-header"
-                            enableResizing={{
-                                top: true, right: true, bottom: true, left: true,
-                                topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
+                            topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
                             }}
-                            style={{ zIndex: 60, position: 'fixed' }}
+                    style={{ zIndex: 60, position: 'fixed' }}
                         >
-                            {renderChatContent()}
-                        </Rnd>
-                    )
+                    {renderChatContent()}
+                </Rnd>
+                )
                 )
             )}
 
-            <div className="fixed bottom-6 right-6 z-50">
-                {/* Toggle Button */}
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
-                        ? 'bg-gray-800 text-white rotate-90'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                        }`}
-                >
-                    {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
-                </button>
-            </div>
-        </>
-    );
+                <div className="fixed bottom-6 right-6 z-50">
+                    {/* Toggle Button */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
+                            ? 'bg-gray-800 text-white rotate-90'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                            }`}
+                    >
+                        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+                    </button>
+                </div>
+            </>
+            );
 }

@@ -68,7 +68,13 @@ export const mdxComponents = {
         <blockquote className="border-l-4 border-accent-primary pl-6 italic my-8 text-text-secondary bg-bg-secondary py-4 pr-4 rounded-r-lg" {...props} />
     ),
     hr: (props: any) => <hr className="my-12 border-border-primary" {...props} />,
-    table: (props: any) => <div className="overflow-x-auto my-8"><table className="min-w-full divide-y divide-border-primary text-left text-sm" {...props} /></div>,
+    table: (props: any) => (
+        <div className="my-8 rounded-lg border border-border-primary overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-border-primary text-left text-sm" {...props} />
+            </div>
+        </div>
+    ),
     th: (props: any) => <th className="bg-bg-secondary p-4 font-semibold text-text-primary" {...props} />,
     td: (props: any) => <td className="p-4 border-t border-border-primary text-text-secondary" {...props} />,
     img: LessonImage,

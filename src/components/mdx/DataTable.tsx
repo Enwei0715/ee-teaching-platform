@@ -70,39 +70,43 @@ export function DataTable({ data, sortable = false }: DataTableProps) {
     };
 
     return (
-        <div className="my-8 overflow-x-auto rounded-lg border border-border-primary shadow-lg">
-            <table className="min-w-full divide-y divide-border-primary">
-                <thead className="bg-bg-secondary">
-                    <tr>
-                        {columns.map((column) => (
-                            <th
-                                key={column}
-                                onClick={() => handleSort(column)}
-                                className={`px-6 py-4 text-left text-xs font-bold text-text-primary uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-bg-tertiary/50 select-none' : ''}`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span>{column}</span>
-                                    {getSortIcon(column)}
-                                </div>
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody className="bg-bg-primary divide-y divide-border-primary">
-                    {sortedData.map((row, rowIdx) => (
-                        <tr key={rowIdx} className="hover:bg-bg-secondary/50 transition-colors">
+    return (
+        <div className="my-8 rounded-lg border border-border-primary shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-border-primary">
+                    <thead className="bg-bg-secondary">
+                        <tr>
                             {columns.map((column) => (
-                                <td
+                                <th
                                     key={column}
-                                    className="px-6 py-4 text-sm text-text-secondary whitespace-pre-wrap"
+                                    onClick={() => handleSort(column)}
+                                    className={`px-6 py-4 text-left text-xs font-bold text-text-primary uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-bg-tertiary/50 select-none' : ''}`}
                                 >
-                                    {row[column] ?? '—'}
-                                </td>
+                                    <div className="flex items-center gap-2">
+                                        <span>{column}</span>
+                                        {getSortIcon(column)}
+                                    </div>
+                                </th>
                             ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="bg-bg-primary divide-y divide-border-primary">
+                        {sortedData.map((row, rowIdx) => (
+                            <tr key={rowIdx} className="hover:bg-bg-secondary/50 transition-colors">
+                                {columns.map((column) => (
+                                    <td
+                                        key={column}
+                                        className="px-6 py-4 text-sm text-text-secondary whitespace-pre-wrap"
+                                    >
+                                        {row[column] ?? '—'}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
+    );
     );
 }
