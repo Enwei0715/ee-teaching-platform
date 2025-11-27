@@ -53,9 +53,15 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         return () => window.removeEventListener('open-ai-tutor', handleOpen);
     }, []);
 
-    // Prevent horizontal swipe on mobile
+    // Prevent horizontal swipe on mobile and lock body scroll
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            document.body.style.overflow = 'unset';
+            return;
+        }
+
+        // Lock body scroll
+        document.body.style.overflow = 'hidden';
 
         const preventDefault = (e: Event) => {
             // Prevent horizontal swipe gestures
@@ -65,8 +71,15 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         const chatWindow = document.querySelector('.ai-tutor-window');
         if (chatWindow) {
             chatWindow.addEventListener('touchstart', preventDefault, { passive: false });
-            return () => chatWindow.removeEventListener('touchstart', preventDefault);
+            return () => {
+                chatWindow.removeEventListener('touchstart', preventDefault);
+                document.body.style.overflow = 'unset';
+            };
         }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, [isOpen]);
 
     const handleSend = async (e: React.FormEvent) => {
@@ -86,18 +99,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                 content: m.content
             }));
 
-            // Build context string
-            let contextStr = "General context: The user is asking questions about electronics engineering.";
-            if (lessonTitle || lessonContent) {
-                contextStr = `The user is currently reading the lesson: "${lessonTitle || 'N/A'}".`;
-                if (lessonContent) {
-                    // Provide a summary of content (first 1500 chars)
-                    const contentSummary = lessonContent.substring(0, 1500);
-                    contextStr += `\n\nHere is the content of the lesson:\n${contentSummary}${lessonContent.length > 1500 ? '...' : ''}`;
-                }
-            }
-
-            const reply = await askQuestion(chatHistory, contextStr, lessonContext);
+            // Use lessonContext directly - the API will use the full lesson content
+            const reply = await askQuestion(chatHistory, lessonContext);
 
             setMessages(prev => [...prev, {
                 role: 'assistant',

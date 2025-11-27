@@ -10,8 +10,8 @@
 
   /* Lock viewport width to prevent layout blowout */
   html {
-    /* Mobile-first: 95% for better mobile readability */
-    font-size: 95%;
+    /* Mobile-first: 90% for better mobile readability */
+    font-size: 90%;
     overflow-x: hidden;
     max-width: 100vw;
   }

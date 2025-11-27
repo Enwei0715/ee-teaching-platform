@@ -68,7 +68,8 @@ Structure:
 Content Rules:
 1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
 2. Difficulty: Match the level of the provided content.
-3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.`
+3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
+4. **VARIETY**: Randomly select a specific section, concept, or detail from the lesson content to generate the question. **DO NOT** always pick the first topic or the main heading. Try to find obscure or specific details to test deep understanding.`
                     },
                     {
                         role: "user",
@@ -76,16 +77,16 @@ Content Rules:
                         Lesson Title: ${lesson.title}
                         Lesson Content:
                         """
-                        ${lesson.content.slice(0, 15000)}
+                        ${lesson.content.slice(0, 100000)}
                         """
                         
-                        Generate a question that tests a specific concept mentioned in this text.
+                        Generate a unique and challenging question that tests a specific concept mentioned in this text. Avoid generic questions.
                         `
                     }
                 ],
                 model: "gemini-2.5-flash",
                 response_format: { type: "json_object" },
-                temperature: 0.5,
+                temperature: 0.7, // Increased temperature for more variety
             });
 
             console.log("Google AI Response:", completion);

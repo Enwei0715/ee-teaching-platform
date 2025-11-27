@@ -13,12 +13,12 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { messages, context, lessonContext } = body;
+        const { messages, lessonContext } = body;
 
         console.log("AI Context Received:", lessonContext ? "YES" : "NO");
         if (lessonContext) {
             console.log("Context Title:", lessonContext.lessonTitle);
-            console.log("Context Snippet:", lessonContext.content.substring(0, 100));
+            console.log("Context Length:", lessonContext.content?.length || 0, "characters");
         }
 
         if (!messages || !Array.isArray(messages)) {
@@ -26,34 +26,32 @@ export async function POST(request: Request) {
         }
 
         let systemPrompt;
-        if (lessonContext) {
+        if (lessonContext && lessonContext.content) {
             const { courseTitle, lessonTitle, content } = lessonContext;
             systemPrompt = `
-    You are an AI Teaching Assistant strictly for the course: "${courseTitle}".
-    The user is currently studying the lesson: "${lessonTitle}".
+You are an AI Teaching Assistant strictly for the course: "${courseTitle}".
+The user is currently studying the lesson: "${lessonTitle}".
 
-    '''LESSON CONTENT START'''
-    ${content}
-    '''LESSON CONTENT END'''
+'''LESSON CONTENT START'''
+${content}
+'''LESSON CONTENT END'''
 
-    INSTRUCTIONS:
-    1. Answer the user's question based **EXCLUSIVELY** on the "LESSON CONTENT" provided above.
-    2. If the user asks for a definition (e.g., "What is CUS?"), check the lesson content first. If it is defined there (e.g., "Constant Utilization Server"), you **MUST** use that definition.
-    3. **DO NOT** use outside knowledge or general definitions if they conflict with the lesson content.
-    4. Only use general knowledge if the answer is NOT found in the text, but you must preface it with: "This is not mentioned in the current lesson, but generally speaking..."
-    5. **FORMATTING**: Use clear Markdown. Use bold for key terms. Use bullet points for lists. Keep paragraphs concise.
-    `;
+INSTRUCTIONS:
+1. Answer the user's question based **EXCLUSIVELY** on the "LESSON CONTENT" provided above.
+2. If the user asks for a definition (e.g., "What is CUS?"), check the lesson content first. If it is defined there (e.g., "Constant Utilization Server"), you **MUST** use that definition.
+3. **DO NOT** use outside knowledge or general definitions if they conflict with the lesson content.
+4. Only use general knowledge if the answer is NOT found in the text, but you must preface it with: "This is not mentioned in the current lesson, but generally speaking..."
+5. **FORMATTING**: Use clear Markdown. Use bold for key terms. Use bullet points for lists. Keep paragraphs concise.
+6. If referencing specific parts of the lesson, quote them directly.
+7. Always relate your answers back to the lesson content when possible.
+8. **LANGUAGE**: Detect the primary language of the "LESSON CONTENT". You **MUST** answer in the SAME language as the lesson content, unless the user explicitly asks to answer in a different language. For example, if the lesson is in Traditional Chinese, answer in Traditional Chinese.
+            `.trim();
         } else {
-            systemPrompt = context && context.trim() !== "General context: The user is asking questions about electronics engineering."
-                ? `You are a helpful physics and engineering tutor.
-${context}
-
-Answer the student's questions clearly and concisely with reference to the lesson content when relevant.
-Focus on explaining concepts in an educational way. Use examples and analogies to aid understanding.
-If the question is about specific content in the lesson, quote or reference it directly.`
-                : `You are a helpful physics and engineering tutor.
+            // Fallback for when no lesson context is available
+            systemPrompt = `You are a helpful physics and engineering tutor.
 Answer the student's questions clearly and concisely about electronics, physics, and engineering topics.
-Focus on explaining concepts in an educational way. Use examples and analogies to aid understanding.`;
+Focus on explaining concepts in an educational way. Use examples and analogies to aid understanding.
+Use clear Markdown formatting with bold for key terms and bullet points for lists.`;
         }
 
         const completion = await openai.chat.completions.create({
@@ -65,7 +63,7 @@ Focus on explaining concepts in an educational way. Use examples and analogies t
         });
 
         const reply = completion.choices[0].message.content;
-        console.log("AI Tutor Reply:", reply);
+        console.log("AI Tutor Reply Length:", reply?.length || 0);
         return NextResponse.json({ reply });
 
     } catch (error) {

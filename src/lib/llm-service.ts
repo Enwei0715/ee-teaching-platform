@@ -27,13 +27,13 @@ export interface ChatMessage {
     content: string;
 }
 
-export async function askQuestion(messages: ChatMessage[], context: string, lessonContext?: any): Promise<string> {
+export async function askQuestion(messages: ChatMessage[], lessonContext?: any): Promise<string> {
     const response = await fetch('/api/llm/chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages, context, lessonContext }),
+        body: JSON.stringify({ messages, lessonContext }),
     });
 
     if (!response.ok) {
