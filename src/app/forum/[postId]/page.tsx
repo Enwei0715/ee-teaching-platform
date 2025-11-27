@@ -68,7 +68,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
     }
 
     return (
-        <div className="min-h-screen bg-bg-primary relative">
+        <div className="min-h-screen relative isolate">
             <InteractiveDotGrid />
             <PostDetail
                 post={post}

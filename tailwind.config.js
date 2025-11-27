@@ -18,7 +18,7 @@ module.exports = {
                     secondary: "#6e7681",
                 },
                 text: {
-                    primary: "#c9d1d9",
+                    primary: "#ffffff",
                     secondary: "#8b949e",
                     link: "#58a6ff",
                 },

@@ -38,9 +38,9 @@ export const mdxComponents = {
     h2: (props: any) => <h2 className="text-2xl md:text-3xl font-bold mt-10 mb-5 text-text-primary tracking-tight border-b border-border-primary pb-2" {...props} />,
     h3: (props: any) => <h3 className="text-xl md:text-2xl font-bold mt-8 mb-4 text-text-primary" {...props} />,
     h4: (props: any) => <h4 className="text-lg font-bold mt-6 mb-3 text-text-primary" {...props} />,
-    p: (props: any) => <p className="mb-6 leading-7 text-text-secondary text-lg" {...props} />,
-    ul: (props: any) => <ul className="list-disc list-outside ml-6 mb-6 space-y-2 text-text-secondary text-lg" {...props} />,
-    ol: (props: any) => <ol className="list-decimal list-outside ml-6 mb-6 space-y-2 text-text-secondary text-lg" {...props} />,
+    p: (props: any) => <p className="mb-6 leading-7 text-text-primary text-lg" {...props} />,
+    ul: (props: any) => <ul className="list-disc list-outside ml-6 mb-6 space-y-2 text-text-primary text-lg" {...props} />,
+    ol: (props: any) => <ol className="list-decimal list-outside ml-6 mb-6 space-y-2 text-text-primary text-lg" {...props} />,
     li: (props: any) => <li className="pl-1" {...props} />,
     a: (props: any) => {
         const { href, ...rest } = props;
