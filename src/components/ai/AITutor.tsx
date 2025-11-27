@@ -269,7 +269,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     );
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
+        <>
             {isOpen && (
                 isMobile ? (
                     <div className={`fixed bottom-24 left-4 right-4 z-[60] ${isExpanded ? 'top-20' : 'h-[60vh]'}`}>
@@ -295,16 +295,18 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                 )
             )}
 
-            {/* Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
-                    ? 'bg-gray-800 text-white rotate-90'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    }`}
-            >
-                {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
-            </button>
-        </div>
+            <div className="fixed bottom-6 right-6 z-50">
+                {/* Toggle Button */}
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
+                        ? 'bg-gray-800 text-white rotate-90'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                >
+                    {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+                </button>
+            </div>
+        </>
     );
 }
