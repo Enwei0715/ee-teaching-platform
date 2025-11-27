@@ -59,18 +59,28 @@
 
 /* Math formulas - 讓公式自然顯示,不限制寬度 */
 @layer utilities {
-  /* KaTeX 區塊公式 - 嚴格限制寬度防止 Layout Blowout */
+  /* KaTeX 區塊公式 - CRITICAL: Force scrolling while keeping parent locked */
   .katex-display {
-    padding: 0.5rem 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    max-width: 100% !important; /* Force constraint */
-    width: 100%;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    /* Prevent the equation from expanding parent */
-    display: block;
-    box-sizing: border-box;
+    /* Container constraints - prevent layout blowout */
+    max-width: 100% !important;
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    
+    /* FORCE horizontal scrolling to work despite parent overflow:hidden */
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    
+    /* iOS smooth scrolling */
+    -webkit-overflow-scrolling: touch !important;
+    
+    /* Padding to prevent scrollbar overlap and ensure content visibility */
+    padding: 0.5rem 0 !important;
+    padding-bottom: 8px !important;
+    padding-right: 8px !important;
+    
+    /* Prevent text wrapping in formulas */
+    white-space: nowrap !important;
   }
 
   /* 自訂 KaTeX 滾動條樣式 (Webkit) */
@@ -93,7 +103,11 @@
   }
 
   .katex-display > .katex {
-    display: inline-block;
+    display: inline-block !important;
+    /* Ensure alignment doesn't hide content */
+    text-align: left !important;
+    /* Force minimum width to trigger scrollbar */
+    min-width: min-content !important;
   }
 
   /* 行內公式 */
@@ -101,19 +115,30 @@
     display: inline-block;
   }
 
-  /* Prose 內容 - 防止水平溢出 */
+  /* Prose 內容 - 防止水平溢出但允許子元素滾動 */
   .prose {
+    /* Ensure prose container fits viewport */
+    max-width: 100vw !important;
+    width: 100% !important;
+    
+    /* Text wrapping for normal content */
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
-    overflow-x: hidden; /* Prevent horizontal scroll of container */
+    
+    /* Hide horizontal overflow of container itself */
+    overflow-x: hidden;
     overflow-y: visible;
   }
   
-  /* 確保數學公式繼承滾動行為 */
+  /* 確保數學公式在 prose 內也能滾動 */
   .prose .katex-display {
-    margin: 1rem 0;
-    /* overflow inherited from .katex-display above */
+    margin: 1rem 0 !important;
+    /* CRITICAL: Re-assert scrolling capabilities within prose */
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
 
   .prose pre {
