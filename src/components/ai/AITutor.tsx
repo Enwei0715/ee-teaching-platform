@@ -233,7 +233,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
     if (!session) {
         return (
-            <div className="fixed bottom-6 right-6 z-[100]">
+            <div className="fixed bottom-6 right-6 z-[9999]">
                 <button
                     onClick={() => window.location.href = '/auth/signin'}
                     className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg bg-gray-800 text-white hover:bg-gray-700 transition-all transform hover:scale-105"
@@ -246,7 +246,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     }
 
     const renderChatContent = () => (
-        <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
+        <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full max-h-[80vh] max-w-[90vw] overscroll-contain ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
             {/* Header */}
             <div className={`ai-tutor-header bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white ${!isMobile ? 'cursor-move' : ''}`}>
                 <div className="flex items-center gap-2">
@@ -353,7 +353,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     return (
         <>
             {/* Bounds container - strictly defined area */}
-            <div id="ai-tutor-bounds" className="fixed left-0 right-0 top-16 bottom-0 pointer-events-none z-0" />
+            <div id="ai-tutor-bounds" className="fixed left-0 right-0 top-0 bottom-0 pointer-events-none z-0" />
 
             {isOpen && !isMobile && rndDefaults && (
                 <Rnd
@@ -379,7 +379,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         top: true, right: true, bottom: true, left: true,
                         topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
                     }}
-                    style={{ zIndex: 100, position: 'fixed' }}
+                    style={{ zIndex: 9999, position: 'fixed' }}
                     className="pointer-events-auto"
                     dragHandleClassName="ai-tutor-header"
                 >
@@ -388,12 +388,12 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             )}
 
             {isOpen && isMobile && (
-                <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-sm p-4 pt-16 flex flex-col">
+                <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-sm p-4 pt-16 flex flex-col">
                     {renderChatContent()}
                 </div>
             )}
 
-            <div className="fixed bottom-6 right-6 z-[100]">
+            <div className="fixed bottom-6 right-6 z-[9999]">
                 {/* Toggle Button */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}

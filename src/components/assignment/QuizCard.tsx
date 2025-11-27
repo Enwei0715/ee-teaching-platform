@@ -35,7 +35,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
             <h3 className="text-lg font-semibold text-text-primary mb-4">Quiz Time!</h3>
             <div className="text-text-primary mb-6 prose prose-invert prose-lg max-w-none">
                 <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkMath]}
+                    remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
                     rehypePlugins={[rehypeKatex]}
                 >
                     {quiz.question}
@@ -60,7 +60,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                         <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
                         <div className="inline-block align-middle">
                             <ReactMarkdown
-                                remarkPlugins={[remarkGfm, remarkMath]}
+                                remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
                                 rehypePlugins={[rehypeKatex]}
                                 components={{
                                     p: ({ children }) => <span className="m-0">{children}</span>
@@ -81,7 +81,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                     </h4>
                     <div className="text-sm text-gray-200 prose prose-sm prose-invert max-w-none leading-relaxed">
                         <ReactMarkdown
-                            remarkPlugins={[remarkGfm, remarkMath]}
+                            remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
                             rehypePlugins={[rehypeKatex]}
                         >
                             {quiz.explanation}

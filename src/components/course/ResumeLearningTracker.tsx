@@ -21,7 +21,12 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
             setTimeout(() => {
                 const element = document.getElementById(initialLastElementId);
                 if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Check if it's a heading element (more reliable for TOC)
+                    const isHeading = element.tagName.match(/^H[1-6]$/);
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: isHeading ? 'start' : 'center'
+                    });
                 }
                 // Clean URL
                 const newUrl = window.location.pathname;

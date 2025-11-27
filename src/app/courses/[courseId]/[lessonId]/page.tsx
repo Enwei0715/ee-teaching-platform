@@ -23,6 +23,7 @@ import LessonEditButton from '@/components/course/LessonEditButton';
 import TextSelectionToolbar from '@/components/ai/TextSelectionToolbar';
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
 import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
+import TableOfContents from '@/components/course/TableOfContents';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
@@ -205,7 +206,7 @@ ${fence}
                         },
                         select: { lastElementId: true }
                     });
-                    initialLastElementId = progress?.lastElementId;
+                    initialLastElementId = progress?.lastElementId || null;
                 }
             }
         } catch (e) {
@@ -219,7 +220,7 @@ ${fence}
 
             <CourseSidebar courseId={params.courseId} lessons={courseStructure} />
 
-            <main className="flex-1 min-w-0">
+            <main className="flex-1 min-w-0 xl:mr-64">
                 <TimeTracker courseId={params.courseId} lessonId={params.lessonId} />
                 <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
                     <div className="mb-8 pb-8 border-b border-border-primary">
@@ -291,6 +292,11 @@ ${fence}
                 lessonId={params.lessonId}
                 initialLastElementId={initialLastElementId}
             />
+
+            {/* Table of Contents - Desktop Only */}
+            <aside className="hidden xl:block fixed right-8 top-24 w-64 z-10">
+                <TableOfContents />
+            </aside>
         </div>
     );
 }
