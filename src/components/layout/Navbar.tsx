@@ -60,7 +60,7 @@ export default function Navbar() {
 
     // Auto-close mobile menu on screen resize (if moving to desktop view)
     useEffect(() => {
-        const mediaQuery = window.matchMedia('(min-width: 1024px)');
+        const mediaQuery = window.matchMedia('(min-width: 1280px)');
 
         const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
             if (e.matches) {
@@ -108,7 +108,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Desktop Navigation - Absolute Center */}
-                        <div className="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="hidden xl:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                             <div className="flex items-center space-x-8">
                                 <Link href="/courses" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                     <EditableText mode="static" contentKey="navbar.link.courses" defaultText="Courses" tag="span" />
@@ -131,23 +131,23 @@ export default function Navbar() {
                         </div>
 
                         {/* Search & Actions */}
-                        <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
-                            {/* Full Search - Visible on XL+ */}
+                        <div className="hidden xl:flex items-center gap-4 flex-shrink-0">
+                            {/* Full Search - Visible on 2XL+ */}
                             <button
                                 onClick={() => setIsSearchOpen(true)}
-                                className="relative group hidden xl:block"
+                                className="relative group hidden 2xl:block"
                             >
                                 <div className="flex items-center gap-2 bg-bg-tertiary border border-border-primary rounded-full px-4 py-1.5 text-sm text-text-secondary hover:border-accent-primary transition-colors w-64">
                                     <Search size={14} />
                                     <span className="flex-1 text-left">Search...</span>
-                                    <kbd className="hidden lg:inline-block font-sans text-[10px] bg-bg-primary border border-border-primary rounded px-1">Ctrl K</kbd>
+                                    <kbd className="hidden xl:inline-block font-sans text-[10px] bg-bg-primary border border-border-primary rounded px-1">Ctrl K</kbd>
                                 </div>
                             </button>
 
-                            {/* Icon Search - Visible on LG to XL */}
+                            {/* Icon Search - Visible on XL to 2XL */}
                             <button
                                 onClick={() => setIsSearchOpen(true)}
-                                className="p-2 text-text-secondary hover:text-text-primary hidden lg:block xl:hidden"
+                                className="p-2 text-text-secondary hover:text-text-primary hidden xl:block 2xl:hidden"
                             >
                                 <Search size={20} />
                             </button>
@@ -257,7 +257,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Mobile menu button */}
-                        <div className="lg:hidden flex items-center gap-2">
+                        <div className="xl:hidden flex items-center gap-2">
                             <button
                                 onClick={() => setIsSearchOpen(true)}
                                 className="p-2 text-text-secondary hover:text-text-primary"

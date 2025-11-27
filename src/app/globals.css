@@ -8,6 +8,10 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   }
 
+  html {
+    font-size: 125%;
+  }
+
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
     overflow-x: hidden;
