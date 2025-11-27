@@ -14,7 +14,6 @@
 
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
-    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -53,52 +52,36 @@
   }
 }
 
-/* Math formulas overflow handling */
+/* Math formulas - 讓公式自然顯示,不限制寬度 */
 @layer utilities {
-  /* KaTeX math overflow - 區塊公式 */
+  /* KaTeX 區塊公式 - 完全移除寬度限制 */
   .katex-display {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
     padding: 0.5rem 0;
-    max-width: 100%;
+    overflow: visible;
+    white-space: nowrap;
   }
 
   .katex-display > .katex {
     display: inline-block;
-    max-width: 100%;
   }
 
-  .katex-display::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .katex-display::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-  }
-
-  .katex-display::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-  }
-
-  .katex-display::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  /* 行內公式應該可以自然換行或滾動 */
+  /* 行內公式 */
   .katex {
-    max-width: 100%;
     display: inline-block;
   }
 
-  /* Ensure prose content doesn't overflow */
+  /* Prose 內容 - 允許公式溢出 */
   .prose {
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
-    max-width: 100%;
+    overflow: visible;
+  }
+  
+  /* 確保數學公式可以溢出容器 */
+  .prose .katex-display {
+    margin: 1rem 0;
+    overflow: visible;
   }
 
   .prose pre {
@@ -110,10 +93,5 @@
     display: block;
     overflow-x: auto;
     max-width: 100%;
-  }
-  
-  /* 確保數學公式不會被父容器裁切 */
-  .prose .katex-display {
-    margin: 1rem 0;
   }
 }
