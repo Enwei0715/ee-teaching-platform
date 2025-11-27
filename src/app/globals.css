@@ -54,11 +54,33 @@
 
 /* Math formulas - 讓公式自然顯示,不限制寬度 */
 @layer utilities {
-  /* KaTeX 區塊公式 - 完全移除寬度限制 */
+  /* KaTeX 區塊公式 - 移動裝置支援水平滾動 */
   .katex-display {
     padding: 0.5rem 0;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  /* 自訂 KaTeX 滾動條樣式 (Webkit) */
+  .katex-display::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .katex-display::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+
+  .katex-display::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .katex-display::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
 
   .katex-display > .katex {

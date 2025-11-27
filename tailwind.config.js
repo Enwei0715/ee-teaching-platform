@@ -33,6 +33,47 @@ module.exports = {
                 sans: ['var(--font-sans)', 'sans-serif'],
                 mono: ['var(--font-mono)', 'monospace'],
             },
+            typography: (theme) => ({
+                DEFAULT: {
+                    css: {
+                        // Mobile-first: Reduced indentation for small screens
+                        'ul, ol': {
+                            paddingLeft: '1rem', // Reduced from default ~1.625rem
+                        },
+                        'ul > li, ol > li': {
+                            paddingLeft: '0.25rem',
+                        },
+                        // Nested lists - even tighter on mobile
+                        'ul > li > ul, ol > li > ol': {
+                            paddingLeft: '0.75rem', // Much tighter for nested lists
+                        },
+                        'ul > li > ul > li, ol > li > ol > li': {
+                            paddingLeft: '0.25rem',
+                        },
+                    },
+                },
+                // Desktop breakpoints: Restore more standard indentation
+                md: {
+                    css: {
+                        'ul, ol': {
+                            paddingLeft: '1.5rem',
+                        },
+                        'ul > li > ul, ol > li > ol': {
+                            paddingLeft: '1.25rem',
+                        },
+                    },
+                },
+                lg: {
+                    css: {
+                        'ul, ol': {
+                            paddingLeft: '1.625rem',
+                        },
+                        'ul > li > ul, ol > li > ol': {
+                            paddingLeft: '1.5rem',
+                        },
+                    },
+                },
+            }),
         },
     },
     plugins: [
