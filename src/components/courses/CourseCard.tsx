@@ -103,7 +103,7 @@ export default function CourseCard({ id, title, description, slug, level, durati
                                 </div>
                             )}
                         </div>
-                        <h3 className="text-lg font-bold text-gray-100 mb-2 hover:text-accent-primary transition-colors line-clamp-1">
+                        <h3 className="text-lg font-bold text-gray-100 mb-2 hover:text-accent-primary transition-colors line-clamp-2">
                             {title}
                         </h3>
                         <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mb-4 md:mb-0">

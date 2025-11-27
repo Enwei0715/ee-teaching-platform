@@ -348,9 +348,9 @@ export default function Navbar() {
                                     <Link
                                         href="/dashboard"
                                         onClick={() => setIsMenuOpen(false)}
-                                        className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-accent-primary text-white font-medium hover:bg-accent-primary/90 transition-colors"
+                                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-accent-primary text-white text-sm font-medium hover:bg-accent-primary/90 transition-colors"
                                     >
-                                        <LayoutDashboard size={18} />
+                                        <LayoutDashboard size={16} />
                                         Dashboard
                                     </Link>
                                     <button
@@ -358,9 +358,9 @@ export default function Navbar() {
                                             setIsMenuOpen(false);
                                             signOut();
                                         }}
-                                        className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors font-medium"
+                                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-red-500/10 text-red-400 text-sm border border-red-500/20 hover:bg-red-500/20 transition-colors font-medium"
                                     >
-                                        <LogOut size={18} />
+                                        <LogOut size={16} />
                                         Sign Out
                                     </button>
                                 </div>
@@ -378,7 +378,7 @@ export default function Navbar() {
                             <Link
                                 href="/auth/signin"
                                 onClick={() => setIsMenuOpen(false)}
-                                className="w-full py-4 rounded-xl bg-accent-primary text-white font-bold text-lg text-center hover:bg-accent-primary/90 transition-colors shadow-lg shadow-accent-primary/20"
+                                className="w-full py-4 rounded-xl bg-accent-primary text-white font-bold text-base text-center hover:bg-accent-primary/90 transition-colors shadow-lg shadow-accent-primary/20"
                             >
                                 Sign In
                             </Link>
