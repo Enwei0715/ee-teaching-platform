@@ -64,7 +64,7 @@ export default function CourseCard({ id, title, description, slug, level, durati
 
             <Link
                 href={`/courses/${slug}`}
-                className="flex flex-col md:flex-row glass-panel rounded-xl overflow-hidden shadow-lg transition-all hover:border-gray-700 h-auto md:h-[180px]"
+                className="flex flex-col md:flex-row glass-panel rounded-xl overflow-hidden shadow-lg transition-all hover:border-gray-700 h-auto"
             >
                 {/* Visual Section: Top on Mobile, Left on Desktop */}
                 <div className="w-full h-48 md:w-[200px] md:h-auto shrink-0 relative glass-ghost flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-800">
@@ -103,10 +103,10 @@ export default function CourseCard({ id, title, description, slug, level, durati
                                 </div>
                             )}
                         </div>
-                        <h3 className="text-lg font-bold text-gray-100 mb-2 hover:text-accent-primary transition-colors line-clamp-2">
+                        <h3 className="text-lg font-bold text-gray-100 mb-2 hover:text-accent-primary transition-colors">
                             {title}
                         </h3>
-                        <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mb-4 md:mb-0">
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
                             {description}
                         </p>
 
