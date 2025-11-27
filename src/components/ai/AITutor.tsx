@@ -35,6 +35,19 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { data: session } = useSession();
 
+    // Moved up to avoid conditional hook execution error
+    const [rndDefaults, setRndDefaults] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
+
+    useEffect(() => {
+        // Initialize Rnd position on client side only
+        setRndDefaults({
+            x: window.innerWidth - 420,
+            y: window.innerHeight - 600,
+            width: 380,
+            height: 500,
+        });
+    }, []);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -130,6 +143,42 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         }
     };
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        e.stopPropagation();
+        // Stop global listeners from seeing this event
+        e.nativeEvent.stopImmediatePropagation();
+
+        if (e.key === 'Enter') {
+            if (e.shiftKey) {
+                // Manual newline insertion
+                e.preventDefault();
+                const textarea = e.currentTarget;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const value = textarea.value;
+
+                const newValue = value.substring(0, start) + "\n" + value.substring(end);
+                setInput(newValue);
+
+                // Restore cursor position after state update
+                requestAnimationFrame(() => {
+                    if (textareaRef.current) {
+                        textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 1;
+                        // Trigger auto-resize
+                        textareaRef.current.style.height = 'auto';
+                        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+                    }
+                });
+            } else {
+                // Send message
+                e.preventDefault();
+                handleSend(e as any);
+            }
+        }
+    };
+
     if (!session) {
         return (
             <div className="fixed bottom-6 right-6 z-50">
@@ -144,27 +193,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         );
     }
 
-    const [rndDefaults, setRndDefaults] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
-
-    useEffect(() => {
-        // Initialize Rnd position on client side only
-        setRndDefaults({
-            x: window.innerWidth - 420,
-            y: window.innerHeight - 600,
-            width: 380,
-            height: 500,
-        });
-    }, []);
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        e.stopPropagation(); // Prevent triggering drag when typing
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend(e as any);
-        }
-    };
-
-    const ChatContent = () => (
+    const renderChatContent = () => (
         <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
             {/* Header */}
             <div className={`ai-tutor-header bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white ${!isMobile ? 'cursor-move' : ''}`}>
@@ -242,6 +271,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
                 <div className="flex gap-2 items-end">
                     <textarea
+                        ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Ask a question... (Shift+Enter for new line)"
@@ -270,10 +300,13 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
     return (
         <>
+            {/* Bounds Container for Rnd */}
+            <div id="ai-tutor-bounds" className="fixed left-0 right-0 top-16 bottom-0 pointer-events-none z-0" />
+
             {isOpen && (
                 isMobile ? (
                     <div className={`fixed bottom-24 left-4 right-4 z-[60] ${isExpanded ? 'top-20' : 'h-[60vh]'}`}>
-                        <ChatContent />
+                        {renderChatContent()}
                     </div>
                 ) : (
                     rndDefaults && (
@@ -281,7 +314,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                             default={rndDefaults}
                             minWidth={300}
                             minHeight={400}
-                            bounds="window"
+                            bounds="#ai-tutor-bounds"
                             dragHandleClassName="ai-tutor-header"
                             enableResizing={{
                                 top: true, right: true, bottom: true, left: true,
@@ -289,7 +322,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                             }}
                             style={{ zIndex: 60, position: 'fixed' }}
                         >
-                            <ChatContent />
+                            {renderChatContent()}
                         </Rnd>
                     )
                 )
