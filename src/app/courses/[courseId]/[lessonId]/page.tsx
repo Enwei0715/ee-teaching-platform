@@ -25,6 +25,7 @@ import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
 import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 
 
 interface Props {
@@ -166,6 +167,52 @@ ${fence}
     const prevLesson = currentIndex > 0 ? courseStructure[currentIndex - 1] : null;
     const nextLesson = currentIndex < courseStructure.length - 1 ? courseStructure[currentIndex + 1] : null;
 
+    // Fetch user progress for this lesson to get lastElementId
+    let initialLastElementId = null;
+    if (session?.user?.id) {
+        // We need to resolve slugs to IDs first, or use a raw query, or update schema to allow slug lookup if possible.
+        // But our schema uses IDs for relations.
+        // Let's do a quick lookup.
+        try {
+            const course = await prisma.course.findUnique({
+                where: { slug: params.courseId },
+                select: { id: true }
+            });
+
+            // We need to find the lesson ID from the slug + courseID
+            // The lesson object from getCourseLesson might not have the UUID if it comes from MDX file system only?
+            // Actually getCourseLesson returns MDX data.
+            // We need to check if the lesson exists in DB.
+            if (course) {
+                const dbLesson = await prisma.lesson.findUnique({
+                    where: {
+                        courseId_slug: {
+                            courseId: course.id,
+                            slug: params.lessonId
+                        }
+                    },
+                    select: { id: true }
+                });
+
+                if (dbLesson) {
+                    const progress = await prisma.userProgress.findUnique({
+                        where: {
+                            userId_courseId_lessonId: {
+                                userId: session.user.id,
+                                courseId: course.id,
+                                lessonId: dbLesson.id
+                            }
+                        },
+                        select: { lastElementId: true }
+                    });
+                    initialLastElementId = progress?.lastElementId;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch initial progress", e);
+        }
+    }
+
     return (
         <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 relative">
             <InteractiveGridPattern />
@@ -212,7 +259,7 @@ ${fence}
                         courseId={params.courseId}
                         lessonId={params.lessonId}
                         topic={lesson.meta.title}
-                        context={lesson.content.substring(0, 1000)}
+                        context={lesson.content} // Pass full content (though API fetches it independently)
                     />
 
                     <LessonNavigation
@@ -240,6 +287,9 @@ ${fence}
             <ResumeLearningTracker
                 userId={session?.user?.id}
                 lessonTitle={lesson.meta.title}
+                courseId={params.courseId}
+                lessonId={params.lessonId}
+                initialLastElementId={initialLastElementId}
             />
         </div>
     );

@@ -48,7 +48,7 @@ export async function POST(request: Request) {
                     {
                         role: "system",
                         content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
-Task: Generate a single multiple-choice question based STRICTLY on the provided lesson content.
+Task: Generate a single multiple-choice question based on a RANDOMLY SELECTED section of the provided lesson content.
 
 Output Format (Strict JSON):
 You must output valid JSON only. No conversational text before or after.
@@ -69,24 +69,31 @@ Content Rules:
 1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
 2. Difficulty: Match the level of the provided content.
 3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
-4. **VARIETY**: Randomly select a specific section, concept, or detail from the lesson content to generate the question. **DO NOT** always pick the first topic or the main heading. Try to find obscure or specific details to test deep understanding.`
+4. **CRITICAL - VARIETY**: 
+   - Do NOT ask about the main title or the first paragraph.
+   - Pick a specific detail, formula, or concept from the MIDDLE or END of the lesson.
+   - If the lesson has multiple sections, pick one at random.
+   - Avoid generic "What is X?" questions. Ask "How does X affect Y?" or "Calculate Z given...".`
                     },
                     {
                         role: "user",
                         content: `
                         Lesson Title: ${lesson.title}
+                        Timestamp: ${Date.now()} (Use this to ensure uniqueness)
+                        
                         Lesson Content:
                         """
                         ${lesson.content.slice(0, 100000)}
                         """
                         
-                        Generate a unique and challenging question that tests a specific concept mentioned in this text. Avoid generic questions.
+                        Generate a unique and challenging question that tests a specific, non-obvious concept from this text. 
+                        Focus on a random paragraph or equation.
                         `
                     }
                 ],
                 model: "gemini-2.5-flash",
                 response_format: { type: "json_object" },
-                temperature: 0.7, // Increased temperature for more variety
+                temperature: 1.0, // Increased for maximum variety
             });
 
             console.log("Google AI Response:", completion);

@@ -66,6 +66,7 @@ model UserProgress {
   lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   completed Boolean  @default(false)
   timeSpent Int      @default(0) // Time spent in seconds
+  lastElementId String? // ID of the last element viewed
   updatedAt DateTime @updatedAt
 
   @@unique([userId, courseId, lessonId])

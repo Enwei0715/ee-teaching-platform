@@ -47,29 +47,24 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         if (savedState) {
             try {
                 const parsed = JSON.parse(savedState);
-                console.log("AITutor: Found saved state:", parsed);
-                // Basic validation to ensure it's on screen
-                if (
-                    typeof parsed.x === 'number' &&
-                    typeof parsed.y === 'number' &&
-                    parsed.x < window.innerWidth - 50 && // At least 50px visible from right
-                    parsed.y < window.innerHeight - 50 && // At least 50px visible from bottom
-                    parsed.x > -parsed.width + 50 && // At least 50px visible from left
-                    parsed.y > 0 // Below top edge
-                ) {
-                    defaults = parsed;
-                } else {
-                    console.warn("AITutor: Saved state is off-screen, resetting.");
+                if (parsed.x !== undefined && parsed.y !== undefined) {
+                    defaults = {
+                        x: parsed.x,
+                        y: parsed.y,
+                        width: parsed.width || 450,
+                        height: parsed.height || 600,
+                    };
+                    console.log("AITutor: Found saved state:", defaults);
                 }
             } catch (e) {
-                console.error("Failed to parse saved AI Tutor state", e);
+                console.error("AITutor: Failed to parse saved state", e);
             }
         }
 
         if (!defaults) {
             // Default: Bottom right
-            const width = 380;
-            const height = 500;
+            const width = 450;
+            const height = 600;
             const rightMargin = 24;
             const bottomMargin = 90;
 
@@ -82,28 +77,48 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             console.log("AITutor: Using default position:", defaults);
         }
 
-        setRndDefaults(defaults);
+        // Ensure initial position is within bounds
+        const safeX = Math.max(0, Math.min(defaults.x, window.innerWidth - defaults.width));
+        const safeY = Math.max(80, Math.min(defaults.y, window.innerHeight - defaults.height)); // 80px for Navbar
+
+        setRndDefaults({ ...defaults, x: safeX, y: safeY });
     }, []);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
+    // Handle Window Resize to keep Tutor on screen
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, isOpen, isExpanded]);
+        if (!rndDefaults || isMobile) return;
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
+        const handleResize = () => {
+            setRndDefaults(prev => {
+                if (!prev) return null;
+
+                const width = prev.width as number;
+                const height = prev.height as number;
+                let x = prev.x;
+                let y = prev.y;
+
+                // Clamp X
+                if (x + width > window.innerWidth) {
+                    x = window.innerWidth - width - 20; // 20px padding
+                }
+                if (x < 0) x = 20;
+
+                // Clamp Y
+                if (y + height > window.innerHeight) {
+                    y = window.innerHeight - height - 20;
+                }
+                if (y < 80) y = 80; // Navbar height
+
+                return { ...prev, x, y };
+            });
         };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [rndDefaults, isMobile]);
 
     useEffect(() => {
-        const handleOpen = (e?: any) => {
+        const handleOpen = (e: any) => {
             setIsOpen(true);
             // If event has detail with text, populate input
             if (e?.detail?.text) {

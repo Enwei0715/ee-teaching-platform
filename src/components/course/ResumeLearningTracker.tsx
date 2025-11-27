@@ -8,7 +8,7 @@ interface Props {
     lessonTitle: string;
 }
 
-export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
+export default function ResumeLearningTracker({ userId, lessonTitle, courseId, lessonId, initialLastElementId }: Props & { courseId?: string, lessonId?: string, initialLastElementId?: string | null }) {
     const pathname = usePathname();
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -16,6 +16,21 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
     useEffect(() => {
         if (!userId) return;
 
+        // Priority 1: Check URL param + initialLastElementId (from DB)
+        if (window.location.search.includes('resume=true') && initialLastElementId) {
+            setTimeout(() => {
+                const element = document.getElementById(initialLastElementId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                // Clean URL
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }, 500);
+            return;
+        }
+
+        // Priority 2: Local Storage (Fallback)
         const key = `resume_learning_${userId}`;
         const savedData = localStorage.getItem(key);
 
@@ -30,7 +45,6 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
                             const element = document.getElementById(elementId);
                             if (element) {
                                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                // Highlight effect? Maybe later.
                             } else {
                                 // Fallback to scrollY if element not found
                                 window.scrollTo({ top: scrollY, behavior: 'smooth' });
@@ -47,7 +61,7 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
                 console.error("Failed to parse resume data", e);
             }
         }
-    }, [userId, pathname]);
+    }, [userId, pathname, initialLastElementId]);
 
     // Save scroll position on scroll
     useEffect(() => {
@@ -58,20 +72,15 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
                 clearTimeout(saveTimeoutRef.current);
             }
 
-            saveTimeoutRef.current = setTimeout(() => {
+            saveTimeoutRef.current = setTimeout(async () => {
                 // Find the closest element to the top of the viewport with an ID
                 let activeElementId = null;
                 const elements = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], p[id], div[id]');
 
-                // Find element closest to top (but not below viewport top by too much)
-                // We want the element the user is currently looking at.
-                // Usually that's the one near the top of the screen.
                 let minDistance = Infinity;
 
                 elements.forEach((el) => {
                     const rect = el.getBoundingClientRect();
-                    // We care about elements that are near the top (e.g. within top 20% or just slightly above/below)
-                    // Let's take the one closest to y=0 (absolute distance)
                     const distance = Math.abs(rect.top - 100); // Offset a bit for navbar
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -79,6 +88,7 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
                     }
                 });
 
+                // Save to Local Storage (Fast, offline support)
                 const data = {
                     url: pathname,
                     scrollY: window.scrollY,
@@ -87,7 +97,27 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
                     title: lessonTitle
                 };
                 localStorage.setItem(`resume_learning_${userId}`, JSON.stringify(data));
-            }, 1000); // Debounce 1s
+
+                // Save to Database (Sync across devices)
+                if (courseId && lessonId && activeElementId) {
+                    try {
+                        await fetch(`/api/courses/${courseId}/progress`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                lessonId,
+                                lastElementId: activeElementId,
+                                // We don't mark as completed here, just tracking position
+                            }),
+                        });
+                    } catch (error) {
+                        console.error("Failed to save progress to DB", error);
+                    }
+                }
+
+            }, 2000); // Debounce 2s (less frequent for DB calls)
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -95,7 +125,7 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
             window.removeEventListener('scroll', handleScroll);
             if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
         };
-    }, [userId, pathname, lessonTitle]);
+    }, [userId, pathname, lessonTitle, courseId, lessonId]);
 
     return null;
 }
