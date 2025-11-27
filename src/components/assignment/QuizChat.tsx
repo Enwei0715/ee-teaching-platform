@@ -46,6 +46,19 @@ export default function QuizChat({ context }: QuizChatProps) {
         }
     };
 
+    const handleAskTutor = () => {
+        const question = input.trim();
+        const fullQuery = `I have a question about this quiz:\n\n${context}\n\nMy Question: ${question}`;
+
+        // Dispatch event to open AI Tutor
+        const event = new CustomEvent('open-ai-tutor', {
+            detail: { text: fullQuery }
+        });
+        window.dispatchEvent(event);
+
+        setInput('');
+    };
+
     return (
         <div className="mt-6 border-t border-indigo-500/20 pt-6 w-full max-w-md mx-auto">
             <h4 className="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">
@@ -98,23 +111,38 @@ export default function QuizChat({ context }: QuizChatProps) {
                 )}
             </div>
 
-            <div className="flex gap-2 w-full">
-                <input
-                    type="text"
+            <div className="flex flex-col gap-3 w-full">
+                <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
                     placeholder="Why is option B incorrect?"
-                    className="flex-1 min-w-0 text-sm border border-indigo-500/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-200 bg-slate-900/60 placeholder-gray-500"
+                    className="w-full min-h-[80px] text-sm border border-indigo-500/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-200 bg-slate-900/60 placeholder-gray-500 resize-y"
                     disabled={loading}
                 />
-                <button
-                    onClick={handleSend}
-                    disabled={loading || !input.trim()}
-                    className="flex-shrink-0 bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-indigo-500/20"
-                >
-                    <Send size={18} />
-                </button>
+                <div className="flex justify-between items-center gap-2">
+                    <button
+                        onClick={handleAskTutor}
+                        className="text-xs flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors px-2 py-1 rounded hover:bg-indigo-500/10"
+                        title="Open in main AI Tutor for more help"
+                    >
+                        <Bot size={14} />
+                        Ask AI Tutor
+                    </button>
+                    <button
+                        onClick={handleSend}
+                        disabled={loading || !input.trim()}
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-indigo-500/20 flex items-center gap-2 font-medium text-sm"
+                    >
+                        <span>Send</span>
+                        <Send size={14} />
+                    </button>
+                </div>
             </div>
         </div>
     );
