@@ -18,7 +18,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const observerRef = useRef<IntersectionObserver | null>(null);
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
 
     // Extract headings from DOM
     useEffect(() => {
@@ -101,18 +101,15 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         return () => clearTimeout(timer);
     }, [initialLastElementId, items]);
 
-    // Save active section to database (fast debounce for instant feel)
+    // Save active section to database (INSTANT - no debounce)
+    // IntersectionObserver already provides filtered signal, so save immediately
     useEffect(() => {
+        // Guard clauses
         if (!activeId || !courseId || !lessonId) return;
+        if (activeId === lastSavedIdRef.current) return; // Prevent duplicate saves
 
-        // Clear previous timer
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-
-        // Fast debounce (500ms) - feels instant but filters scrolling noise
-        // This ensures "read and close tab" behavior still captures progress
-        debounceTimerRef.current = setTimeout(async () => {
+        // Immediate save - activeId change IS the trigger
+        (async () => {
             try {
                 await fetch(`/api/courses/${courseId}/progress`, {
                     method: 'POST',
@@ -122,18 +119,13 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                         lastElementId: activeId
                     })
                 });
-                console.log(`Saved position: ${activeId}`);
+                console.log(`💾 Instantly saved position: ${activeId}`);
+                lastSavedIdRef.current = activeId; // Update ref after successful save
             } catch (error) {
                 console.error('Failed to save position:', error);
                 // Fail silently - don't break UI on network errors
             }
-        }, 500); // Reduced from 2500ms for instant-feel saving
-
-        return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-            }
-        };
+        })();
     }, [activeId, courseId, lessonId]);
 
     // Scroll to section on click
