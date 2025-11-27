@@ -10,9 +10,17 @@
 
   /* Lock viewport width to prevent layout blowout */
   html {
-    font-size: 115%;
+    /* Mobile-first: 95% for better mobile readability */
+    font-size: 95%;
     overflow-x: hidden;
     max-width: 100vw;
+  }
+
+  /* Desktop: 115% for comfortable reading */
+  @media (min-width: 768px) {
+    html {
+      font-size: 115%;
+    }
   }
 
   body {
