@@ -55,7 +55,12 @@ export function Mermaid({ chart, children }: MermaidProps) {
                 // Decode HTML entities (e.g. &gt; -> >)
                 const txt = document.createElement('textarea');
                 txt.innerHTML = chartDefinition;
-                const decodedChart = txt.value.trim();
+                let decodedChart = txt.value.trim();
+
+                // Auto-quote unquoted content inside square brackets []
+                // This fixes issues with special characters like () inside labels
+                // e.g. T1[Task (High)] -> T1["Task (High)"]
+                decodedChart = decodedChart.replace(/\[([^"\]]+)\]/g, '["$1"]');
 
                 // Generate unique ID for this diagram
                 const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
