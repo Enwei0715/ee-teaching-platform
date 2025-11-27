@@ -40,11 +40,17 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
     useEffect(() => {
         // Initialize Rnd position on client side only
+        // Align with bottom-right button (right-6 = 24px, button height ~56px)
+        const width = 380;
+        const height = 500;
+        const rightMargin = 24;
+        const bottomMargin = 90; // 24px margin + 56px button + 10px gap
+
         setRndDefaults({
-            x: window.innerWidth - 420,
-            y: window.innerHeight - 600,
-            width: 380,
-            height: 500,
+            x: window.innerWidth - width - rightMargin,
+            y: window.innerHeight - height - bottomMargin,
+            width,
+            height,
         });
     }, []);
 
