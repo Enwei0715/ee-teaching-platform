@@ -144,6 +144,26 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         );
     }
 
+    const [rndDefaults, setRndDefaults] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
+
+    useEffect(() => {
+        // Initialize Rnd position on client side only
+        setRndDefaults({
+            x: window.innerWidth - 420,
+            y: window.innerHeight - 600,
+            width: 380,
+            height: 500,
+        });
+    }, []);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        e.stopPropagation(); // Prevent triggering drag when typing
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend(e as any);
+        }
+    };
+
     const ChatContent = () => (
         <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
             {/* Header */}
@@ -220,20 +240,26 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
             {/* Input */}
             <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
-                <div className="flex gap-2">
-                    <input
-                        type="text"
+                <div className="flex gap-2 items-end">
+                    <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask a question..."
-                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Ask a question... (Shift+Enter for new line)"
+                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none min-h-[44px] max-h-[120px] custom-scrollbar"
                         disabled={loading}
-                        onKeyDown={(e) => e.stopPropagation()} // Prevent triggering drag when typing
+                        onKeyDown={handleKeyDown}
+                        rows={1}
+                        style={{ height: 'auto', minHeight: '44px' }}
+                        onInput={(e) => {
+                            const target = e.target as HTMLTextAreaElement;
+                            target.style.height = 'auto';
+                            target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+                        }}
                     />
                     <button
                         type="submit"
                         disabled={!input.trim() || loading}
-                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="p-2 mb-1 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                     >
                         <Send size={18} />
                     </button>
@@ -250,25 +276,22 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         <ChatContent />
                     </div>
                 ) : (
-                    <Rnd
-                        default={{
-                            x: window.innerWidth - 420,
-                            y: window.innerHeight - 600,
-                            width: 380,
-                            height: 500,
-                        }}
-                        minWidth={300}
-                        minHeight={400}
-                        bounds="window"
-                        dragHandleClassName="ai-tutor-header"
-                        enableResizing={{
-                            top: true, right: true, bottom: true, left: true,
-                            topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
-                        }}
-                        style={{ zIndex: 60, position: 'fixed' }}
-                    >
-                        <ChatContent />
-                    </Rnd>
+                    rndDefaults && (
+                        <Rnd
+                            default={rndDefaults}
+                            minWidth={300}
+                            minHeight={400}
+                            bounds="window"
+                            dragHandleClassName="ai-tutor-header"
+                            enableResizing={{
+                                top: true, right: true, bottom: true, left: true,
+                                topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
+                            }}
+                            style={{ zIndex: 60, position: 'fixed' }}
+                        >
+                            <ChatContent />
+                        </Rnd>
+                    )
                 )
             )}
 
