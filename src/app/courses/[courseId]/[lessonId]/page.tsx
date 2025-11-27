@@ -220,7 +220,7 @@ ${fence}
 
             <CourseSidebar courseId={params.courseId} lessons={courseStructure} />
 
-            <main className="flex-1 min-w-0 xl:mr-64">
+            <main className="flex-1 min-w-0">
                 <TimeTracker courseId={params.courseId} lessonId={params.lessonId} />
                 <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
                     <div className="mb-8 pb-8 border-b border-border-primary">
@@ -276,6 +276,14 @@ ${fence}
                     />
                 </div>
             </main>
+
+            {/* TOC is now self-positioning with hover trigger */}
+            <TableOfContents
+                courseId={params.courseId}
+                lessonId={params.lessonId}
+                initialLastElementId={initialLastElementId}
+            />
+
             <AITutor
                 lessonTitle={lesson.meta.title}
                 lessonContent={lesson.content}

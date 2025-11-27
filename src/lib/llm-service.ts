@@ -4,6 +4,7 @@ export interface Quiz {
     correctAnswer: number;
     explanation: string;
     model?: string;
+    sectionTitle?: string;
 }
 
 export async function generateQuiz(courseSlug: string, lessonSlug: string): Promise<Quiz> {

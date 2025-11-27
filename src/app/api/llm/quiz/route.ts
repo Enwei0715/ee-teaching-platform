@@ -11,6 +11,40 @@ const openai = new OpenAI({
     },
 });
 
+interface Section {
+    title: string;
+    content: string;
+}
+
+/**
+ * Extracts a random section from markdown content based on H2/H3 headings.
+ * This ensures quiz questions focus on different parts of the lesson.
+ */
+function extractRandomSection(markdown: string): Section {
+    // Split by H2 or H3 headers (## or ###)
+    // Lookahead keeps the heading in the section content
+    const sections = markdown.split(/(?=\n#{2,3}\s)/);
+
+    // Filter sections with meaningful content (>200 chars)
+    // This avoids testing on just a heading or very short intro
+    const validSections = sections.filter(s => s.trim().length > 200);
+
+    // Fallback for short lessons or lessons without headers
+    if (validSections.length === 0) {
+        return { title: "Full Lesson", content: markdown };
+    }
+
+    // Random selection for variety
+    const randomIndex = Math.floor(Math.random() * validSections.length);
+    const selectedContent = validSections[randomIndex];
+
+    // Extract heading title for UI display
+    const titleMatch = selectedContent.match(/^\n?#{2,3}\s+(.+)/);
+    const title = titleMatch ? titleMatch[1].trim() : "Selected Section";
+
+    return { title, content: selectedContent };
+}
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -43,12 +77,20 @@ export async function POST(request: Request) {
         try {
             console.log("Calling Google AI Studio with lesson content...");
 
+            // CRITICAL: Extract random section to ensure variety
+            const { title: sectionTitle, content: sectionContent } = extractRandomSection(lesson.content);
+            console.log(`Selected section: "${sectionTitle}" (${sectionContent.length} chars)`);
+
             const completion = await openai.chat.completions.create({
                 messages: [
                     {
                         role: "system",
                         content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
-Task: Generate a single multiple-choice question based on a RANDOMLY SELECTED section of the provided lesson content.
+
+**CURRENT FOCUS SECTION:** "${sectionTitle}"
+
+Task: Generate ONE multiple-choice question based EXCLUSIVELY on the content from this specific section.
+Do NOT ask about other parts of the lesson. Focus deeply on specific details, formulas, or concepts found ONLY in the provided section text.
 
 Output Format (Strict JSON):
 You must output valid JSON only. No conversational text before or after.
@@ -69,31 +111,31 @@ Content Rules:
 1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
 2. Difficulty: Match the level of the provided content.
 3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
-4. **CRITICAL - VARIETY**: 
-   - Do NOT ask about the main title or the first paragraph.
-   - Pick a specific detail, formula, or concept from the MIDDLE or END of the lesson.
-   - If the lesson has multiple sections, pick one at random.
-   - Avoid generic "What is X?" questions. Ask "How does X affect Y?" or "Calculate Z given...".`
+4. **CRITICAL - SPECIFICITY**: 
+   - Ask about a specific detail, formula, calculation, or concept from THIS section.
+   - Avoid generic "What is X?" questions. Prefer "How does X affect Y?" or "Calculate Z given...".
+   - Test understanding, not just memorization.`
                     },
                     {
                         role: "user",
                         content: `
-                        Lesson Title: ${lesson.title}
-                        Timestamp: ${Date.now()} (Use this to ensure uniqueness)
-                        
-                        Lesson Content:
-                        """
-                        ${lesson.content.slice(0, 100000)}
-                        """
-                        
-                        Generate a unique and challenging question that tests a specific, non-obvious concept from this text. 
-                        Focus on a random paragraph or equation.
+Lesson: ${lesson.title}
+Focused Section: ${sectionTitle}
+Timestamp: ${Date.now()} (Use this to ensure uniqueness)
+
+Section Content:
+"""
+${sectionContent}
+"""
+
+Generate a unique and challenging question that tests a specific concept from THIS section.
+Focus on details that require understanding, not just recall.
                         `
                     }
                 ],
                 model: "gemini-2.5-flash",
                 response_format: { type: "json_object" },
-                temperature: 1.0, // Increased for maximum variety
+                temperature: 1.0, // High temperature for variety
             });
 
             console.log("Google AI Response:", completion);
@@ -111,7 +153,11 @@ Content Rules:
                 quiz.correctAnswer = quiz.correctAnswerIndex;
             }
 
-            return NextResponse.json({ ...quiz, model: "gemini-2.5-flash" });
+            return NextResponse.json({
+                ...quiz,
+                model: "gemini-2.5-flash",
+                sectionTitle: sectionTitle  // Include which section was tested
+            });
 
         } catch (aiError) {
             console.error("AI Generation Failed:", aiError);

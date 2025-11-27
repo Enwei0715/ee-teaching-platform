@@ -9,10 +9,12 @@ interface TocItem {
 }
 
 interface TableOfContentsProps {
-    onActiveChange?: (activeId: string) => void;
+    courseId?: string;
+    lessonId?: string;
+    initialLastElementId?: string | null;
 }
 
-export default function TableOfContents({ onActiveChange }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -82,18 +84,47 @@ export default function TableOfContents({ onActiveChange }: TableOfContentsProps
         };
     }, [items]);
 
-    // Debounced callback when active section changes
+    // Auto-scroll to saved position on mount
     useEffect(() => {
-        if (!activeId || !onActiveChange) return;
+        if (!initialLastElementId || items.length === 0) return;
+
+        // Small delay to ensure content is fully rendered
+        const timer = setTimeout(() => {
+            const element = document.getElementById(initialLastElementId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setActiveId(initialLastElementId); // Set as active
+                console.log(`Restored position: ${initialLastElementId}`);
+            }
+        }, 600);
+
+        return () => clearTimeout(timer);
+    }, [initialLastElementId, items]);
+
+    // Save active section to database (debounced)
+    useEffect(() => {
+        if (!activeId || !courseId || !lessonId) return;
 
         // Clear previous timer
         if (debounceTimerRef.current) {
             clearTimeout(debounceTimerRef.current);
         }
 
-        // Set new timer (2.5s debounce)
-        debounceTimerRef.current = setTimeout(() => {
-            onActiveChange(activeId);
+        // Debounce API call (2.5s)
+        debounceTimerRef.current = setTimeout(async () => {
+            try {
+                await fetch(`/api/courses/${courseId}/progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        lessonId,
+                        lastElementId: activeId
+                    })
+                });
+                console.log(`Saved position: ${activeId}`);
+            } catch (error) {
+                console.error('Failed to save position:', error);
+            }
         }, 2500);
 
         return () => {
@@ -101,7 +132,7 @@ export default function TableOfContents({ onActiveChange }: TableOfContentsProps
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [activeId, onActiveChange]);
+    }, [activeId, courseId, lessonId]);
 
     // Scroll to section on click
     const handleClick = (id: string) => {
@@ -121,10 +152,24 @@ export default function TableOfContents({ onActiveChange }: TableOfContentsProps
     }
 
     return (
-        <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
-            <div className="glass-panel rounded-xl p-4 shadow-xl">
+        // Right Edge Hover Trigger Zone
+        <div className="
+            fixed right-0 top-24 bottom-24 w-12
+            hover:w-auto
+            z-40 flex items-start justify-end
+            group transition-all duration-300
+        ">
+            {/* TOC Panel - Hidden by default, slides in on hover */}
+            <div className="
+                w-64 max-h-[70vh] overflow-y-auto custom-scrollbar
+                glass-panel rounded-l-xl border-r-0 shadow-2xl
+                transform translate-x-full opacity-0
+                group-hover:translate-x-0 group-hover:opacity-100
+                transition-all duration-300 ease-out
+                p-4
+            ">
                 <h3 className="text-sm font-bold text-white/90 mb-3 uppercase tracking-wide">
-                    Contents
+                    On this page
                 </h3>
                 <nav className="space-y-1">
                     {items.map((item) => {

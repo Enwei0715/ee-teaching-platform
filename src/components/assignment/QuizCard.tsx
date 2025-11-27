@@ -32,7 +32,17 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
 
     return (
         <div className="glass-panel border border-white/10 rounded-lg p-6 shadow-lg my-4">
-            <h3 className="text-lg font-semibold text-text-primary mb-4">Quiz Time!</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-2">Quiz Time!</h3>
+
+            {/* Section Focus Badge */}
+            {quiz.sectionTitle && quiz.sectionTitle !== "Full Lesson" && (
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30">
+                    <span className="text-xs font-medium text-indigo-300">
+                        📍 Focusing on: {quiz.sectionTitle}
+                    </span>
+                </div>
+            )}
+
             <div className="text-text-primary mb-6 prose prose-invert prose-lg max-w-none">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}

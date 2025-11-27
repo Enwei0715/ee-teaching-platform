@@ -62,17 +62,17 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         }
 
         if (!defaults) {
-            // Default: Bottom right
-            const width = 450;
-            const height = 600;
+            // Default: Bottom right with viewport-aware sizing
+            const maxWidth = Math.min(450, window.innerWidth - 32); // 32px = 2rem total margin
+            const maxHeight = Math.min(600, window.innerHeight * 0.85); // 85% of viewport max
             const rightMargin = 24;
             const bottomMargin = 90;
 
             defaults = {
-                x: window.innerWidth - width - rightMargin,
-                y: window.innerHeight - height - bottomMargin,
-                width,
-                height,
+                x: window.innerWidth - maxWidth - rightMargin,
+                y: window.innerHeight - maxHeight - bottomMargin,
+                width: maxWidth,
+                height: maxHeight,
             };
             console.log("AITutor: Using default position:", defaults);
         }
@@ -246,7 +246,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     }
 
     const renderChatContent = () => (
-        <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full max-h-[80vh] max-w-[90vw] overscroll-contain ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
+        <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full max-w-[calc(100vw-2rem)] max-h-[85vh] overscroll-contain ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
             {/* Header */}
             <div className={`ai-tutor-header bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white ${!isMobile ? 'cursor-move' : ''}`}>
                 <div className="flex items-center gap-2">
