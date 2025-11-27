@@ -162,7 +162,7 @@ ${fence}
     const nextLesson = currentIndex < courseStructure.length - 1 ? courseStructure[currentIndex + 1] : null;
 
     return (
-        <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 relative overflow-x-hidden">
+        <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 relative">
             <InteractiveGridPattern />
 
             <CourseSidebar courseId={params.courseId} lessons={courseStructure} />

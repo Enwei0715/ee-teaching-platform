@@ -55,12 +55,18 @@
 
 /* Math formulas overflow handling */
 @layer utilities {
-  /* KaTeX math overflow */
+  /* KaTeX math overflow - 區塊公式 */
   .katex-display {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     padding: 0.5rem 0;
+    max-width: 100%;
+  }
+
+  .katex-display > .katex {
+    display: inline-block;
+    max-width: 100%;
   }
 
   .katex-display::-webkit-scrollbar {
@@ -81,11 +87,9 @@
     background: rgba(255, 255, 255, 0.3);
   }
 
-  /* Inline math should break if too long */
+  /* 行內公式應該可以自然換行或滾動 */
   .katex {
     max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
     display: inline-block;
   }
 
@@ -94,6 +98,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
+    max-width: 100%;
   }
 
   .prose pre {
@@ -105,5 +110,10 @@
     display: block;
     overflow-x: auto;
     max-width: 100%;
+  }
+  
+  /* 確保數學公式不會被父容器裁切 */
+  .prose .katex-display {
+    margin: 1rem 0;
   }
 }
