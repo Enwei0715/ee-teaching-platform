@@ -101,7 +101,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         return () => clearTimeout(timer);
     }, [initialLastElementId, items]);
 
-    // Save active section to database (debounced)
+    // Save active section to database (fast debounce for instant feel)
     useEffect(() => {
         if (!activeId || !courseId || !lessonId) return;
 
@@ -110,7 +110,8 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
             clearTimeout(debounceTimerRef.current);
         }
 
-        // Debounce API call (2.5s)
+        // Fast debounce (500ms) - feels instant but filters scrolling noise
+        // This ensures "read and close tab" behavior still captures progress
         debounceTimerRef.current = setTimeout(async () => {
             try {
                 await fetch(`/api/courses/${courseId}/progress`, {
@@ -124,8 +125,9 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                 console.log(`Saved position: ${activeId}`);
             } catch (error) {
                 console.error('Failed to save position:', error);
+                // Fail silently - don't break UI on network errors
             }
-        }, 2500);
+        }, 500); // Reduced from 2500ms for instant-feel saving
 
         return () => {
             if (debounceTimerRef.current) {

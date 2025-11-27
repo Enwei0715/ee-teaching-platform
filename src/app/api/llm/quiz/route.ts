@@ -108,7 +108,11 @@ Structure:
 }
 
 Content Rules:
-1. Math: ALWAYS use LaTeX format for numbers and variables. Example: $N_d = 10^{16} \\text{ cm}^{-3}$, not 10^16.
+1. **Math & Code Formatting:**
+   - Numbers and formulas: Use math mode. Example: $N_d = 10^{16} \\text{ cm}^{-3}$
+   - Code/functions: Use $\\texttt{functionName()}$ for code terms
+   - Variables in text: Use $\\texttt{variableName}$ 
+   - NEVER use \\texttt{} outside of $...$ delimiters
 2. Difficulty: Match the level of the provided content.
 3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
 4. **CRITICAL - SPECIFICITY**: 
