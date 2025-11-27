@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import MDXContent from '@/components/mdx/MDXContent';
 import MDXEditor from '@/components/ui/MDXEditor';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 interface Comment {
     id: string;
@@ -144,7 +145,25 @@ export default function PostDetail({ post, mdxSource, serializationError, autoFo
                                     <span>⚠️ Auto-formatted: Code blocks were missing. Please use Markdown code blocks for better formatting.</span>
                                 </div>
                             )}
-                            {mdxSource && <MDXContent source={mdxSource} />}
+                            {mdxSource && (
+                                <ErrorBoundary
+                                    fallback={
+                                        <div className="p-4 border border-red-900/50 bg-red-900/10 rounded-lg">
+                                            <p className="text-red-400 mb-2 font-bold flex items-center gap-2">
+                                                ⚠️ Render Error
+                                            </p>
+                                            <p className="text-sm text-red-300 mb-4">
+                                                An error occurred while rendering the content. Displaying raw text instead:
+                                            </p>
+                                            <pre className="whitespace-pre-wrap font-mono text-sm bg-black/50 p-4 rounded border border-gray-800 text-gray-300 overflow-x-auto">
+                                                {rawContent}
+                                            </pre>
+                                        </div>
+                                    }
+                                >
+                                    <MDXContent source={mdxSource} />
+                                </ErrorBoundary>
+                            )}
                         </>
                     )}
                 </div>
