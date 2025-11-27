@@ -30,14 +30,6 @@ export default function ProjectsPage() {
             });
     }, []);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-                <p className="text-gray-400">Loading...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-transparent flex flex-col flex-1 relative">
             <HexagonalBackground />

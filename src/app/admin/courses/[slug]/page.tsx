@@ -18,6 +18,7 @@ export default function EditCoursePage() {
     const [meta, setMeta] = useState<any>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [activeTab, setActiveTab] = useState<'editor' | 'settings'>('editor');
 
     useEffect(() => {
         fetch(`/api/admin/courses/${courseId}`)
@@ -35,6 +36,7 @@ export default function EditCoursePage() {
     const loadFile = async (file: string) => {
         setLoading(true);
         setSelectedFile(file);
+        setActiveTab('editor'); // Switch to editor tab when loading a file
         try {
             const res = await fetch(`/api/admin/courses/${courseId}?file=${file}`);
             const data = await res.json();
@@ -271,79 +273,105 @@ export default function EditCoursePage() {
                     </div>
                 </div>
 
-                {/* Editor & Sidebar */}
-                <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-6">
-                    {/* Main Content Editor */}
-                    <div className="flex-1 glass-panel flex flex-col min-h-[50vh] lg:min-h-[400px]">
-                        {selectedFile ? (
-                            <>
-                                <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
-                                    <FileText size={18} />
-                                    {selectedFile}
-                                </div>
-                                <div className="flex-1 flex flex-col">
+
+                {/* Editor with Tabs */}
+                <div className="flex-1 glass-panel flex flex-col min-h-[50vh] lg:min-h-[400px]">
+                    {selectedFile ? (
+                        <>
+                            <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
+                                <FileText size={18} />
+                                {selectedFile}
+                            </div>
+
+                            {/* Tab Navigation */}
+                            <div className="flex border-b border-gray-800">
+                                <button
+                                    onClick={() => setActiveTab('editor')}
+                                    className={`px-6 py-3 font-medium transition-colors relative ${activeTab === 'editor'
+                                            ? 'text-indigo-400 bg-indigo-500/10'
+                                            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
+                                        }`}
+                                >
+                                    Edit Content
+                                    {activeTab === 'editor' && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500"></div>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('settings')}
+                                    className={`px-6 py-3 font-medium transition-colors relative ${activeTab === 'settings'
+                                            ? 'text-indigo-400 bg-indigo-500/10'
+                                            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
+                                        }`}
+                                >
+                                    Lesson Settings
+                                    {activeTab === 'settings' && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500"></div>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div className="flex-1 flex flex-col overflow-hidden">
+                                {activeTab === 'editor' ? (
                                     <MDXEditor
                                         value={content}
                                         onChange={setContent}
                                         className="flex-1 flex flex-col h-full"
                                         rows={20}
                                     />
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex-1 flex items-center justify-center text-gray-500 min-h-[200px]">
-                                Select a file to edit
+                                ) : (
+                                    <div className="p-8 space-y-6 overflow-y-auto">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+                                            <input
+                                                type="text"
+                                                value={meta.title || ''}
+                                                onChange={(e) => setMeta({ ...meta, title: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                                                placeholder="Lesson title..."
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400 mb-2">Slug (URL)</label>
+                                            <input
+                                                type="text"
+                                                value={meta.slug || ''}
+                                                onChange={(e) => setMeta({ ...meta, slug: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                                                placeholder="lesson-slug"
+                                            />
+                                            <p className="text-xs text-yellow-500/70 mt-2">Changing this changes the URL.</p>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400 mb-2">Order</label>
+                                            <input
+                                                type="number"
+                                                value={meta.order || ''}
+                                                onChange={(e) => setMeta({ ...meta, order: parseInt(e.target.value) })}
+                                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                                                placeholder="1"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                                            <MDXEditor
+                                                value={meta.description || ''}
+                                                onChange={(val) => setMeta({ ...meta, description: val })}
+                                                rows={8}
+                                                placeholder="Course description..."
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-
-                    {/* Sidebar Settings */}
-                    {selectedFile && (
-                        <div className="w-full lg:w-80 glass-panel flex flex-col h-auto">
-                            <div className="p-4 border-b border-gray-800 font-semibold text-gray-300">
-                                Lesson Settings
-                            </div>
-                            <div className="p-6 space-y-6">
-                                <div>
-                                    <input
-                                        type="text"
-                                        value={meta.title || ''}
-                                        onChange={(e) => setMeta({ ...meta, title: e.target.value })}
-                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Slug (URL)</label>
-                                    <input
-                                        type="text"
-                                        value={meta.slug || ''}
-                                        onChange={(e) => setMeta({ ...meta, slug: e.target.value })}
-                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                    />
-                                    <p className="text-xs text-yellow-500/50 mt-1">Changing this changes the URL.</p>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Order</label>
-                                    <input
-                                        type="number"
-                                        value={meta.order || ''}
-                                        onChange={(e) => setMeta({ ...meta, order: parseInt(e.target.value) })}
-                                        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
-                                    <MDXEditor
-                                        value={meta.description || ''}
-                                        onChange={(val) => setMeta({ ...meta, description: val })}
-                                        rows={6}
-                                        placeholder="Course description..."
-                                    />
-                                </div>
-                            </div>
+                        </>
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center text-gray-500 min-h-[200px]">
+                            Select a file to edit
                         </div>
                     )}
                 </div>
