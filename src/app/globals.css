@@ -28,19 +28,19 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-white/[0.03] backdrop-blur-md border border-white/[0.05];
+    @apply bg-slate-950/80 backdrop-blur-md border border-white/10;
   }
 
   .glass-heavy {
-    @apply bg-slate-950/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-slate-950/90 backdrop-blur-xl border border-white/10 shadow-2xl;
   }
 
   .glass-ghost {
-    @apply bg-white/[0.05] backdrop-blur-sm;
+    @apply bg-slate-950/60 backdrop-blur-sm;
   }
 
   .glass-light {
-    @apply bg-black/30 backdrop-blur-md;
+    @apply bg-slate-900/70 backdrop-blur-md;
   }
 
   .skeleton-bone {
