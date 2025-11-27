@@ -8,12 +8,17 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   }
 
+  /* Lock viewport width to prevent layout blowout */
   html {
     font-size: 115%;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -54,14 +59,18 @@
 
 /* Math formulas - 讓公式自然顯示,不限制寬度 */
 @layer utilities {
-  /* KaTeX 區塊公式 - 移動裝置支援水平滾動 */
+  /* KaTeX 區塊公式 - 嚴格限制寬度防止 Layout Blowout */
   .katex-display {
     padding: 0.5rem 0;
     overflow-x: auto;
     overflow-y: hidden;
-    max-width: 100%;
+    max-width: 100% !important; /* Force constraint */
+    width: 100%;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    /* Prevent the equation from expanding parent */
+    display: block;
+    box-sizing: border-box;
   }
 
   /* 自訂 KaTeX 滾動條樣式 (Webkit) */
@@ -92,18 +101,19 @@
     display: inline-block;
   }
 
-  /* Prose 內容 - 允許公式溢出 */
+  /* Prose 內容 - 防止水平溢出 */
   .prose {
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
-    overflow: visible;
+    overflow-x: hidden; /* Prevent horizontal scroll of container */
+    overflow-y: visible;
   }
   
-  /* 確保數學公式可以溢出容器 */
+  /* 確保數學公式繼承滾動行為 */
   .prose .katex-display {
     margin: 1rem 0;
-    overflow: visible;
+    /* overflow inherited from .katex-display above */
   }
 
   .prose pre {
@@ -115,5 +125,40 @@
     display: block;
     overflow-x: auto;
     max-width: 100%;
+  }
+
+  /* Mobile-specific fixes for squashed text (below 640px) */
+  @media (max-width: 640px) {
+    .prose {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .prose ul,
+    .prose ol {
+      padding-left: 1rem !important; /* Drastically reduced from default 1.625rem */
+    }
+
+    .prose ul > li,
+    .prose ol > li {
+      padding-left: 0.25rem !important;
+    }
+
+    /* Nested lists - even tighter */
+    .prose ul > li > ul,
+    .prose ol > li > ol {
+      padding-left: 0.75rem !important;
+    }
+
+    .prose ul > li > ul > li,
+    .prose ol > li > ol > li {
+      padding-left: 0.25rem !important;
+    }
+
+    /* Third level nesting */
+    .prose ul > li > ul > li > ul,
+    .prose ol > li > ol > li > ol {
+      padding-left: 0.5rem !important;
+    }
   }
 }
