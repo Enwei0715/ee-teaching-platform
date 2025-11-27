@@ -23,6 +23,7 @@ import { Exercise } from './Exercise';
 import { DataTable } from './DataTable';
 import { Mermaid } from './Mermaid';
 import { Columns, Column } from './Columns';
+import { ProgressBar } from './ProgressBar';
 
 // Register languages for syntax highlighting
 SyntaxHighlighter.registerLanguage('tsx', tsx);
@@ -101,4 +102,5 @@ export const mdxComponents = {
     Columns,
     Column,
     Mermaid,
+    ProgressBar,
 };
