@@ -16,6 +16,7 @@ import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import remarkUnwrapImages from 'remark-unwrap-images';
 import rehypeKatex from 'rehype-katex';
+import rehypeSlug from 'rehype-slug';
 import YouTubePlayer from '@/components/courses/YouTubePlayer';
 import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
 import LessonEditButton from '@/components/course/LessonEditButton';
@@ -78,7 +79,7 @@ export default async function LessonPage({ params }: Props) {
                     remarkUnwrapImages,
                     [remarkMath, { singleDollarTextMath: true }]
                 ],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins: [rehypeKatex, rehypeSlug],
             },
         });
     } catch (error) {

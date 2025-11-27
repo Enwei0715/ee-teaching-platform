@@ -39,6 +39,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     const [rndDefaults, setRndDefaults] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
 
     useEffect(() => {
+        console.log("AITutor: Initializing Rnd defaults...");
         // Initialize Rnd position on client side only
         const savedState = localStorage.getItem('ai-tutor-state');
         let defaults = null;
@@ -46,9 +47,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         if (savedState) {
             try {
                 const parsed = JSON.parse(savedState);
+                console.log("AITutor: Found saved state:", parsed);
                 // Basic validation to ensure it's on screen
-                // We check if x/y are within reasonable bounds (e.g. not negative infinity or way off screen)
-                // We allow some flexibility but ensure at least part of it is visible
                 if (
                     typeof parsed.x === 'number' &&
                     typeof parsed.y === 'number' &&
@@ -58,6 +58,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                     parsed.y > 0 // Below top edge
                 ) {
                     defaults = parsed;
+                } else {
+                    console.warn("AITutor: Saved state is off-screen, resetting.");
                 }
             } catch (e) {
                 console.error("Failed to parse saved AI Tutor state", e);
@@ -77,6 +79,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                 width,
                 height,
             };
+            console.log("AITutor: Using default position:", defaults);
         }
 
         setRndDefaults(defaults);
@@ -215,7 +218,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
     if (!session) {
         return (
-            <div className="fixed bottom-6 right-6 z-50">
+            <div className="fixed bottom-6 right-6 z-[100]">
                 <button
                     onClick={() => window.location.href = '/auth/signin'}
                     className="flex items-center justify-center w-14 h-14 rounded-full shadow-lg bg-gray-800 text-white hover:bg-gray-700 transition-all transform hover:scale-105"
@@ -361,7 +364,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         top: true, right: true, bottom: true, left: true,
                         topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
                     }}
-                    style={{ zIndex: 60, position: 'fixed' }}
+                    style={{ zIndex: 100, position: 'fixed' }}
                     className="pointer-events-auto"
                     dragHandleClassName="ai-tutor-header"
                 >
@@ -370,12 +373,12 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             )}
 
             {isOpen && isMobile && (
-                <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm p-4 pt-16 flex flex-col">
+                <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-sm p-4 pt-16 flex flex-col">
                     {renderChatContent()}
                 </div>
             )}
 
-            <div className="fixed bottom-6 right-6 z-50">
+            <div className="fixed bottom-6 right-6 z-[100]">
                 {/* Toggle Button */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
