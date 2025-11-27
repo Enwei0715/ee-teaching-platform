@@ -40,7 +40,7 @@ export default function InteractiveDotGrid() {
                     dots.push({
                         x: i * GRID_SPACING,
                         y: j * GRID_SPACING,
-                        baseOpacity: 0.1
+                        baseOpacity: 0.05
                     });
                 }
             }
@@ -84,7 +84,7 @@ export default function InteractiveDotGrid() {
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     if (distance < 100) { // Connect nearby dots
-                        const opacity = (100 - distance) / 100 * 0.15;
+                        const opacity = (100 - distance) / 100 * 0.08;
                         ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
