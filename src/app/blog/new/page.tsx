@@ -46,7 +46,7 @@ export default function NewBlogPostPage() {
     return (
         <div className="min-h-screen bg-slate-950 relative">
             <DigitalGridBackground />
-            <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8 relative z-10">
                 <BlogEditor
                     slug="new"
                     isNew={true}

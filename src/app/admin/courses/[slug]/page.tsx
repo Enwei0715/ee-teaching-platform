@@ -212,27 +212,27 @@ export default function EditCoursePage() {
                     </Link>
                     <h1 className="text-2xl lg:text-3xl font-bold text-white break-all">Edit Course: {courseId}</h1>
                 </div>
-                <div className="flex gap-3 w-full lg:w-auto">
+                <div className="flex flex-wrap gap-2 w-full lg:w-auto">
                     <button
                         onClick={() => setShowEditDetailsModal(true)}
-                        className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors flex-1 lg:flex-none justify-center"
+                        className="bg-gray-800 text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg text-sm lg:text-base font-medium lg:font-bold flex items-center gap-1.5 lg:gap-2 hover:bg-gray-700 transition-colors"
                     >
                         Edit Details
                     </button>
                     <button
                         onClick={() => setShowNewLessonModal(true)}
-                        className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors flex-1 lg:flex-none justify-center"
+                        className="bg-gray-800 text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg text-sm lg:text-base font-medium lg:font-bold flex items-center gap-1.5 lg:gap-2 hover:bg-gray-700 transition-colors"
                     >
-                        <Plus size={20} />
+                        <Plus size={16} className="lg:w-5 lg:h-5" />
                         Add Lesson
                     </button>
                     {selectedFile && (
                         <button
                             onClick={saveFile}
                             disabled={saving}
-                            className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors disabled:opacity-50 flex-1 lg:flex-none justify-center"
+                            className="bg-indigo-600 text-white px-4 py-1.5 lg:px-6 lg:py-2 rounded-lg text-sm lg:text-base font-medium lg:font-bold flex items-center gap-1.5 lg:gap-2 hover:bg-indigo-700 transition-colors disabled:opacity-50"
                         >
-                            <Save size={20} />
+                            <Save size={16} className="lg:w-5 lg:h-5" />
                             {saving ? "Saving..." : "Save Changes"}
                         </button>
                     )}
@@ -287,9 +287,9 @@ export default function EditCoursePage() {
                             <div className="flex border-b border-gray-800">
                                 <button
                                     onClick={() => setActiveTab('editor')}
-                                    className={`px-6 py-3 font-medium transition-colors relative ${activeTab === 'editor'
-                                            ? 'text-indigo-400 bg-indigo-500/10'
-                                            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
+                                    className={`px-3 py-2 lg:px-6 lg:py-3 text-sm lg:text-base font-medium transition-colors relative ${activeTab === 'editor'
+                                        ? 'text-indigo-400 bg-indigo-500/10'
+                                        : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
                                         }`}
                                 >
                                     Edit Content
@@ -299,9 +299,9 @@ export default function EditCoursePage() {
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('settings')}
-                                    className={`px-6 py-3 font-medium transition-colors relative ${activeTab === 'settings'
-                                            ? 'text-indigo-400 bg-indigo-500/10'
-                                            : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
+                                    className={`px-3 py-2 lg:px-6 lg:py-3 text-sm lg:text-base font-medium transition-colors relative ${activeTab === 'settings'
+                                        ? 'text-indigo-400 bg-indigo-500/10'
+                                        : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
                                         }`}
                                 >
                                     Lesson Settings

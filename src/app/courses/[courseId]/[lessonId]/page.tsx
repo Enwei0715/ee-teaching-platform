@@ -169,7 +169,7 @@ ${fence}
 
             <main className="flex-1 min-w-0">
                 <TimeTracker courseId={params.courseId} lessonId={params.lessonId} />
-                <div className="max-w-4xl mx-auto px-6 py-12">
+                <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
                     <div className="mb-8 pb-8 border-b border-border-primary">
                         <nav className="flex items-center gap-2 text-sm text-text-secondary mb-6">
                             <Link href="/courses" className="hover:text-accent-primary transition-colors">Courses</Link>

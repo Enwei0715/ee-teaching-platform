@@ -98,36 +98,37 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
         <div className="max-w-6xl mx-auto">
             <div className="glass-heavy rounded-2xl border border-white/10 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Header */}
-                <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/5">
-                    <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">
+                <div className="p-4 lg:p-8 border-b border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white/5">
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-xl lg:text-3xl font-bold text-white tracking-tight">
                             {isNew ? "Create New Post" : "Edit Post"}
                         </h1>
-                        <p className="text-gray-400 mt-1 text-sm">
+                        <p className="text-gray-400 mt-1 text-xs lg:text-sm truncate">
                             {isNew ? "Drafting a new article for the engineering blog." : `Editing: ${slug}`}
                         </p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 lg:gap-4">
                         <button
                             onClick={() => window.history.back()}
-                            className="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium"
+                            className="px-3 py-1.5 lg:px-4 lg:py-2 text-gray-400 hover:text-white transition-colors text-xs lg:text-sm font-medium"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={saveFile}
                             disabled={saving}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 lg:px-6 lg:py-2.5 rounded-lg lg:rounded-xl text-sm lg:text-base font-bold flex items-center gap-1.5 lg:gap-2 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <Save size={18} />
-                            {saving ? "Saving..." : "Publish Post"}
+                            <Save size={16} className="lg:w-[18px] lg:h-[18px]" />
+                            <span className="hidden sm:inline">{saving ? "Saving..." : "Publish Post"}</span>
+                            <span className="sm:hidden">{saving ? "Save" : "Publish"}</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     {/* Main Content Area */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-4 lg:space-y-8">
                         {/* Title Input */}
                         <div className="space-y-2">
                             <input
@@ -135,12 +136,12 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
                                 placeholder="Enter post title..."
                                 value={meta.title || ''}
                                 onChange={(e) => setMeta({ ...meta, title: e.target.value })}
-                                className="w-full bg-transparent border-b border-gray-700 text-3xl font-bold text-white py-2 focus:border-indigo-500 focus:outline-none transition-colors placeholder:text-gray-600"
+                                className="w-full bg-transparent border-b border-gray-700 text-xl lg:text-3xl font-bold text-white py-2 focus:border-indigo-500 focus:outline-none transition-colors placeholder:text-gray-600"
                             />
                         </div>
 
                         {/* Editor Container */}
-                        <div className="bg-slate-950/50 rounded-xl border border-white/10 overflow-hidden min-h-[600px] flex flex-col">
+                        <div className="bg-slate-950/50 rounded-xl border border-white/10 overflow-hidden min-h-[400px] lg:min-h-[600px] flex flex-col">
                             <div className="p-3 border-b border-white/10 bg-white/5 flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
                                 <FileText size={14} />
                                 Markdown Content
@@ -168,7 +169,7 @@ export default function BlogEditor({ slug, initialContent = "", initialMeta = {}
 
                     {/* Sidebar Settings */}
                     <div className="lg:col-span-1 space-y-6">
-                        <div className="bg-slate-950/50 rounded-xl border border-white/10 p-6 space-y-6">
+                        <div className="bg-slate-950/50 rounded-xl border border-white/10 p-4 lg:p-6 space-y-4 lg:space-y-6">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                                 <Settings size={18} className="text-indigo-400" />
                                 Post Settings
