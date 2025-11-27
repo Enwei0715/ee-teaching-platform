@@ -19,6 +19,10 @@ import { Terminal } from './Terminal';
 import { Grid } from './Grid';
 import { Card } from './Card';
 import { Diff } from './Diff';
+import { Exercise } from './Exercise';
+import { DataTable } from './DataTable';
+import { Mermaid } from './Mermaid';
+import { Columns, Column } from './Columns';
 
 // Register languages for syntax highlighting
 SyntaxHighlighter.registerLanguage('tsx', tsx);
@@ -92,4 +96,9 @@ export const mdxComponents = {
     Grid,
     Card,
     Diff,
+    Exercise,
+    DataTable,
+    Columns,
+    Column,
+    Mermaid,
 };
