@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { Rnd } from 'react-rnd';
 
 interface LessonContext {
     courseTitle: string;
@@ -25,6 +26,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
         { role: 'assistant', content: "Hi! I'm your AI Tutor. I can help you understand this lesson better. Ask me anything!" }
     ]);
@@ -40,6 +42,15 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     useEffect(() => {
         scrollToBottom();
     }, [messages, isOpen, isExpanded]);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const handleOpen = (e?: any) => {
@@ -60,8 +71,10 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             return;
         }
 
-        // Lock body scroll
-        document.body.style.overflow = 'hidden';
+        // Only lock scroll on mobile
+        if (isMobile) {
+            document.body.style.overflow = 'hidden';
+        }
 
         const preventDefault = (e: Event) => {
             // Prevent horizontal swipe gestures
@@ -69,7 +82,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         };
 
         const chatWindow = document.querySelector('.ai-tutor-window');
-        if (chatWindow) {
+        if (chatWindow && isMobile) {
             chatWindow.addEventListener('touchstart', preventDefault, { passive: false });
             return () => {
                 chatWindow.removeEventListener('touchstart', preventDefault);
@@ -80,7 +93,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isOpen]);
+    }, [isOpen, isMobile]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,107 +144,132 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         );
     }
 
+    const ChatContent = () => (
+        <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col w-full h-full ${isMobile ? 'animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right' : ''}`}>
+            {/* Header */}
+            <div className={`ai-tutor-header bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white ${!isMobile ? 'cursor-move' : ''}`}>
+                <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-white/10 rounded-full">
+                        <Bot size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-sm">AI Tutor</h3>
+                        <p className="text-xs text-gray-400">Always here to help</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    {isMobile && (
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="p-1 hover:bg-white/20 rounded transition-colors"
+                            title={isExpanded ? "Minimize" : "Expand"}
+                        >
+                            {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                        </button>
+                    )}
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="p-1 hover:bg-white/20 rounded transition-colors"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 relative min-h-0 bg-transparent">
+                <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth custom-scrollbar">
+                    {messages.map((msg, idx) => (
+                        <div
+                            key={idx}
+                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div
+                                className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
+                                    ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
+                                    : 'bg-slate-800 border border-white/10 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
+                                    }`}
+                            >
+                                {msg.role === 'user' ? (
+                                    msg.content
+                                ) : (
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm, remarkMath]}
+                                        rehypePlugins={[rehypeKatex]}
+                                    >
+                                        {msg.content}
+                                    </ReactMarkdown>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    {loading && (
+                        <div className="flex justify-start">
+                            <div className="bg-slate-800 border border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
+                                <div className="flex gap-1">
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+            </div>
+
+            {/* Input */}
+            <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Ask a question..."
+                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        disabled={loading}
+                        onKeyDown={(e) => e.stopPropagation()} // Prevent triggering drag when typing
+                    />
+                    <button
+                        type="submit"
+                        disabled={!input.trim() || loading}
+                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <Send size={18} />
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+
     return (
         <div className="fixed bottom-6 right-6 z-50">
-            {/* Chat Window */}
             {isOpen && (
-                <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
-                    ${isExpanded
-                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-[600px] md:h-[700px]'
-                        : 'fixed bottom-24 left-4 right-4 h-[60vh] z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-96 md:h-[500px]'
-                    }`}>
-                    {/* Header */}
-                    <div className="bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white">
-                        <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-white/10 rounded-full">
-                                <Bot size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-sm">AI Tutor</h3>
-                                <p className="text-xs text-gray-400">Always here to help</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                className="hidden md:block p-1 hover:bg-white/20 rounded transition-colors"
-                                title={isExpanded ? "Minimize" : "Expand"}
-                            >
-                                {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                            </button>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="p-1 hover:bg-white/20 rounded transition-colors"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
+                isMobile ? (
+                    <div className={`fixed bottom-24 left-4 right-4 z-[60] ${isExpanded ? 'top-20' : 'h-[60vh]'}`}>
+                        <ChatContent />
                     </div>
-
-                    {/* Messages */}
-                    {/* Messages */}
-                    <div className="flex-1 relative min-h-0 bg-transparent">
-                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth">
-                            {messages.map((msg, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                >
-                                    <div
-                                        className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                            ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
-                                            : 'bg-slate-800 border border-white/10 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
-                                            }`}
-                                    >
-                                        {msg.role === 'user' ? (
-                                            msg.content
-                                        ) : (
-                                            <ReactMarkdown
-                                                remarkPlugins={[remarkGfm, remarkMath]}
-                                                rehypePlugins={[rehypeKatex]}
-                                            >
-                                                {msg.content}
-                                            </ReactMarkdown>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                            {loading && (
-                                <div className="flex justify-start">
-                                    <div className="bg-slate-800 border border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
-                                        <div className="flex gap-1">
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
-                    </div>
-
-                    {/* Input */}
-                    <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                placeholder="Ask a question..."
-                                className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                disabled={loading}
-                            />
-                            <button
-                                type="submit"
-                                disabled={!input.trim() || loading}
-                                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <Send size={18} />
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                ) : (
+                    <Rnd
+                        default={{
+                            x: window.innerWidth - 420,
+                            y: window.innerHeight - 600,
+                            width: 380,
+                            height: 500,
+                        }}
+                        minWidth={300}
+                        minHeight={400}
+                        bounds="window"
+                        dragHandleClassName="ai-tutor-header"
+                        enableResizing={{
+                            top: true, right: true, bottom: true, left: true,
+                            topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
+                        }}
+                        style={{ zIndex: 60, position: 'fixed' }}
+                    >
+                        <ChatContent />
+                    </Rnd>
+                )
             )}
 
             {/* Toggle Button */}
