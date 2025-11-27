@@ -33,6 +33,7 @@ export function Mermaid({ chart, children }: MermaidProps) {
                 mermaid.initialize({
                     startOnLoad: false,
                     theme: 'dark',
+                    securityLevel: 'loose', // Allow HTML in nodes
                     themeVariables: {
                         primaryColor: '#6366f1',
                         primaryTextColor: '#e2e8f0',
@@ -51,11 +52,16 @@ export function Mermaid({ chart, children }: MermaidProps) {
                     },
                 });
 
+                // Decode HTML entities (e.g. &gt; -> >)
+                const txt = document.createElement('textarea');
+                txt.innerHTML = chartDefinition;
+                const decodedChart = txt.value.trim();
+
                 // Generate unique ID for this diagram
                 const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
 
                 // Render the diagram
-                const { svg } = await mermaid.render(id, chartDefinition.trim());
+                const { svg } = await mermaid.render(id, decodedChart);
 
                 if (containerRef.current) {
                     containerRef.current.innerHTML = svg;
@@ -64,7 +70,7 @@ export function Mermaid({ chart, children }: MermaidProps) {
                 setIsLoading(false);
             } catch (err) {
                 console.error('Mermaid rendering error:', err);
-                setError(err instanceof Error ? err.message : 'Failed to render diagram');
+                setError(`${err instanceof Error ? err.message : 'Failed to render diagram'}\n\nSource:\n${chartDefinition}`);
                 setIsLoading(false);
             }
         };
