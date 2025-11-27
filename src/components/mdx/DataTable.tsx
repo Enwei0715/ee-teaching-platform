@@ -70,7 +70,6 @@ export function DataTable({ data, sortable = false }: DataTableProps) {
     };
 
     return (
-    return (
         <div className="my-8 rounded-lg border border-border-primary shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border-primary">
@@ -107,6 +106,5 @@ export function DataTable({ data, sortable = false }: DataTableProps) {
                 </table>
             </div>
         </div>
-    );
     );
 }
