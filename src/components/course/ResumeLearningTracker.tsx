@@ -14,8 +14,6 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
 
     // Restore scroll position on mount if requested
     useEffect(() => {
-        // Check if we should resume (e.g. from URL param or just always check if this is the last saved)
-        // For simplicity, we can check if the current URL matches the saved URL for this user
         if (!userId) return;
 
         const key = `resume_learning_${userId}`;
@@ -23,18 +21,26 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
 
         if (savedData) {
             try {
-                const { url, scrollY } = JSON.parse(savedData);
+                const { url, scrollY, elementId } = JSON.parse(savedData);
                 // If we are on the same page as saved, restore scroll
                 if (url === pathname && window.location.search.includes('resume=true')) {
                     // Small delay to ensure content is rendered
                     setTimeout(() => {
-                        window.scrollTo({
-                            top: scrollY,
-                            behavior: 'smooth'
-                        });
-                        // Remove the query param to avoid re-scrolling on refresh? 
-                        // Actually keeping it is fine, or we can replaceState.
-                        window.history.replaceState({}, '', pathname);
+                        if (elementId) {
+                            const element = document.getElementById(elementId);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                // Highlight effect? Maybe later.
+                            } else {
+                                // Fallback to scrollY if element not found
+                                window.scrollTo({ top: scrollY, behavior: 'smooth' });
+                            }
+                        } else {
+                            window.scrollTo({ top: scrollY, behavior: 'smooth' });
+                        }
+                        // Remove the query param to clean URL
+                        const newUrl = window.location.pathname;
+                        window.history.replaceState({}, '', newUrl);
                     }, 500);
                 }
             } catch (e) {
@@ -53,9 +59,30 @@ export default function ResumeLearningTracker({ userId, lessonTitle }: Props) {
             }
 
             saveTimeoutRef.current = setTimeout(() => {
+                // Find the closest element to the top of the viewport with an ID
+                let activeElementId = null;
+                const elements = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], p[id], div[id]');
+
+                // Find element closest to top (but not below viewport top by too much)
+                // We want the element the user is currently looking at.
+                // Usually that's the one near the top of the screen.
+                let minDistance = Infinity;
+
+                elements.forEach((el) => {
+                    const rect = el.getBoundingClientRect();
+                    // We care about elements that are near the top (e.g. within top 20% or just slightly above/below)
+                    // Let's take the one closest to y=0 (absolute distance)
+                    const distance = Math.abs(rect.top - 100); // Offset a bit for navbar
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        activeElementId = el.id;
+                    }
+                });
+
                 const data = {
                     url: pathname,
                     scrollY: window.scrollY,
+                    elementId: activeElementId,
                     timestamp: Date.now(),
                     title: lessonTitle
                 };

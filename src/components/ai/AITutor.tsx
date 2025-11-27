@@ -40,18 +40,46 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
     useEffect(() => {
         // Initialize Rnd position on client side only
-        // Align with bottom-right button (right-6 = 24px, button height ~56px)
-        const width = 380;
-        const height = 500;
-        const rightMargin = 24;
-        const bottomMargin = 90; // 24px margin + 56px button + 10px gap
+        const savedState = localStorage.getItem('ai-tutor-state');
+        let defaults = null;
 
-        setRndDefaults({
-            x: window.innerWidth - width - rightMargin,
-            y: window.innerHeight - height - bottomMargin,
-            width,
-            height,
-        });
+        if (savedState) {
+            try {
+                const parsed = JSON.parse(savedState);
+                // Basic validation to ensure it's on screen
+                // We check if x/y are within reasonable bounds (e.g. not negative infinity or way off screen)
+                // We allow some flexibility but ensure at least part of it is visible
+                if (
+                    typeof parsed.x === 'number' &&
+                    typeof parsed.y === 'number' &&
+                    parsed.x < window.innerWidth - 50 && // At least 50px visible from right
+                    parsed.y < window.innerHeight - 50 && // At least 50px visible from bottom
+                    parsed.x > -parsed.width + 50 && // At least 50px visible from left
+                    parsed.y > 0 // Below top edge
+                ) {
+                    defaults = parsed;
+                }
+            } catch (e) {
+                console.error("Failed to parse saved AI Tutor state", e);
+            }
+        }
+
+        if (!defaults) {
+            // Default: Bottom right
+            const width = 380;
+            const height = 500;
+            const rightMargin = 24;
+            const bottomMargin = 90;
+
+            defaults = {
+                x: window.innerWidth - width - rightMargin,
+                y: window.innerHeight - height - bottomMargin,
+                width,
+                height,
+            };
+        }
+
+        setRndDefaults(defaults);
     }, []);
 
     const scrollToBottom = () => {
@@ -289,28 +317,76 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         onInput={(e) => {
                             const target = e.target as HTMLTextAreaElement;
                             target.style.height = 'auto';
-                            topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
-                            }}
-                    style={{ zIndex: 60, position: 'fixed' }}
-                        >
-                    {renderChatContent()}
-                </Rnd>
-                )
-                )
-            )}
-
-                <div className="fixed bottom-6 right-6 z-50">
-                    {/* Toggle Button */}
+                            target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+                        }}
+                    />
                     <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
-                            ? 'bg-gray-800 text-white rotate-90'
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                            }`}
+                        type="submit"
+                        disabled={!input.trim() || loading}
+                        className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20"
                     >
-                        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+                        <Send size={18} />
                     </button>
                 </div>
-            </>
-            );
+            </form>
+        </div>
+    );
+
+    return (
+        <>
+            {/* Bounds container - strictly defined area */}
+            <div id="ai-tutor-bounds" className="fixed left-0 right-0 top-16 bottom-0 pointer-events-none z-0" />
+
+            {isOpen && !isMobile && rndDefaults && (
+                <Rnd
+                    default={rndDefaults}
+                    minWidth={300}
+                    minHeight={400}
+                    bounds="#ai-tutor-bounds"
+                    onDragStop={(e, d) => {
+                        const newState = { ...rndDefaults, x: d.x, y: d.y };
+                        setRndDefaults(newState);
+                        localStorage.setItem('ai-tutor-state', JSON.stringify(newState));
+                    }}
+                    onResizeStop={(e, direction, ref, delta, position) => {
+                        const newState = {
+                            width: parseInt(ref.style.width),
+                            height: parseInt(ref.style.height),
+                            ...position
+                        };
+                        setRndDefaults(newState);
+                        localStorage.setItem('ai-tutor-state', JSON.stringify(newState));
+                    }}
+                    enableResizing={{
+                        top: true, right: true, bottom: true, left: true,
+                        topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
+                    }}
+                    style={{ zIndex: 60, position: 'fixed' }}
+                    className="pointer-events-auto"
+                    dragHandleClassName="ai-tutor-header"
+                >
+                    {renderChatContent()}
+                </Rnd>
+            )}
+
+            {isOpen && isMobile && (
+                <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm p-4 pt-16 flex flex-col">
+                    {renderChatContent()}
+                </div>
+            )}
+
+            <div className="fixed bottom-6 right-6 z-50">
+                {/* Toggle Button */}
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
+                        ? 'bg-gray-800 text-white rotate-90'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                >
+                    {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+                </button>
+            </div>
+        </>
+    );
 }
