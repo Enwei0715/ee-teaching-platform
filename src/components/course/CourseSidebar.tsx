@@ -23,6 +23,36 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
     const { data: session } = useSession();
     const [completedLessons, setCompletedLessons] = useState<string[]>([]);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Load collapsed state from localStorage on mount
+    useEffect(() => {
+        setIsMounted(true);
+        const savedState = localStorage.getItem('course-sidebar-collapsed');
+        if (savedState !== null) {
+            setIsCollapsed(JSON.parse(savedState));
+        }
+    }, []);
+
+    // Toggle function with localStorage persistence
+    const toggleSidebar = () => {
+        const newState = !isCollapsed;
+        setIsCollapsed(newState);
+        localStorage.setItem('course-sidebar-collapsed', JSON.stringify(newState));
+    };
+
+    // Keyboard shortcut: Ctrl+B (or Cmd+B on Mac)
+    useEffect(() => {
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                toggleSidebar();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [isCollapsed]); // Include isCollapsed in deps for toggleSidebar closure
 
     // Fetch progress directly from DB to ensure sync with Course Curriculum
     useEffect(() => {
@@ -58,9 +88,9 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
 
                     {/* Collapse Button */}
                     <button
-                        onClick={() => setIsCollapsed(true)}
+                        onClick={toggleSidebar}
                         className="absolute top-6 right-6 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
-                        title="Hide sidebar (Focus Mode)"
+                        title="Hide sidebar (Focus Mode) • Ctrl+B"
                     >
                         <PanelLeftClose size={18} />
                     </button>
@@ -117,21 +147,4 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                                     </Link>
                                 </li>
                             );
-                        })}
-                    </ul>
-                </nav>
-            </aside>
-
-            {/* Floating Reopen Button (when collapsed) */}
-            {isCollapsed && (
-                <button
-                    onClick={() => setIsCollapsed(false)}
-                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300"
-                    title="Show sidebar"
-                >
-                    <PanelLeftOpen size={20} />
-                </button>
-            )}
-        </>
-    );
-}
+                        }
