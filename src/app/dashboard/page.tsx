@@ -38,9 +38,20 @@ export default async function DashboardPage() {
         select: { streak: true }
     });
 
-    // Fetch user progress
+    // Fetch user progress including lastElementId for precise resume
     const progress = await prisma.userProgress.findMany({
         where: { userId: session.user.id },
+        select: {
+            id: true,
+            userId: true,
+            courseId: true,
+            lessonId: true,
+            completed: true,
+            timeSpent: true,
+            lastElementId: true,  // Include for precise resume
+            updatedAt: true,
+            createdAt: true,
+        }
     });
 
     // Get all courses
@@ -50,6 +61,7 @@ export default async function DashboardPage() {
     const courseProgressMap = new Map();
     const courseNextLessonMap = new Map();
     const courseLastAccessedMap = new Map();
+    const courseLastElementMap = new Map(); // Store lastElementId for each course
 
     for (const course of allCourses) {
         const lessons = await getCourseStructure(course.id);
@@ -83,6 +95,12 @@ export default async function DashboardPage() {
         }
         if (nextLesson) {
             courseNextLessonMap.set(course.id, nextLesson);
+
+            // Find lastElementId for the next lesson to resume
+            const lessonProgress = courseProgress.find((p: any) => p.lessonId === nextLesson.uuid);
+            if (lessonProgress?.lastElementId) {
+                courseLastElementMap.set(course.id, lessonProgress.lastElementId);
+            }
         }
     }
 
@@ -187,9 +205,17 @@ export default async function DashboardPage() {
                                 activeCourses.map(course => {
                                     const progressData = courseProgressMap.get(course.id);
                                     const nextLesson = courseNextLessonMap.get(course.id);
+                                    const lastElementId = courseLastElementMap.get(course.id);
+
+                                    // Construct resume URL with hash fragment if lastElementId exists
+                                    const resumeUrl = nextLesson
+                                        ? (lastElementId
+                                            ? `/courses/${course.slug}/${nextLesson.slug}#${lastElementId}`
+                                            : `/courses/${course.slug}/${nextLesson.slug}`)
+                                        : `/courses/${course.slug}`;
 
                                     return (
-                                        <Link key={course.id} href={nextLesson ? `/courses/${course.slug}/${nextLesson.slug}` : `/courses/${course.slug}`} className="block p-6 border-b border-gray-800 hover:bg-gray-800 transition-colors group">
+                                        <Link key={course.id} href={resumeUrl} className="block p-6 border-b border-gray-800 hover:bg-gray-800 transition-colors group">
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3 className="font-bold text-white group-hover:text-indigo-400 transition-colors">{course.title}</h3>
                                                 <span className={`text-xs font-bold px-2 py-1 rounded-full ${course.level === 'Beginner' ? 'text-green-300 bg-green-900/30' : course.level === 'Intermediate' ? 'text-amber-300 bg-amber-900/30' : 'text-red-300 bg-red-900/30'}`}>
