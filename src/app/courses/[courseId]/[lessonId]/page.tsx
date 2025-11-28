@@ -292,6 +292,8 @@ ${fence}
                     lessonTitle: lesson.meta.title,
                     content: lesson.content.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n') // Strip HTML tags and reduce excessive newlines
                 }}
+                courseSlug={params.courseId}
+                lessonSlug={params.lessonId}
             />
             <ResumeLearningTracker
                 userId={session?.user?.id}

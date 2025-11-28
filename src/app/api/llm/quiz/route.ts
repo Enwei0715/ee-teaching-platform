@@ -49,13 +49,97 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         console.log("API Request Body:", body);
-        const { courseSlug, lessonSlug } = body;
+        const { courseSlug, lessonSlug, sectionContent, sectionTitle } = body;
 
         if (!courseSlug || !lessonSlug) {
             return NextResponse.json({ error: 'Course slug and lesson slug are required' }, { status: 400 });
         }
 
-        // 1. Fetch Lesson Content from DB using slugs
+        // If sectionContent is provided (from progress-aware quiz), use it directly
+        if (sectionContent && sectionTitle) {
+            console.log(`Using provided section: "${sectionTitle}"`);
+
+            try {
+                const completion = await openai.chat.completions.create({
+                    messages: [
+                        {
+                            role: "system",
+                            content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
+
+**CURRENT FOCUS SECTION:** "${sectionTitle}"
+
+Task: Generate ONE multiple-choice question based EXCLUSIVELY on the content from this specific section.
+Do NOT ask about other parts of the lesson. Focus deeply on specific details, formulas, or concepts found ONLY in the provided section text.
+
+Output Format (Strict JSON):
+You must output valid JSON only. No conversational text before or after.
+Structure:
+{
+  "question": "The question text here. Use LaTeX $...$ for math.",
+  "options": [
+    "Option A text (incorrect)",
+    "Option B text (incorrect)",
+    "Option C text (correct answer)",
+    "Option D text (incorrect)"
+  ],
+  "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
+  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
+}
+
+=== MDX SYNTAX RULES (CRITICAL - MUST FOLLOW) ===
+
+1. **Math & LaTeX Formatting:**
+   - ALL math MUST be in $...$ or $$...$$
+   - Code/variables: Always use $\\texttt{name}$ inside math delimiters
+   - Units: $10^{16}\\ \\text{cm}^{-3}$ - wrap \\text{} in $...$
+2. **Language:** Traditional Chinese for questions, English for technical terms
+3. **Quality:** Test understanding, not just recall
+
+REMEMBER: Wrap \\texttt{}, \\text{}, \\mathrm{} in $...$!
+`,
+                        },
+                        {
+                            role: "user",
+                            content: `
+Section: ${sectionTitle}
+Timestamp: ${Date.now()} (Use this to ensure uniqueness)
+
+Content:
+"""
+${sectionContent}
+"""
+
+Generate a unique quiz question based on THIS section only.
+`
+                        }
+                    ],
+                    model: "gemini-2.5-flash",
+                    response_format: { type: "json_object" },
+                    temperature: 1.0,
+                });
+
+                const content = completion.choices[0].message.content;
+                if (!content) {
+                    throw new Error("No content received from LLM");
+                }
+
+                const quiz = JSON.parse(content);
+                if (typeof quiz.correctAnswerIndex === 'number') {
+                    quiz.correctAnswer = quiz.correctAnswerIndex;
+                }
+
+                return NextResponse.json({
+                    ...quiz,
+                    model: "gemini-2.5-flash",
+                    sectionTitle: sectionTitle
+                });
+            } catch (aiError) {
+                console.error("AI Generation Failed:", aiError);
+                return NextResponse.json({ error: 'Failed to generate quiz', details: String(aiError) }, { status: 500 });
+            }
+        }
+
+        // Original behavior: Fetch lesson from DB and extract random section
         const lesson = await prisma.lesson.findFirst({
             where: {
                 slug: lessonSlug,

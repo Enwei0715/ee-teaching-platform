@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import QuizTab from './QuizTab';
 
 interface LessonContext {
     courseTitle: string;
@@ -19,12 +20,16 @@ interface AITutorProps {
     lessonTitle?: string;
     lessonContent?: string;
     lessonContext?: LessonContext;
+    activeHeadingId?: string;  // For progress-aware quiz
+    courseSlug?: string;
+    lessonSlug?: string;
 }
 
-export default function AITutor({ lessonTitle, lessonContent, lessonContext }: AITutorProps = {}) {
+export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug }: AITutorProps = {}) {
     console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [activeTab, setActiveTab] = useState<'chat' | 'quiz'>('chat');
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
         { role: 'assistant', content: "Hi! I'm your AI Tutor. I can help you understand this lesson better. Ask me anything!" }
     ]);
@@ -152,11 +157,11 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             {isOpen && (
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
                     ${isExpanded
-                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[600px] h-[85vh] md:h-[700px]'
-                        : 'fixed bottom-24 left-4 right-4 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[400px] h-[600px] md:h-[700px]'
+                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[600px] h-[70vh] md:h-[700px]'
+                        : 'fixed bottom-24 left-4 right-4 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[400px] h-[70vh] max-h-[600px] md:h-[600px]'
                     }`}>
                     {/* Header */}
-                    <div className="bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white">
+                    <div className="bg-slate-900/50 border-b border-white/10 px-4 pt-4 flex justify-between items-start text-white">
                         <div className="flex items-center gap-2">
                             <div className="p-1.5 bg-white/10 rounded-full">
                                 <Bot size={20} />
@@ -183,76 +188,110 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
                         </div>
                     </div>
 
-                    {/* Messages */}
-                    <div className="flex-1 relative min-h-0 bg-transparent">
-                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth overscroll-contain">
-                            {messages.map((msg, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                >
-                                    <div
-                                        className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                            ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
-                                            : 'bg-slate-800 border border-white/10 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
-                                            }`}
-                                    >
-                                        {msg.role === 'user' ? (
-                                            msg.content
-                                        ) : (
-                                            <ReactMarkdown
-                                                remarkPlugins={[remarkGfm, remarkMath]}
-                                                rehypePlugins={[rehypeKatex]}
-                                            >
-                                                {msg.content}
-                                            </ReactMarkdown>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                            {loading && (
-                                <div className="flex justify-start">
-                                    <div className="bg-slate-800 border border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
-                                        <div className="flex gap-1">
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
+                    {/* Tabs */}
+                    <div className="bg-slate-900/30 border-b border-white/5 px-4 py-2 flex gap-2">
+                        <button
+                            onClick={() => setActiveTab('chat')}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'chat'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            Assistant
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('quiz')}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeTab === 'quiz'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            Quiz
+                        </button>
                     </div>
 
-                    {/* Input */}
-                    <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
-                        <div className="flex gap-2 items-end">
-                            <textarea
-                                ref={textareaRef}
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Ask a question... (Shift+Enter for new line)"
-                                className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none min-h-[42px] max-h-[120px]"
-                                disabled={loading}
-                                rows={1}
-                                style={{ height: 'auto' }}
-                                onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement;
-                                    target.style.height = 'auto';
-                                    target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                                }}
-                            />
-                            <button
-                                type="submit"
-                                disabled={!input.trim() || loading}
-                                className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20"
-                            >
-                                <Send size={18} />
-                            </button>
-                        </div>
-                    </form>
+                    {/* Tab Content */}
+                    {activeTab === 'chat' ? (
+                        <>
+                            {/* Messages */}
+                            <div className="flex-1 relative min-h-0 bg-transparent">
+                                <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth overscroll-contain">
+                                    {messages.map((msg, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                        >
+                                            <div
+                                                className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
+                                                    ? 'bg-blue-600 text-white rounded-br-none break-words [overflow-wrap:anywhere]'
+                                                    : 'bg-slate-800 border border-white/10 text-gray-100 rounded-bl-none shadow-sm prose prose-invert prose-sm max-w-none'
+                                                    }`}
+                                            >
+                                                {msg.role === 'user' ? (
+                                                    msg.content
+                                                ) : (
+                                                    <ReactMarkdown
+                                                        remarkPlugins={[remarkGfm, remarkMath]}
+                                                        rehypePlugins={[rehypeKatex]}
+                                                    >
+                                                        {msg.content}
+                                                    </ReactMarkdown>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {loading && (
+                                        <div className="flex justify-start">
+                                            <div className="bg-slate-800 border border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
+                                                <div className="flex gap-1">
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                            </div>
+
+                            {/* Input */}
+                            <form onSubmit={handleSend} className="p-3 bg-slate-900/50 border-t border-white/10">
+                                <div className="flex gap-2 items-end">
+                                    <textarea
+                                        ref={textareaRef}
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder="Ask a question... (Shift+Enter for new line)"
+                                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none min-h-[42px] max-h-[120px]"
+                                        disabled={loading}
+                                        rows={1}
+                                        style={{ height: 'auto' }}
+                                        onInput={(e) => {
+                                            const target = e.target as HTMLTextAreaElement;
+                                            target.style.height = 'auto';
+                                            target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+                                        }}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={!input.trim() || loading}
+                                        className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20"
+                                    >
+                                        <Send size={18} />
+                                    </button>
+                                </div>
+                            </form>
+                        </>
+                    ) : (
+                        <QuizTab
+                            lessonContent={lessonContent}
+                            activeHeadingId={activeHeadingId}
+                            courseSlug={courseSlug}
+                            lessonSlug={lessonSlug}
+                        />
+                    )}
                 </div>
             )}
 
