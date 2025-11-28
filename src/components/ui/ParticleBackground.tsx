@@ -1,18 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import type { Container, Engine } from "tsparticles-engine";
-import Particles from "react-tsparticles";
-import { loadSlim } from "tsparticles-slim";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
+import type { Container, Engine } from "@tsparticles/engine";
 
 export default function ParticleBackground() {
-    const particlesInit = useCallback(async (engine: Engine) => {
-        await loadSlim(engine);
+    const [init, setInit] = useState(false);
+
+    useEffect(() => {
+        initParticlesEngine(async (engine: Engine) => {
+            await loadSlim(engine);
+        }).then(() => {
+            setInit(true);
+        });
     }, []);
 
-    const particlesLoaded = useCallback(async (container: Container | undefined) => {
+    const particlesLoaded = async (container?: Container) => {
         // console.log(container);
-    }, []);
+    };
 
     const [mounted, setMounted] = useState(false);
 
@@ -20,13 +26,12 @@ export default function ParticleBackground() {
         setMounted(true);
     }, []);
 
-    if (!mounted) return null;
+    if (!mounted || !init) return null;
 
     return (
         <Particles
             id="tsparticles"
-            init={particlesInit}
-            loaded={particlesLoaded}
+            particlesLoaded={particlesLoaded}
             className="absolute inset-0 z-0"
             options={{
                 background: {
@@ -45,7 +50,9 @@ export default function ParticleBackground() {
                             enable: true,
                             mode: "grab",
                         },
-                        resize: true,
+                        resize: {
+                            enable: true,
+                        },
                     },
                     modes: {
                         push: {
@@ -83,7 +90,6 @@ export default function ParticleBackground() {
                     number: {
                         density: {
                             enable: true,
-                            area: 800,
                         },
                         value: 80,
                     },
