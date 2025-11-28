@@ -40,6 +40,19 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         }
     }, [messages]);
 
+    // Listen for "Ask AI" button from TextSelectionToolbar
+    useEffect(() => {
+        const handleOpen = (e: any) => {
+            setIsOpen(true);
+            // If event has detail with text, populate input
+            if (e?.detail?.text) {
+                setInput(e.detail.text);
+            }
+        };
+        window.addEventListener('open-ai-tutor', handleOpen);
+        return () => window.removeEventListener('open-ai-tutor', handleOpen);
+    }, []);
+
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || loading) return;
