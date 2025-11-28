@@ -238,7 +238,7 @@ export default async function DashboardPage() {
                                     );
                                 })
                             ) : (
-                                <div className="p-8 text-center">
+                                <div className="glass-panel p-8 text-center rounded-xl">
                                     <p className="text-gray-400 mb-4">You haven't started any courses yet.</p>
                                     <Link href="/courses" className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
                                         Browse Courses
