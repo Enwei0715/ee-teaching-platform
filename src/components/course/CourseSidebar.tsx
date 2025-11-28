@@ -147,4 +147,21 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                                     </Link>
                                 </li>
                             );
-                        }
+                        })}
+                    </ul>
+                </nav>
+            </aside>
+
+            {/* Floating Reopen Button (when collapsed) */}
+            {isMounted && isCollapsed && (
+                <button
+                    onClick={toggleSidebar}
+                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300"
+                    title="Show sidebar • Ctrl+B"
+                >
+                    <PanelLeftOpen size={20} />
+                </button>
+            )}
+        </>
+    );
+}
