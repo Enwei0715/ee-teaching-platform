@@ -35,7 +35,7 @@ export default async function RootLayout({
 
     return (
         <html lang="en" className="scroll-smooth">
-            <body className={`${inter.className} bg-gray-950 text-white antialiased overflow-x-hidden`}>
+            <body className={`${inter.className} bg-gray-950 text-white antialiased`}>
                 <AuthProvider>
                     <EditModeProvider>
                         <HotkeysProvider>

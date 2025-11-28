@@ -54,9 +54,12 @@ export default async function DashboardPage() {
         }
     });
 
-    // Fetch most recent learning activity for Resume Card
-    const mostRecentProgress = await prisma.userProgress.findFirst({
-        where: { userId: session.user.id },
+    // Fetch all active learning progress (IN_PROGRESS or REVIEWING)
+    const activeProgress = await prisma.userProgress.findMany({
+        where: {
+            userId: session.user.id,
+            status: { in: ['IN_PROGRESS', 'REVIEWING'] }
+        },
         orderBy: { updatedAt: 'desc' },
         include: {
             lesson: {
@@ -221,15 +224,24 @@ export default async function DashboardPage() {
                 {/* Recent Activity & Recommended */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Resume Learning Card */}
+                        {/* Resume Learning Carousel */}
                         <section>
                             <h2 className="text-xl font-bold text-white mb-4">Continue Learning</h2>
-                            {mostRecentProgress ? (
-                                <ResumeCard
-                                    courseTitle={mostRecentProgress.course.title}
-                                    lessonTitle={mostRecentProgress.lesson.title}
-                                    resumeLink={`/courses/${mostRecentProgress.course.slug}/${mostRecentProgress.lesson.slug}${mostRecentProgress.lastElementId ? `#${mostRecentProgress.lastElementId}` : ''}`}
-                                />
+                            {activeProgress.length > 0 ? (
+                                <div className="flex flex-col space-y-4">
+                                    {activeProgress.map((progress) => (
+                                        <div key={progress.id} className="w-full">
+                                            <ResumeCard
+                                                courseTitle={progress.course.title}
+                                                lessonTitle={progress.lesson.title}
+                                                resumeLink={`/courses/${progress.course.slug}/${progress.lesson.slug}${progress.lastElementId ? `#${progress.lastElementId}` : ''}`}
+                                                status={progress.status}
+                                                courseId={progress.course.slug}
+                                                lessonId={progress.lesson.slug}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
                                 <div className="glass-panel p-8 text-center rounded-xl border border-white/10">
                                     <p className="text-gray-400 mb-6">You haven't started any courses yet.</p>

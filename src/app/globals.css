@@ -12,7 +12,8 @@
   html {
     /* Mobile-first: 90% for better mobile readability */
     font-size: 90%;
-    overflow-x: hidden;
+    /* overflow-x: hidden; -> Breaks sticky positioning */
+    overflow-x: clip; 
     max-width: 100vw;
   }
 
@@ -25,7 +26,8 @@
 
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
-    overflow-x: hidden;
+    /* overflow-x: hidden; -> Breaks sticky positioning */
+    overflow-x: clip;
     max-width: 100vw;
   }
 

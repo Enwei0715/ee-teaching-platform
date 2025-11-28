@@ -26,7 +26,13 @@ interface QuizProps {
 
 export default function Quiz({ courseId, lessonId, questions: propQuestions, question, options, correctAnswer, explanation }: QuizProps) {
     // Normalize props into a single questions array
-    const questions: Question[] = propQuestions || (question && options ? [{
+    const questions: Question[] = (propQuestions as any[])?.map((q, i) => ({
+        id: q.id || i + 1,
+        text: q.text || q.question || "Question Text Missing",
+        options: q.options || [],
+        correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : (q.answer !== undefined ? q.answer : 0),
+        explanation: q.explanation
+    })) || (question && options ? [{
         id: 1,
         text: question,
         options: options,

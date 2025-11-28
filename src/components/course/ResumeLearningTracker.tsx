@@ -68,26 +68,32 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
         }
     }, [userId, pathname, initialLastElementId]);
 
+    const isMounting = useRef(true);
+
     // Initialize progress on mount (Create IN_PROGRESS or switch to REVIEWING)
     useEffect(() => {
         if (!userId || !courseId || !lessonId) return;
 
-        const initProgress = async () => {
-            try {
-                await fetch(`/api/courses/${courseId}/progress`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        lessonId,
-                        // No lastElementId or completed flag, just "I am here" to trigger status logic
-                    }),
-                });
-            } catch (error) {
-                console.error("Failed to initialize progress", error);
-            }
-        };
+        // Only run this logic on initial mount to prevent loops
+        if (isMounting.current) {
+            const initProgress = async () => {
+                try {
+                    await fetch(`/api/courses/${courseId}/progress`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            lessonId,
+                            // No lastElementId or completed flag, just "I am here" to trigger status logic
+                        }),
+                    });
+                } catch (error) {
+                    console.error("Failed to initialize progress", error);
+                }
+            };
 
-        initProgress();
+            initProgress();
+            isMounting.current = false;
+        }
     }, [userId, courseId, lessonId]);
 
     // Save scroll position on scroll
@@ -153,6 +159,9 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
             if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
         };
     }, [userId, pathname, lessonTitle, courseId, lessonId]);
+
+    // Hide on dashboard to avoid duplication with "Continue Learning" section
+    if (pathname === '/dashboard') return null;
 
     return null;
 }

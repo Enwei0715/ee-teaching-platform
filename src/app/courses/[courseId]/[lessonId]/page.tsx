@@ -218,22 +218,17 @@ ${fence}
         <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 relative">
             <InteractiveGridPattern />
 
-            <CourseSidebar courseId={params.courseId} lessons={courseStructure} />
+            <CourseSidebar
+                courseId={params.courseId}
+                lessons={courseStructure}
+                category="Electronics" // TODO: Fetch dynamically if available, or infer
+                courseTitle={params.courseId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            />
 
             <main className="flex-1 min-w-0">
                 <TimeTracker courseId={params.courseId} lessonId={params.lessonId} />
                 <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
                     <div className="mb-8 pb-8 border-b border-border-primary">
-                        <nav className="flex items-center gap-2 text-sm text-text-secondary mb-6">
-                            <Link href="/courses" className="hover:text-accent-primary transition-colors">Courses</Link>
-                            <ChevronRight size={14} />
-                            <Link href={`/courses/${params.courseId}`} className="hover:text-accent-primary transition-colors line-clamp-1">
-                                {params.courseId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                            </Link>
-                            <ChevronRight size={14} />
-                            <span className="text-text-primary font-medium line-clamp-1">{lesson.meta.title}</span>
-                        </nav>
-
                         <div className="flex items-start justify-between gap-4 mb-4">
                             <h1 className="text-3xl md:text-4xl font-bold text-text-primary flex-1">{lesson.meta.title}</h1>
                             <LessonEditButton courseSlug={params.courseId} lessonSlug={params.lessonId} />

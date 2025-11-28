@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { ChevronRight, ChevronDown, PanelLeftClose, PanelLeftOpen, CheckCircle2, Circle, Lock, PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StatusIcon } from '@/components/course/StatusIcon';
 
@@ -17,14 +17,17 @@ interface Lesson {
 interface Props {
     courseId: string;
     lessons: Lesson[];
+    category?: string;
+    courseTitle?: string;
 }
 
-export default function CourseSidebar({ courseId, lessons }: Props) {
+export default function CourseSidebar({ courseId, lessons, category = "Courses", courseTitle = "Course" }: Props) {
     const pathname = usePathname();
     const { data: session } = useSession();
     const [progressMap, setProgressMap] = useState<Record<string, string>>({});
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     // Load collapsed state from localStorage on mount
     useEffect(() => {
@@ -78,83 +81,153 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
     const totalLessons = lessons.length;
     const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-    return (
+    // Reusable Sidebar Header with Breadcrumbs
+    const SidebarHeader = () => (
+        <div className="p-4 border-b border-white/10 bg-slate-950/50 backdrop-blur-md sticky top-0 z-10">
+            <nav className="flex items-center text-xs text-gray-400 space-x-1 mb-2">
+                <Link href="/courses" className="hover:text-white transition-colors">Courses</Link>
+                <span>/</span>
+                <Link href={`/courses/${courseId}`} className="hover:text-white transition-colors truncate max-w-[200px]">
+                    {courseTitle}
+                </Link>
+            </nav>
+            <h2 className="text-base font-bold text-white leading-tight">
+                {courseTitle}
+            </h2>
+        </div>
+    );
+
+    // Reusable Sidebar Content (Lesson List)
+    const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
         <>
-            <aside className={cn(
-                "hidden lg:block glass-heavy border-r border-gray-800/80 h-[calc(100vh-64px)] overflow-y-auto sticky top-16 rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
-                isCollapsed ? "w-0 opacity-0 pointer-events-none" : "w-72 opacity-100"
-            )}>
-                <div className="p-6 border-b border-border-primary glass-ghost sticky top-0 z-10 relative">
+            {/* Progress Bar Section */}
+            <div className="p-6 border-b border-border-primary glass-ghost">
+                <div className="flex justify-between items-center">
                     <h2 className="font-bold text-text-primary text-lg tracking-tight">Course Content</h2>
 
-                    {/* Collapse Button */}
-                    <button
-                        onClick={toggleSidebar}
-                        className="absolute top-6 right-6 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
-                        title="Hide sidebar (Focus Mode) • Ctrl+B"
-                    >
-                        <PanelLeftClose size={18} />
-                    </button>
-
-                    <div className="mt-4 w-full bg-bg-tertiary h-1.5 rounded-full overflow-hidden">
-                        <div
-                            className="bg-accent-primary h-full rounded-full transition-all duration-500 ease-out"
-                            style={{ width: `${progressPercentage}%` }}
-                        ></div>
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                        <p className="text-xs text-text-secondary font-medium">{progressPercentage}% Completed</p>
-                        <p className="text-xs text-text-secondary">{completedCount}/{totalLessons} Lessons</p>
-                    </div>
+                    {/* Close Button (Mobile) or Collapse Button (Desktop) */}
+                    {isMobile ? (
+                        <button
+                            onClick={() => setIsMobileOpen(false)}
+                            className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
+                        >
+                            <X size={20} />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={toggleSidebar}
+                            className="absolute top-6 right-6 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
+                            title="Hide sidebar (Focus Mode) • Ctrl+B"
+                        >
+                            <PanelLeftClose size={18} />
+                        </button>
+                    )}
                 </div>
 
-                <nav className="p-4 pb-20">
-                    <ul className="space-y-1">
-                        {lessons.map((lesson, index) => {
-                            const isActive = pathname === `/courses/${courseId}/${lesson.id}`;
+                <div className="mt-4 w-full bg-bg-tertiary h-1.5 rounded-full overflow-hidden">
+                    <div
+                        className="bg-accent-primary h-full rounded-full transition-all duration-500 ease-out"
+                        style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-text-secondary font-medium">{progressPercentage}% Completed</p>
+                    <p className="text-xs text-text-secondary">{completedCount}/{totalLessons} Lessons</p>
+                </div>
+            </div>
 
-                            return (
-                                <li key={lesson.id}>
-                                    <Link
-                                        href={`/courses/${courseId}/${lesson.id}`}
-                                        className={cn(
-                                            "flex items-start gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-200 group relative",
-                                            isActive
-                                                ? "bg-accent-primary/10 text-accent-primary font-medium"
-                                                : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
-                                        )}
-                                    >
-                                        {isActive && (
-                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent-primary rounded-r-full" />
-                                        )}
+            <nav className="p-4 pb-20">
+                <ul className="space-y-1">
+                    {lessons.map((lesson, index) => {
+                        const isActive = pathname === `/courses/${courseId}/${lesson.id}`;
 
-                                        <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "text-text-secondary/30 group-hover:text-text-secondary/70")}>
-                                            <StatusIcon
-                                                status={progressMap[lesson.id]}
-                                                index={index}
-                                                className="w-4 h-4"
-                                            />
-                                        </div>
+                        return (
+                            <li key={lesson.id}>
+                                <Link
+                                    href={`/courses/${courseId}/${lesson.id}`}
+                                    onClick={() => isMobile && setIsMobileOpen(false)}
+                                    className={cn(
+                                        "flex items-start gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-200 group relative",
+                                        isActive
+                                            ? "bg-accent-primary/10 text-accent-primary font-medium"
+                                            : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
+                                    )}
+                                >
+                                    {isActive && (
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent-primary rounded-r-full" />
+                                    )}
 
-                                        <div className="flex-1">
-                                            <span className={cn("line-clamp-2 leading-snug", isActive && "text-accent-primary")}>
-                                                {lesson.title}
-                                            </span>
-                                            {isActive && <p className="text-[10px] opacity-70 mt-1 font-normal">Current Lesson</p>}
-                                        </div>
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </nav>
+                                    <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "text-text-secondary/30 group-hover:text-text-secondary/70")}>
+                                        <StatusIcon
+                                            status={progressMap[lesson.id]}
+                                            index={index}
+                                            className="w-4 h-4"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <span className={cn("line-clamp-2 leading-snug", isActive && "text-accent-primary")}>
+                                            {lesson.title}
+                                        </span>
+                                        {isActive && <p className="text-[10px] opacity-70 mt-1 font-normal">Current Lesson</p>}
+                                    </div>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </nav>
+        </>
+    );
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <aside className={cn(
+                "hidden lg:flex flex-col glass-heavy border-r border-gray-800/80 h-[calc(100vh-4rem)] sticky top-16 self-start rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
+                isCollapsed ? "w-0 opacity-0 pointer-events-none" : "w-72 opacity-100"
+            )}>
+                <SidebarHeader />
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <SidebarContent />
+                </div>
             </aside>
 
-            {/* Floating Reopen Button (when collapsed) */}
+            {/* Mobile Sub-Navbar Trigger (Flow-based) */}
+            <div
+                className="lg:hidden w-full p-4 border-b border-white/10 bg-slate-950/30 backdrop-blur-md flex items-center gap-3 cursor-pointer mb-6 active:bg-white/5 transition-colors"
+                onClick={() => setIsMobileOpen(true)}
+            >
+                <PanelLeftOpen className="text-accent-primary" size={20} />
+                <div className="flex-1 min-w-0">
+                    <p className="text-xs text-text-secondary">Current Course</p>
+                    <h3 className="text-sm font-bold text-text-primary truncate">{courseTitle}</h3>
+                </div>
+                <ChevronRight className="text-text-secondary" size={16} />
+            </div>
+
+            {/* Mobile Drawer Overlay */}
+            {isMobileOpen && (
+                <div className="lg:hidden fixed inset-0 z-[100] flex">
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 z-[99]"
+                        onClick={() => setIsMobileOpen(false)}
+                    />
+
+                    {/* Drawer Panel */}
+                    <aside className="fixed inset-y-0 left-0 w-3/4 max-w-xs h-full glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[100]">
+                        <SidebarHeader />
+                        <SidebarContent isMobile={true} />
+                    </aside>
+                </div>
+            )}
+
+            {/* Desktop Floating Reopen Button (when collapsed) */}
             {isMounted && isCollapsed && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300"
+                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300 hidden lg:block"
                     title="Show sidebar • Ctrl+B"
                 >
                     <PanelLeftOpen size={20} />

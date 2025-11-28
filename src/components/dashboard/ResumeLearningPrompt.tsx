@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { BookOpen, X, ArrowRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -10,6 +10,7 @@ export default function ResumeLearningPrompt() {
     const [savedState, setSavedState] = useState<{ url: string; title: string; timestamp: number } | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (!session?.user?.id) return;
@@ -44,7 +45,11 @@ export default function ResumeLearningPrompt() {
         }
     };
 
-    if (!isVisible || !savedState) return null;
+    // Only show on Home ('/') or Courses List ('/courses')
+    // Hide on Dashboard, Lesson Pages, etc.
+    const isAllowedPage = pathname === '/' || pathname === '/courses';
+
+    if (!isVisible || !savedState || !isAllowedPage) return null;
 
     return (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-in slide-in-from-bottom-10 duration-500 w-full max-w-md px-4">

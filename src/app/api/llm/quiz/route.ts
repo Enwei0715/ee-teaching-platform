@@ -17,32 +17,93 @@ interface Section {
 }
 
 /**
- * Extracts a random section from markdown content based on H2/H3 headings.
- * This ensures quiz questions focus on different parts of the lesson.
+ * Calculates a "Quiz Worthiness" score for a section.
+ * Higher score = better content for generating questions.
+ */
+function calculateScore(section: { title: string, content: string }): number {
+    const { title, content } = section;
+
+    // 1. Instant Disqualification (Blocklist)
+    // Filter out structural or low-value sections
+    const blocklist = ['reference', 'summary', 'conclusion', 'intro', 'setup', 'install', 'prerequisite', '參考', '結語', '小結', '前言'];
+    if (blocklist.some(term => title.toLowerCase().includes(term))) {
+        return 0;
+    }
+
+    // 2. Strip Noise to find "Real Content"
+    // Remove code blocks, images, and links to evaluate the actual explanatory text
+    const textOnly = content
+        .replace(/```[\s\S]*?```/g, "") // Remove code blocks
+        .replace(/!\[.*?\]\(.*?\)/g, "") // Remove images
+        .replace(/\[.*?\]\(.*?\)/g, ""); // Remove links
+
+    // Filter out sections with very little actual text (e.g., just a header and an image)
+    if (textOnly.trim().length < 150) {
+        return 0;
+    }
+
+    // 3. Calculate Base Score
+    let score = textOnly.length;
+
+    // 4. Bonus Points for Explanatory Keywords
+    // These words suggest the section contains definitions, reasons, or examples
+    const keywords = ['because', 'means', 'example', 'however', 'therefore', 'defined as', '定義', '例如', '因此', '原理', '因為'];
+    keywords.forEach(word => {
+        if (textOnly.toLowerCase().includes(word)) {
+            score += 50;
+        }
+    });
+
+    return score;
+}
+
+/**
+ * Extracts a high-quality random section from markdown content using heuristic scoring.
  */
 function extractRandomSection(markdown: string): Section {
     // Split by H2 or H3 headers (## or ###)
-    // Lookahead keeps the heading in the section content
-    const sections = markdown.split(/(?=\n#{2,3}\s)/);
+    const sectionsRaw = markdown.split(/(?=\n#{2,3}\s)/);
 
-    // Filter sections with meaningful content (>200 chars)
-    // This avoids testing on just a heading or very short intro
-    const validSections = sections.filter(s => s.trim().length > 200);
+    // Map sections to objects and calculate scores
+    const scoredSections = sectionsRaw.map(raw => {
+        const titleMatch = raw.match(/^\n?#{2,3}\s+(.+)/);
+        const title = titleMatch ? titleMatch[1].trim() : "Main Content";
+        return {
+            title,
+            content: raw,
+            score: calculateScore({ title, content: raw })
+        };
+    });
 
-    // Fallback for short lessons or lessons without headers
+    // Filter out zero-score sections
+    const validSections = scoredSections.filter(s => s.score > 0);
+
+    // Fallback: If no sections pass the filter, use the highest scoring one (even if 0) or the longest
     if (validSections.length === 0) {
-        return { title: "Full Lesson", content: markdown };
+        // Sort by length descending as a last resort
+        const longestSection = scoredSections.sort((a, b) => b.content.length - a.content.length)[0];
+
+        if (!longestSection || longestSection.content.length < 50) {
+            return { title: "Full Lesson", content: markdown };
+        }
+        return { title: longestSection.title, content: longestSection.content };
     }
 
-    // Random selection for variety
-    const randomIndex = Math.floor(Math.random() * validSections.length);
-    const selectedContent = validSections[randomIndex];
+    // Sort by score descending
+    validSections.sort((a, b) => b.score - a.score);
 
-    // Extract heading title for UI display
-    const titleMatch = selectedContent.match(/^\n?#{2,3}\s+(.+)/);
-    const title = titleMatch ? titleMatch[1].trim() : "Selected Section";
+    // Select from the "Top Tier"
+    // Take the top 30% or top 3, whichever is larger, to ensure variety among good sections
+    const topTierCount = Math.max(3, Math.ceil(validSections.length * 0.3));
+    const topTier = validSections.slice(0, topTierCount);
 
-    return { title, content: selectedContent };
+    // Randomly pick one from the top tier
+    const randomIndex = Math.floor(Math.random() * topTier.length);
+    const selectedSection = topTier[randomIndex];
+
+    console.log(`Quiz Selection: Picked "${selectedSection.title}" (Score: ${selectedSection.score}) from ${validSections.length} candidates.`);
+
+    return { title: selectedSection.title, content: selectedSection.content };
 }
 
 export async function POST(request: Request) {
@@ -77,23 +138,23 @@ Structure:
 {
   "question": "The question text here. Use LaTeX $...$ for math.",
   "options": [
-    "Option A text (incorrect)",
-    "Option B text (incorrect)",
-    "Option C text (correct answer)",
-    "Option D text (incorrect)"
+    "Option A text",
+    "Option B text",
+    "Option C text",
+    "Option D text"
   ],
   "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
   "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
 }
 
-=== MDX SYNTAX RULES (CRITICAL - MUST FOLLOW) ===
-
-1. **Math & LaTeX Formatting:**
+=== CRITICAL RULES ===
+1. **RANDOMIZATION**: You MUST randomize the position of the correct answer. Do NOT always place it in the same position (e.g., do not always make 'C' correct). Ensure an even distribution of correct answers across A, B, C, and D.
+2. **Math & LaTeX Formatting:**
    - ALL math MUST be in $...$ or $$...$$
    - Code/variables: Always use $\\texttt{name}$ inside math delimiters
    - Units: $10^{16}\\ \\text{cm}^{-3}$ - wrap \\text{} in $...$
-2. **Language:** Traditional Chinese for questions, English for technical terms
-3. **Quality:** Test understanding, not just recall
+3. **Language:** Traditional Chinese for questions, English for technical terms
+4. **Quality:** Test understanding, not just recall
 
 REMEMBER: Wrap \\texttt{}, \\text{}, \\mathrm{} in $...$!
 `,
@@ -182,24 +243,25 @@ Structure:
 {
   "question": "The question text here. Use LaTeX $...$ for math.",
   "options": [
-    "Option A text (incorrect)",
-    "Option B text (incorrect)",
-    "Option C text (correct answer)",
-    "Option D text (incorrect)"
+    "Option A text",
+    "Option B text",
+    "Option C text",
+    "Option D text"
   ],
   "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
   "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
 }
 
 Content Rules:
-1. **Math & Code Formatting:**
+1. **RANDOMIZATION**: You MUST randomize the position of the correct answer. Do NOT always place it in the same position. Ensure an even distribution across A, B, C, D.
+2. **Math & Code Formatting:**
    - Numbers and formulas: Use math mode. Example: $N_d = 10^{16} \\text{ cm}^{-3}$
    - Code/functions: Use $\\texttt{functionName()}$ for code terms
    - Variables in text: Use $\\texttt{variableName}$ 
    - NEVER use \\texttt{} outside of $...$ delimiters
-2. Difficulty: Match the level of the provided content.
-3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
-4. **CRITICAL - SPECIFICITY**: 
+3. Difficulty: Match the level of the provided content.
+4. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
+5. **CRITICAL - SPECIFICITY**: 
    - Ask about a specific detail, formula, calculation, or concept from THIS section.
    - Avoid generic "What is X?" questions. Prefer "How does X affect Y?" or "Calculate Z given...".
    - Test understanding, not just memorization.`
