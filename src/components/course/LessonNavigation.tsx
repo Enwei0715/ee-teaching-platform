@@ -33,8 +33,13 @@ export default function LessonNavigation({
 
         try {
             // Mark current lesson as completed
-            await fetch(`/api/courses/${courseId}/lessons/${currentLessonId}/complete`, {
+            await fetch(`/api/courses/${courseId}/progress`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lessonId: currentLessonId,
+                    completed: true
+                }),
             });
 
             // Navigate to next lesson

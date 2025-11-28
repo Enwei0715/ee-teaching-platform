@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { CheckCircle, Edit2, PlayCircle } from 'lucide-react';
+import { Edit2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calculateReadingTime } from '@/lib/utils';
 import { useEditMode } from '@/context/EditModeContext';
+import { StatusIcon } from '@/components/course/StatusIcon';
 
 interface Lesson {
     id: string;
@@ -25,7 +26,7 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
     const { data: session } = useSession();
     const { isEditMode } = useEditMode();
     const router = useRouter();
-    const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+    const [progressMap, setProgressMap] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -35,7 +36,7 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                     const response = await fetch(`/api/courses/${courseId}/progress`);
                     if (response.ok) {
                         const data = await response.json();
-                        setCompletedLessons(data.completedLessonIds || []);
+                        setProgressMap(data.progressMap || {});
                     }
                 } catch (error) {
                     console.error('Failed to fetch progress:', error);
@@ -66,14 +67,12 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                         href={`/courses/${courseId}/${lesson.id}`}
                         className="flex items-center gap-4 flex-1 min-w-0"
                     >
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bg-tertiary border border-border-primary group-hover:border-accent-primary/50 group-hover:bg-accent-primary/10 transition-colors shrink-0">
-                            {completedLessons.includes(lesson.id) ? (
-                                <CheckCircle size={20} className="text-accent-success" />
-                            ) : (
-                                <span className="font-mono text-sm text-text-secondary group-hover:text-accent-primary font-medium">
-                                    {String(index + 1).padStart(2, '0')}
-                                </span>
-                            )}
+                        <div className="flex items-center justify-center w-10 h-10 shrink-0">
+                            <StatusIcon
+                                status={progressMap[lesson.id]}
+                                index={index}
+                                className="w-8 h-8"
+                            />
                         </div>
 
                         <div className="flex-1 min-w-0">

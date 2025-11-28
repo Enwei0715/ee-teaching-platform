@@ -24,12 +24,11 @@ export async function GET(
             return NextResponse.json({ completedLessonIds: [] });
         }
 
-        // Get all completed lessons for this user in this course
-        const completedProgress = await prisma.userProgress.findMany({
+        // Get all progress for this user in this course
+        const userProgress = await prisma.userProgress.findMany({
             where: {
                 userId: session.user.id,
                 courseId: course.id,
-                completed: true,
             },
             include: {
                 lesson: {
@@ -38,13 +37,20 @@ export async function GET(
             }
         });
 
-        // Return lesson slugs (not UUIDs) for frontend compatibility
-        const completedLessonIds = completedProgress.map(p => p.lesson.slug);
+        // Create a map of lessonSlug -> status
+        const progressMap: Record<string, string> = {};
+        userProgress.forEach(p => {
+            progressMap[p.lesson.slug] = p.status;
+        });
 
-        return NextResponse.json({ completedLessonIds });
+        return NextResponse.json({
+            progressMap,
+            // Keep legacy field for backward compatibility if needed, or remove if safe
+            completedLessonIds: userProgress.filter(p => p.status === 'COMPLETED').map(p => p.lesson.slug)
+        });
     } catch (error) {
         console.error("Error fetching course progress:", error);
-        return NextResponse.json({ completedLessonIds: [] });
+        return NextResponse.json({ progressMap: {}, completedLessonIds: [] });
     }
 }
 
@@ -91,29 +97,53 @@ export async function POST(
             return new NextResponse("Lesson not found", { status: 404 });
         }
 
-        // Upsert progress
-        const progress = await prisma.userProgress.upsert({
+        // Check existing progress
+        const existingProgress = await prisma.userProgress.findUnique({
             where: {
                 userId_courseId_lessonId: {
                     userId: session.user.id,
                     courseId: course.id,
                     lessonId: lesson.id
                 }
-            },
-            update: {
-                lastElementId: lastElementId || undefined,
-                timeSpent: timeSpent || undefined,
-                completed: completed || undefined,
-            },
-            create: {
-                userId: session.user.id,
-                courseId: course.id,
-                lessonId: lesson.id,
-                lastElementId: lastElementId || null,
-                timeSpent: timeSpent || 0,
-                completed: completed || false
             }
         });
+
+        let newStatus = existingProgress?.status || 'IN_PROGRESS';
+
+        // Logic: Calculate new status
+        if (completed) {
+            newStatus = 'COMPLETED';
+        } else if (existingProgress?.status === 'COMPLETED') {
+            // If it was COMPLETED and we are updating progress (not finishing), switch to REVIEWING
+            newStatus = 'REVIEWING';
+        } else if (!existingProgress) {
+            newStatus = 'IN_PROGRESS';
+        }
+
+        let progress;
+        if (existingProgress) {
+            progress = await prisma.userProgress.update({
+                where: { id: existingProgress.id },
+                data: {
+                    lastElementId: lastElementId || undefined,
+                    timeSpent: timeSpent || undefined,
+                    completed: completed || undefined, // Keep legacy boolean for now
+                    status: newStatus
+                }
+            });
+        } else {
+            progress = await prisma.userProgress.create({
+                data: {
+                    userId: session.user.id,
+                    courseId: course.id,
+                    lessonId: lesson.id,
+                    lastElementId: lastElementId || null,
+                    timeSpent: timeSpent || 0,
+                    completed: completed || false,
+                    status: newStatus
+                }
+            });
+        }
 
         return NextResponse.json(progress);
     } catch (error) {

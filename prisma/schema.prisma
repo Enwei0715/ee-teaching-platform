@@ -68,8 +68,15 @@ model UserProgress {
   timeSpent Int      @default(0) // Time spent in seconds
   lastElementId String? // ID of the last element viewed
   updatedAt DateTime @updatedAt
+  status    LessonStatus @default(IN_PROGRESS)
 
   @@unique([userId, courseId, lessonId])
+}
+
+enum LessonStatus {
+  IN_PROGRESS
+  COMPLETED
+  REVIEWING
 }
 
 model Post {

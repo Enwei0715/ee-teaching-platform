@@ -68,6 +68,28 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
         }
     }, [userId, pathname, initialLastElementId]);
 
+    // Initialize progress on mount (Create IN_PROGRESS or switch to REVIEWING)
+    useEffect(() => {
+        if (!userId || !courseId || !lessonId) return;
+
+        const initProgress = async () => {
+            try {
+                await fetch(`/api/courses/${courseId}/progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        lessonId,
+                        // No lastElementId or completed flag, just "I am here" to trigger status logic
+                    }),
+                });
+            } catch (error) {
+                console.error("Failed to initialize progress", error);
+            }
+        };
+
+        initProgress();
+    }, [userId, courseId, lessonId]);
+
     // Save scroll position on scroll
     useEffect(() => {
         if (!userId) return;

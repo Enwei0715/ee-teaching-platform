@@ -130,6 +130,9 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                 return;
             }
 
+            // Check if this is the last item in the TOC
+            const isLastItem = items.length > 0 && activeId === items[items.length - 1].id;
+
             // Save to database
             (async () => {
                 try {
@@ -138,10 +141,11 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             lessonId,
-                            lastElementId: activeId
+                            lastElementId: activeId,
+                            completed: isLastItem ? true : undefined
                         })
                     });
-                    console.log(`💾 Saved position: ${activeId}`);
+                    console.log(`💾 Saved position: ${activeId}${isLastItem ? ' (COMPLETED)' : ''}`);
                     lastSavedIdRef.current = activeId; // Update ref after successful save
                 } catch (error) {
                     console.error('Failed to save position:', error);
@@ -151,7 +155,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         }, 1000); // 1 second debounce
 
         return () => clearTimeout(saveTimer);
-    }, [activeId, courseId, lessonId]);
+    }, [activeId, courseId, lessonId, items]);
 
     // Scroll to section on click
     const handleClick = (id: string) => {

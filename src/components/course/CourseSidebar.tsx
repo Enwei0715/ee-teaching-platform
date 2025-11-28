@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { CheckCircle, Circle, ChevronRight, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { StatusIcon } from '@/components/course/StatusIcon';
 
 interface Lesson {
     id: string;
@@ -21,7 +22,7 @@ interface Props {
 export default function CourseSidebar({ courseId, lessons }: Props) {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+    const [progressMap, setProgressMap] = useState<Record<string, string>>({});
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -62,7 +63,7 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                     const response = await fetch(`/api/courses/${courseId}/progress`);
                     if (response.ok) {
                         const data = await response.json();
-                        setCompletedLessons(data.completedLessonIds || []);
+                        setProgressMap(data.progressMap || {});
                     }
                 } catch (error) {
                     console.error('Failed to fetch progress:', error);
@@ -73,7 +74,7 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
         fetchProgress();
     }, [session, courseId]);
 
-    const completedCount = lessons.filter(l => completedLessons.includes(l.id)).length;
+    const completedCount = lessons.filter(l => progressMap[l.id] === 'COMPLETED' || progressMap[l.id] === 'REVIEWING').length;
     const totalLessons = lessons.length;
     const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
@@ -111,7 +112,6 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                     <ul className="space-y-1">
                         {lessons.map((lesson, index) => {
                             const isActive = pathname === `/courses/${courseId}/${lesson.id}`;
-                            const isCompleted = completedLessons.includes(lesson.id);
 
                             return (
                                 <li key={lesson.id}>
@@ -129,13 +129,11 @@ export default function CourseSidebar({ courseId, lessons }: Props) {
                                         )}
 
                                         <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "text-text-secondary/30 group-hover:text-text-secondary/70")}>
-                                            {isCompleted ? (
-                                                <CheckCircle size={16} className="text-accent-success fill-accent-success/10" />
-                                            ) : isActive ? (
-                                                <Circle size={16} className="fill-accent-primary/20" />
-                                            ) : (
-                                                <Circle size={16} />
-                                            )}
+                                            <StatusIcon
+                                                status={progressMap[lesson.id]}
+                                                index={index}
+                                                className="w-4 h-4"
+                                            />
                                         </div>
 
                                         <div className="flex-1">
