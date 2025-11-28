@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { List, X } from 'lucide-react';
 
 interface TocItem {
     id: string;
@@ -17,6 +18,7 @@ interface TableOfContentsProps {
 export default function TableOfContents({ courseId, lessonId, initialLastElementId }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
 
@@ -146,49 +148,111 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
     }
 
     return (
-        // Right Edge Hover Trigger Zone
-        <div className="
-            fixed right-0 top-24 bottom-24 w-12
-            hover:w-auto
-            z-40 flex items-start justify-end
-            group transition-all duration-300
-        ">
-            {/* TOC Panel - Hidden by default, slides in on hover */}
-            <div className="
-                w-64 max-h-[70vh] overflow-y-auto custom-scrollbar
-                glass-panel rounded-l-xl border-r-0 shadow-2xl
-                transform translate-x-full opacity-0
-                group-hover:translate-x-0 group-hover:opacity-100
-                transition-all duration-300 ease-out
-                p-4
-            ">
-                <h3 className="text-sm font-bold text-white/90 mb-3 uppercase tracking-wide">
-                    On this page
-                </h3>
-                <nav className="space-y-1">
-                    {items.map((item) => {
-                        const isActive = activeId === item.id;
-                        return (
+        <>
+            {/* Mobile Trigger Button */}
+            <button
+                onClick={() => setIsMobileOpen(true)}
+                className="lg:hidden fixed bottom-32 right-4 z-50 p-3 glass-heavy rounded-full text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                title="Table of Contents"
+            >
+                <List size={20} />
+            </button>
+
+            {/* Mobile Drawer */}
+            {isMobileOpen && (
+                <>
+                    {/* Backdrop */}
+                    <div
+                        className="lg:hidden fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
+                        onClick={() => setIsMobileOpen(false)}
+                    />
+
+                    {/* Drawer Panel */}
+                    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[95] glass-heavy rounded-t-2xl max-h-[70vh] overflow-y-auto p-6 border-t border-white/10 animate-in slide-in-from-bottom-10">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-white">Table of Contents</h3>
                             <button
-                                key={item.id}
-                                onClick={() => handleClick(item.id)}
-                                className={`
-                                    w-full text-left text-sm py-1.5 px-3 rounded-lg
-                                    transition-all duration-200
-                                    ${item.level === 3 ? 'pl-6' : 'pl-3'}
-                                    ${isActive
-                                        ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
-                                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border-l-2 border-transparent'
-                                    }
-                                `}
-                                title={item.text}
+                                onClick={() => setIsMobileOpen(false)}
+                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                             >
-                                <span className="line-clamp-2">{item.text}</span>
+                                <X size={20} className="text-white" />
                             </button>
-                        );
-                    })}
-                </nav>
+                        </div>
+
+                        <nav className="space-y-2">
+                            {items.map((item) => {
+                                const isActive = activeId === item.id;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => {
+                                            handleClick(item.id);
+                                            setIsMobileOpen(false); // Close drawer on click
+                                        }}
+                                        className={`
+                                            w-full text-left text-sm py-2.5 px-4 rounded-lg
+                                            transition-all duration-200
+                                            ${item.level === 3 ? 'pl-8' : 'pl-4'}
+                                            ${isActive
+                                                ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
+                                                : 'text-gray-300 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
+                                            }
+                                        `}
+                                    >
+                                        {item.text}
+                                    </button>
+                                );
+                            })}
+                        </nav>
+                    </div>
+                </>
+            )}
+
+            {/* Desktop Hover Trigger Zone */}
+            <div className="
+                hidden lg:block
+                fixed right-0 top-24 bottom-24 w-12
+                hover:w-auto
+                z-40 flex items-start justify-end
+                group transition-all duration-300
+            ">
+                {/* TOC Panel - Hidden by default, slides in on hover */}
+                <div className="
+                    w-64 max-h-[70vh] overflow-y-auto custom-scrollbar
+                    glass-panel rounded-l-xl border-r-0 shadow-2xl
+                    transform translate-x-full opacity-0
+                    group-hover:translate-x-0 group-hover:opacity-100
+                    transition-all duration-300 ease-out
+                    p-4
+                ">
+                    <h3 className="text-sm font-bold text-white/90 mb-3 uppercase tracking-wide">
+                        On this page
+                    </h3>
+                    <nav className="space-y-1">
+                        {items.map((item) => {
+                            const isActive = activeId === item.id;
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => handleClick(item.id)}
+                                    className={`
+                                        w-full text-left text-sm py-1.5 px-3 rounded-lg
+                                        transition-all duration-200
+                                        ${item.level === 3 ? 'pl-6' : 'pl-3'}
+                                        ${isActive
+                                            ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
+                                            : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border-l-2 border-transparent'
+                                        }
+                                    `}
+                                    title={item.text}
+                                >
+                                    <span className="line-clamp-2">{item.text}</span>
+                                </button>
+                            );
+                        })}
+                    </nav>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

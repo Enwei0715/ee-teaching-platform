@@ -53,6 +53,30 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         return () => window.removeEventListener('open-ai-tutor', handleOpen);
     }, []);
 
+    // Lock body scroll on mobile when AI Tutor is open (prevents scroll bleed)
+    useEffect(() => {
+        if (!isOpen) {
+            document.body.style.overflow = 'unset';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            return;
+        }
+
+        // Only lock scroll on mobile (< 768px)
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        };
+    }, [isOpen]);
+
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || loading) return;
@@ -115,7 +139,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
     }
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
+        <div className="fixed bottom-6 right-6 z-[100]">
             {/* Chat Window */}
             {isOpen && (
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
@@ -153,7 +177,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
 
                     {/* Messages */}
                     <div className="flex-1 relative min-h-0 bg-transparent">
-                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth">
+                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 scroll-smooth overscroll-contain">
                             {messages.map((msg, idx) => (
                                 <div
                                     key={idx}
