@@ -53,27 +53,35 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
         return () => window.removeEventListener('open-ai-tutor', handleOpen);
     }, []);
 
-    // Lock body scroll on mobile when AI Tutor is open (prevents scroll bleed)
+    // Strict body scroll lock on mobile (prevents background shift when keyboard appears)
     useEffect(() => {
-        if (!isOpen) {
-            document.body.style.overflow = 'unset';
-            document.body.style.position = '';
-            document.body.style.width = '';
+        // Only apply on mobile when open
+        if (!isOpen || window.innerWidth >= 768) {
             return;
         }
 
-        // Only lock scroll on mobile (< 768px)
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) {
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-        }
+        // 1. Capture current scroll position
+        const scrollY = window.scrollY;
 
+        // 2. Freeze body using position:fixed with offset
+        // This completely detaches the page from scrolling
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.style.overflow = 'hidden';
+
+        // 3. Cleanup - restore scroll position
         return () => {
-            document.body.style.overflow = 'unset';
+            const bodyTop = document.body.style.top;
+
+            // Reset all styles
             document.body.style.position = '';
+            document.body.style.top = '';
             document.body.style.width = '';
+            document.body.style.overflow = '';
+
+            // Restore original scroll position
+            window.scrollTo(0, parseInt(bodyTop || '0') * -1);
         };
     }, [isOpen]);
 
@@ -144,8 +152,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext }: A
             {isOpen && (
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
                     ${isExpanded
-                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-[600px] md:h-[700px]'
-                        : 'fixed bottom-24 left-4 right-4 h-[60vh] z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 md:w-96 md:h-[500px]'
+                        ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[600px] h-[85vh] md:h-[700px]'
+                        : 'fixed bottom-24 left-4 right-4 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[400px] h-[600px] md:h-[700px]'
                     }`}>
                     {/* Header */}
                     <div className="bg-slate-900/50 border-b border-white/10 p-4 flex justify-between items-center text-white">
