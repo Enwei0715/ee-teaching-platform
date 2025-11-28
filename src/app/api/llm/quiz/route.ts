@@ -107,53 +107,22 @@ Structure:
   "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
 }
 
-=== MDX SYNTAX RULES (CRITICAL - MUST FOLLOW) ===
-
-1. **Math & LaTeX Formatting (MOST IMPORTANT):**
-   - ALL math expressions MUST be wrapped in $...$ (inline) or $$...$$ (block)
-   - Code/function names: $\\texttt{functionName()}$ - ALWAYS wrap \\texttt{} in $...$
-   - Variables: $\\texttt{variableName}$ - ALWAYS wrap \\texttt{} in $...$
-   - Units: $10^{16}\\ \\text{cm}^{-3}$ or $5\\ \\mathrm{V}$ - ALWAYS wrap \\text{} or \\mathrm{} in $...$
-   - Text in formulas: $F = ma\\ \\text{(Newton's second law)}$
-   - **NEVER** use \\texttt{}, \\text{}, or \\mathrm{} outside of $...$ delimiters
-   - **NEVER** use single backticks (`) for code - use $\\texttt{ }$ instead
-
-            2. ** Correct Examples:**
-   ✅ $\\texttt{ mutex } $ - function/ code name
-   ✅ $\\texttt{ HP } $ - variable name
-   ✅ $N_d = 10 ^ { 16}\\ \\text{ cm }^ {- 3
-        }$ - number with unit
-   ✅ $V_{ GS } = 2\\ \\mathrm{ V } $ - voltage
-   ✅ $I_D = 5\\ \\mathrm{ mA } $ - current
-
-        3. ** Wrong Examples(DO NOT USE):**
-   ❌ exttt{ mutex } - missing $ delimiters and \\
-   ❌ \\texttt{ HP } - missing $ delimiters
-   ❌ `code` - backticks not allowed
-   ❌ 10 ^ 16 cm ^ -3 - missing $ delimiters
-   ❌ \\text{ unit } outside math mode - missing $ delimiters
-
-        4. ** Text Formatting:**
-            - Bold: ** 重要文字 **
-                - Italic: * 強調文字 *
-                    - DO NOT use HTML tags
-
-        5. ** Language:**
-            - Use Traditional Chinese(繁體中文) for question text
-                - Keep technical terms in English when appropriate
-                    - Use proper terminology
-
-        6. ** Question Quality:**
-            - Ask about specific details from THIS section only
-                - Avoid generic "What is X?" questions
-                    - Prefer "How/Why/Calculate" questions
-                        - Test understanding, not just memorization
-
-        REMEMBER: Every time you write \\texttt{ }, \\text{ }, or \\mathrm{ }, wrap it in $...$!
-    },
-    {
-        role: "user",
-            content: `
+Content Rules:
+1. **Math & Code Formatting:**
+   - Numbers and formulas: Use math mode. Example: $N_d = 10^{16} \\text{ cm}^{-3}$
+   - Code/functions: Use $\\texttt{functionName()}$ for code terms
+   - Variables in text: Use $\\texttt{variableName}$ 
+   - NEVER use \\texttt{} outside of $...$ delimiters
+2. Difficulty: Match the level of the provided content.
+3. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
+4. **CRITICAL - SPECIFICITY**: 
+   - Ask about a specific detail, formula, calculation, or concept from THIS section.
+   - Avoid generic "What is X?" questions. Prefer "How does X affect Y?" or "Calculate Z given...".
+   - Test understanding, not just memorization.`
+                    },
+                    {
+                        role: "user",
+                        content: `
 Lesson: ${lesson.title}
 Focused Section: ${sectionTitle}
 Timestamp: ${Date.now()} (Use this to ensure uniqueness)
@@ -166,56 +135,56 @@ ${sectionContent}
 Generate a unique and challenging question that tests a specific concept from THIS section.
 Focus on details that require understanding, not just recall.
                         `
-    }
+                    }
                 ],
-    model: "gemini-2.5-flash",
-        response_format: { type: "json_object" },
-    temperature: 1.0, // High temperature for variety
+                model: "gemini-2.5-flash",
+                response_format: { type: "json_object" },
+                temperature: 1.0, // High temperature for variety
             });
 
-console.log("Google AI Response:", completion);
-const content = completion.choices[0].message.content;
-console.log("Google AI Response Content:", content);
+            console.log("Google AI Response:", completion);
+            const content = completion.choices[0].message.content;
+            console.log("Google AI Response Content:", content);
 
-if (!content) {
-    throw new Error("No content received from LLM");
-}
+            if (!content) {
+                throw new Error("No content received from LLM");
+            }
 
-const quiz = JSON.parse(content);
+            const quiz = JSON.parse(content);
 
-// Map correctAnswerIndex to correctAnswer for frontend compatibility
-if (typeof quiz.correctAnswerIndex === 'number') {
-    quiz.correctAnswer = quiz.correctAnswerIndex;
-}
+            // Map correctAnswerIndex to correctAnswer for frontend compatibility
+            if (typeof quiz.correctAnswerIndex === 'number') {
+                quiz.correctAnswer = quiz.correctAnswerIndex;
+            }
 
-return NextResponse.json({
-    ...quiz,
-    model: "gemini-2.5-flash",
-    sectionTitle: sectionTitle  // Include which section was tested
-});
+            return NextResponse.json({
+                ...quiz,
+                model: "gemini-2.5-flash",
+                sectionTitle: sectionTitle  // Include which section was tested
+            });
 
         } catch (aiError) {
-    console.error("AI Generation Failed:", aiError);
+            console.error("AI Generation Failed:", aiError);
 
-    // 3. Fallback: Use a random question from the database
-    if (lesson.questions && lesson.questions.length > 0) {
-        console.log("Using fallback question from database.");
-        const backupQuestion = lesson.questions[Math.floor(Math.random() * lesson.questions.length)];
+            // 3. Fallback: Use a random question from the database
+            if (lesson.questions && lesson.questions.length > 0) {
+                console.log("Using fallback question from database.");
+                const backupQuestion = lesson.questions[Math.floor(Math.random() * lesson.questions.length)];
 
-        return NextResponse.json({
-            question: backupQuestion.question,
-            options: backupQuestion.options,
-            correctAnswer: backupQuestion.correctAnswer,
-            explanation: backupQuestion.explanation || "Standard database question.",
-            model: "Database Fallback"
-        });
-    }
+                return NextResponse.json({
+                    question: backupQuestion.question,
+                    options: backupQuestion.options,
+                    correctAnswer: backupQuestion.correctAnswer,
+                    explanation: backupQuestion.explanation || "Standard database question.",
+                    model: "Database Fallback"
+                });
+            }
 
-    return NextResponse.json({ error: 'Failed to generate quiz and no backup available', details: String(aiError) }, { status: 500 });
-}
+            return NextResponse.json({ error: 'Failed to generate quiz and no backup available', details: String(aiError) }, { status: 500 });
+        }
 
     } catch (error) {
-    console.error('Error in quiz API:', error);
-    return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 });
-}
+        console.error('Error in quiz API:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 });
+    }
 }

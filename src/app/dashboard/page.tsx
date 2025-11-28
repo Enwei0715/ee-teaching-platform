@@ -50,7 +50,6 @@ export default async function DashboardPage() {
             timeSpent: true,
             lastElementId: true,  // Include for precise resume
             updatedAt: true,
-            createdAt: true,
         }
     });
 
