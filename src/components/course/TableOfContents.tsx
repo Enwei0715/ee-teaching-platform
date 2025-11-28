@@ -21,6 +21,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
+    const isRestoredRef = useRef(false); // Prevent saving during initial load
 
     // Extract headings from DOM
     useEffect(() => {
@@ -86,48 +87,70 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         };
     }, [items]);
 
-    // Auto-scroll to saved position on mount
+    // Auto-scroll to saved position on mount & unlock saving after delay
     useEffect(() => {
-        if (!initialLastElementId || items.length === 0) return;
+        // Scroll to saved position if it exists
+        if (initialLastElementId && items.length > 0) {
+            const timer = setTimeout(() => {
+                const element = document.getElementById(initialLastElementId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setActiveId(initialLastElementId);
+                    console.log(`📍 Restored position: ${initialLastElementId}`);
+                }
+            }, 600);
+        }
 
-        // Small delay to ensure content is fully rendered
-        const timer = setTimeout(() => {
-            const element = document.getElementById(initialLastElementId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setActiveId(initialLastElementId); // Set as active
-                console.log(`Restored position: ${initialLastElementId}`);
+        // CRITICAL: Unlock saving after 1500ms to prevent overwriting on load
+        // This gives time for scroll animation and user orientation
+        const unlockTimer = setTimeout(() => {
+            isRestoredRef.current = true;
+            console.log('🔓 Resume Learning: Save enabled');
+        }, 1500);
+
+        return () => {
+            if (initialLastElementId && items.length > 0) {
+                // Clear scroll timer if component unmounts early
             }
-        }, 600);
-
-        return () => clearTimeout(timer);
+            clearTimeout(unlockTimer);
+        };
     }, [initialLastElementId, items]);
 
-    // Save active section to database (INSTANT - no debounce)
-    // IntersectionObserver already provides filtered signal, so save immediately
+    // Save active section to database with debounce and initialization guard
     useEffect(() => {
         // Guard clauses
         if (!activeId || !courseId || !lessonId) return;
         if (activeId === lastSavedIdRef.current) return; // Prevent duplicate saves
 
-        // Immediate save - activeId change IS the trigger
-        (async () => {
-            try {
-                await fetch(`/api/courses/${courseId}/progress`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        lessonId,
-                        lastElementId: activeId
-                    })
-                });
-                console.log(`💾 Instantly saved position: ${activeId}`);
-                lastSavedIdRef.current = activeId; // Update ref after successful save
-            } catch (error) {
-                console.error('Failed to save position:', error);
-                // Fail silently - don't break UI on network errors
+        // Debounce save by 1000ms to prevent rapid-fire updates
+        const saveTimer = setTimeout(() => {
+            // CRITICAL GUARD: Only save if initialization is complete
+            if (!isRestoredRef.current) {
+                console.log(`⏸️  Blocked save (still loading): ${activeId}`);
+                return;
             }
-        })();
+
+            // Save to database
+            (async () => {
+                try {
+                    await fetch(`/api/courses/${courseId}/progress`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            lessonId,
+                            lastElementId: activeId
+                        })
+                    });
+                    console.log(`💾 Saved position: ${activeId}`);
+                    lastSavedIdRef.current = activeId; // Update ref after successful save
+                } catch (error) {
+                    console.error('Failed to save position:', error);
+                    // Fail silently - don't break UI on network errors
+                }
+            })();
+        }, 1000); // 1 second debounce
+
+        return () => clearTimeout(saveTimer);
     }, [activeId, courseId, lessonId]);
 
     // Scroll to section on click
