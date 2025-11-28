@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { getAllCourses, getCourseStructure } from "@/lib/mdx";
 import OscilloscopeBackground from "@/components/ui/OscilloscopeBackground";
 import ResumeLearningPrompt from "@/components/dashboard/ResumeLearningPrompt";
+import ResumeCard from "@/components/dashboard/ResumeCard";
 
 export const dynamic = 'force-dynamic';
 
@@ -50,6 +51,28 @@ export default async function DashboardPage() {
             timeSpent: true,
             lastElementId: true,  // Include for precise resume
             updatedAt: true,
+        }
+    });
+
+    // Fetch most recent learning activity for Resume Card
+    const mostRecentProgress = await prisma.userProgress.findFirst({
+        where: { userId: session.user.id },
+        orderBy: { updatedAt: 'desc' },
+        include: {
+            lesson: {
+                select: {
+                    id: true,
+                    slug: true,
+                    title: true
+                }
+            },
+            course: {
+                select: {
+                    id: true,
+                    slug: true,
+                    title: true
+                }
+            }
         }
     });
 
@@ -198,54 +221,69 @@ export default async function DashboardPage() {
                 {/* Recent Activity & Recommended */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        <h2 className="text-xl font-bold text-white">Continue Learning</h2>
-                        <div className="glass-panel rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80">
-                            {activeCourses.length > 0 ? (
-                                activeCourses.map(course => {
-                                    const progressData = courseProgressMap.get(course.id);
-                                    const nextLesson = courseNextLessonMap.get(course.id);
-                                    const lastElementId = courseLastElementMap.get(course.id);
-
-                                    // Construct resume URL with hash fragment if lastElementId exists
-                                    const resumeUrl = nextLesson
-                                        ? (lastElementId
-                                            ? `/courses/${course.slug}/${nextLesson.slug}#${lastElementId}`
-                                            : `/courses/${course.slug}/${nextLesson.slug}`)
-                                        : `/courses/${course.slug}`;
-
-                                    return (
-                                        <Link key={course.id} href={resumeUrl} className="block p-6 border-b border-gray-800 hover:bg-gray-800 transition-colors group">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h3 className="font-bold text-white group-hover:text-indigo-400 transition-colors">{course.title}</h3>
-                                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${course.level === 'Beginner' ? 'text-green-300 bg-green-900/30' : course.level === 'Intermediate' ? 'text-amber-300 bg-amber-900/30' : 'text-red-300 bg-red-900/30'}`}>
-                                                    {course.level}
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-gray-400 mb-4">
-                                                {nextLesson ? `Next: ${nextLesson.title}` : 'Course Completed!'}
-                                            </p>
-                                            <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                                                <span>{progressData.completed} / {progressData.total} Lessons</span>
-                                                <span>{progressData.percentage}%</span>
-                                            </div>
-                                            <div className="w-full bg-gray-800 rounded-full h-2 mb-4">
-                                                <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${progressData.percentage}%` }}></div>
-                                            </div>
-                                            <div className="flex items-center text-sm text-indigo-400 font-medium">
-                                                <PlayCircle size={16} className="mr-2" /> {nextLesson ? 'Continue Lesson' : 'Review Course'}
-                                            </div>
-                                        </Link>
-                                    );
-                                })
+                        {/* Resume Learning Card */}
+                        <section>
+                            <h2 className="text-xl font-bold text-white mb-4">Continue Learning</h2>
+                            {mostRecentProgress ? (
+                                <ResumeCard
+                                    courseTitle={mostRecentProgress.course.title}
+                                    lessonTitle={mostRecentProgress.lesson.title}
+                                    resumeLink={`/courses/${mostRecentProgress.course.slug}/${mostRecentProgress.lesson.slug}${mostRecentProgress.lastElementId ? `#${mostRecentProgress.lastElementId}` : ''}`}
+                                />
                             ) : (
-                                <div className="glass-panel p-8 text-center rounded-xl">
-                                    <p className="text-gray-400 mb-4">You haven't started any courses yet.</p>
-                                    <Link href="/courses" className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                                <div className="glass-panel p-8 text-center rounded-xl border border-white/10">
+                                    <p className="text-gray-400 mb-6">You haven't started any courses yet.</p>
+                                    <Link href="/courses" className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2 rounded-lg transition-colors">
                                         Browse Courses
                                     </Link>
                                 </div>
                             )}
-                        </div>
+                        </section>
+
+                        {/* In Progress Courses List */}
+                        {activeCourses.length > 0 && (
+                            <section>
+                                <h2 className="text-xl font-bold text-white mb-4">In Progress</h2>
+                                <div className="glass-panel rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-out hover:scale-[1.01] hover:shadow-2xl hover:bg-gray-800/80">
+                                    {activeCourses.map(course => {
+                                        const progressData = courseProgressMap.get(course.id);
+                                        const nextLesson = courseNextLessonMap.get(course.id);
+                                        const lastElementId = courseLastElementMap.get(course.id);
+
+                                        // Construct resume URL with hash fragment if lastElementId exists
+                                        const resumeUrl = nextLesson
+                                            ? (lastElementId
+                                                ? `/courses/${course.slug}/${nextLesson.slug}#${lastElementId}`
+                                                : `/courses/${course.slug}/${nextLesson.slug}`)
+                                            : `/courses/${course.slug}`;
+
+                                        return (
+                                            <Link key={course.id} href={resumeUrl} className="block p-6 border-b border-gray-800 hover:bg-gray-800 transition-colors group last:border-0">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="font-bold text-white group-hover:text-indigo-400 transition-colors">{course.title}</h3>
+                                                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${course.level === 'Beginner' ? 'text-green-300 bg-green-900/30' : course.level === 'Intermediate' ? 'text-amber-300 bg-amber-900/30' : 'text-red-300 bg-red-900/30'}`}>
+                                                        {course.level}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-400 mb-4">
+                                                    {nextLesson ? `Next: ${nextLesson.title}` : 'Course Completed!'}
+                                                </p>
+                                                <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                                    <span>{progressData.completed} / {progressData.total} Lessons</span>
+                                                    <span>{progressData.percentage}%</span>
+                                                </div>
+                                                <div className="w-full bg-gray-800 rounded-full h-2 mb-4">
+                                                    <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${progressData.percentage}%` }}></div>
+                                                </div>
+                                                <div className="flex items-center text-sm text-indigo-400 font-medium">
+                                                    <PlayCircle size={16} className="mr-2" /> {nextLesson ? 'Continue Lesson' : 'Review Course'}
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        )}
                     </div>
 
                     <div className="space-y-6">
