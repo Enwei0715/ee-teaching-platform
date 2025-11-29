@@ -24,7 +24,7 @@ export default function Footer({ settings = {}, links = [] }: FooterProps) {
         <>
             {/* Subtle Top Border for Footer area */}
             <div className="w-full h-[1px] bg-white/5 relative z-20"></div>
-            <footer className="relative z-10 w-full border-t border-gray-800 bg-gray-950/70 backdrop-blur-md py-12 mt-auto">
+            <footer className="relative z-10 w-full border-t border-gray-800 bg-gray-950/70 backdrop-blur-md py-12 pb-12 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-3 mb-4">

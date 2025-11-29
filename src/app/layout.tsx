@@ -35,22 +35,20 @@ export default async function RootLayout({
 
     return (
         <html lang="en" className="scroll-smooth">
-            <body className={`${inter.className} bg-gray-950 text-white antialiased`}>
+            <body className={`${inter.className} bg-gray-950 text-white antialiased min-h-screen flex flex-col relative overflow-x-hidden`}>
                 <AuthProvider>
                     <EditModeProvider>
                         <HotkeysProvider>
-                            <div className="flex flex-col min-h-screen">
-                                <Navbar />
-                                <main className="flex-1 w-full relative pt-16">
-                                    {/* Subtle Blueprint Grid Overlay */}
-                                    <BackgroundGrid />
-                                    <div className="relative z-10">
-                                        {children}
-                                    </div>
-                                </main>
-                                <ShortcutsModal />
-                                <Footer settings={settings} links={links} />
-                            </div>
+                            <Navbar />
+                            <main className="flex-1 w-full relative">
+                                {/* Subtle Blueprint Grid Overlay */}
+                                <BackgroundGrid />
+                                <div className="relative z-10">
+                                    {children}
+                                </div>
+                            </main>
+                            <ShortcutsModal />
+                            <Footer settings={settings} links={links} />
                         </HotkeysProvider>
                     </EditModeProvider>
                 </AuthProvider>

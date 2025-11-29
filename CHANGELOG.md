@@ -1,5 +1,13 @@
 # Project Changelog
 
+## v4.3.1 - Mobile Layout & Global Polish (2025-11-30)
+- **Global Layout**:
+    - **Footer Cut-Off Fix**: Resolved global footer accessibility issue by enforcing `min-h-screen` on body and removing restrictive overflow settings.
+    - **Sticky Navbar**: Switched Navbar from `fixed` to `sticky` for natural content flow and better mobile compatibility.
+- **Mobile Experience**:
+    - **Breadcrumbs**: Restored breadcrumb navigation on mobile devices with horizontal scrolling support.
+    - **Content Occlusion**: Removed manual padding hacks (`pt-16`) in favor of native sticky positioning.
+
 ## v4.3.0 - Smart Quiz Algorithm & Mobile Polish (2025-11-30)
 - **AI Quiz**:
     - **Smart Selection Algorithm**: Implemented a 4-phase pipeline (Parse -> Scope -> Score -> Select) to intelligently choose high-quality content for quizzes.

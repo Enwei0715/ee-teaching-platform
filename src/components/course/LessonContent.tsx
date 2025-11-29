@@ -96,8 +96,8 @@ export default function LessonContent({
                 <div className="flex-1 container mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8">
                     {/* Main Article */}
                     <main className="flex-1 min-w-0">
-                        {/* Breadcrumbs (Desktop only - Mobile has them in sidebar) */}
-                        <nav className="hidden lg:flex items-center text-sm text-text-secondary mb-6">
+                        {/* Breadcrumbs (Visible on all devices) */}
+                        <nav className="flex items-center text-sm text-text-secondary mb-6 overflow-x-auto whitespace-nowrap pb-2">
                             <Link href="/courses" className="hover:text-text-primary transition-colors">Courses</Link>
                             <ChevronRight size={16} className="mx-2" />
                             <Link href={`/courses/${course.slug}`} className="hover:text-text-primary transition-colors">
