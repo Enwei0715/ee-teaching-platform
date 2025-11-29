@@ -184,7 +184,7 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
         <>
             {/* Desktop Sidebar */}
             <aside className={cn(
-                "hidden lg:flex flex-col glass-heavy border-r border-gray-800/80 h-[calc(100vh-4rem)] sticky top-16 self-start rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
+                "hidden lg:flex flex-col glass-heavy border-r border-gray-800/80 h-[calc(100vh-5rem)] sticky top-20 self-start rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
                 isCollapsed ? "w-0 opacity-0 pointer-events-none" : "w-72 opacity-100"
             )}>
                 <SidebarHeader />
@@ -216,7 +216,7 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
                     />
 
                     {/* Drawer Panel */}
-                    <aside className="fixed inset-y-0 left-0 w-3/4 max-w-xs h-full glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[100]">
+                    <aside className="fixed inset-y-0 left-0 w-[85vw] max-w-xs h-full glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[100]">
                         <SidebarHeader />
                         <SidebarContent isMobile={true} />
                     </aside>

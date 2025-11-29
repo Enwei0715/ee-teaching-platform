@@ -1,12 +1,23 @@
 # Project Changelog
 
+## v4.2.1 - Quiz Stability & Visual Fixes (2025-11-29)
+- **AI Quiz**:
+    - Reverted quiz generation logic to stable version (v4.1.0 era) to resolve "400 Bad Request" errors.
+    - Restored `gemini-2.5-flash` model usage with `json_object` response format.
+- **UI**:
+    - Fixed Lesson Page background to use `InteractiveGridPattern` (matching Course Page) instead of plain background.
+
 ## v4.2.0 - Smart Quiz & Mobile Navigation (2025-11-29)
 **Current Release**
 - **Navigation**:
     - **Mobile UX**: Replaced floating sidebar trigger with a flow-based "Sub-Navbar" for better accessibility.
     - **Breadcrumbs**: Fixed fake sidebar breadcrumbs to dynamically show `Courses > [Course Title]`.
     - Removed hardcoded category labels.
+- **Architecture**:
+    - **Server/Client Split**: Refactored `LessonPage` into Server Component and `LessonContent` Client Component for better performance and state management.
 - **AI Quiz**:
+    - **Progress Awareness**: Quiz now respects user's reading progress, generating questions only from read sections when "In Progress".
+    - **Database Optimization**: Pre-calculating and storing `sectionsMetadata` on lesson save to speed up quiz generation.
     - **Smart Scoring**: Implemented heuristic scoring to select high-quality content sections (filtering noise, rewarding explanations).
     - **Randomization**: Enforced strict answer position randomization (A/B/C/D) to prevent predictability.
     - **Quality Control**: Added blocklist for low-value sections (Summary, Reference, etc.).

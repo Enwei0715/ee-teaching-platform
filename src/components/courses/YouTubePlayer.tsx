@@ -41,9 +41,10 @@ export default function YouTubePlayer({ url }: YouTubePlayerProps) {
     return (
         <div className="relative w-full pb-[56.25%] h-0 rounded-xl overflow-hidden shadow-lg my-8 border border-gray-800 bg-gray-900">
             <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
+                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
                 className="absolute top-0 left-0 w-full h-full"
             />

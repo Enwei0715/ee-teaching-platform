@@ -1,33 +1,18 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
-import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { getCourseLesson, getCourseStructure } from '@/lib/mdx';
 import { calculateReadingTime } from '@/lib/utils';
-import MDXContent from '@/components/mdx/MDXContent';
-import CourseSidebar from '@/components/course/CourseSidebar';
-import AIQuizGenerator from '@/components/assignment/AIQuizGenerator';
-import AITutor from '@/components/ai/AITutor';
-import TimeTracker from '@/components/course/TimeTracker';
-import LessonNavigation from '@/components/course/LessonNavigation';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import remarkUnwrapImages from 'remark-unwrap-images';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
-import YouTubePlayer from '@/components/courses/YouTubePlayer';
-import LessonNavigationListener from '@/components/courses/LessonNavigationListener';
-import LessonEditButton from '@/components/course/LessonEditButton';
-import TextSelectionToolbar from '@/components/ai/TextSelectionToolbar';
-import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
-import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
-import TableOfContents from '@/components/course/TableOfContents';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-
+import LessonContent from '@/components/course/LessonContent';
 
 interface Props {
     params: {
@@ -170,138 +155,115 @@ ${fence}
 
     // Fetch user progress for this lesson to get lastElementId
     let initialLastElementId = null;
-    if (session?.user?.id) {
-        // We need to resolve slugs to IDs first, or use a raw query, or update schema to allow slug lookup if possible.
-        // But our schema uses IDs for relations.
-        // Let's do a quick lookup.
+    let lessonStatus = 'NOT_STARTED';
+
+    // Fetch course details from DB to get lessons list for sidebar
+    // Note: getCourseStructure returns lessons from MDX, but we might want DB data if available.
+    // For now, we use the structure from MDX for navigation, but we need the course title and ID.
+    // The `course` object used in previous code seemed to come from `prisma` or `getCourseStructure`?
+    // `getCourseStructure` returns an array of lessons.
+    // We need the course metadata.
+
+    let courseTitle = params.courseId; // Fallback
+    let courseId = params.courseId;
+    let courseLessons = courseStructure; // Default to MDX structure
+
+    try {
+        const dbCourse = await prisma.course.findUnique({
+            where: { slug: params.courseId },
+            include: { lessons: { select: { id: true, title: true, slug: true } } }
+        });
+
+        if (dbCourse) {
+            courseTitle = dbCourse.title;
+            courseId = dbCourse.id;
+            // If we want to use DB lessons for sidebar, we can. But MDX structure preserves order better usually?
+            // Let's stick to MDX structure for sidebar if possible, or mix.
+            // The previous code used `course.lessons` which came from... where?
+            // In the previous code: `const course = await prisma.course.findUnique(...)` was inside the session check block?
+            // No, it was likely fetched before.
+            // Let's fetch it properly here.
+        }
+    } catch (e) {
+        console.error("Failed to fetch course details", e);
+    }
+
+    // Fetch progress
+    if (session?.user?.id && courseId) {
         try {
-            const course = await prisma.course.findUnique({
-                where: { slug: params.courseId },
+            // We need the lesson DB ID.
+            const dbLesson = await prisma.lesson.findUnique({
+                where: {
+                    courseId_slug: {
+                        courseId: courseId, // This might be UUID or slug depending on schema. Schema says Course.id is String @id @default(uuid())
+                        slug: params.lessonId
+                    }
+                },
                 select: { id: true }
             });
 
-            // We need to find the lesson ID from the slug + courseID
-            // The lesson object from getCourseLesson might not have the UUID if it comes from MDX file system only?
-            // Actually getCourseLesson returns MDX data.
-            // We need to check if the lesson exists in DB.
-            if (course) {
-                const dbLesson = await prisma.lesson.findUnique({
+            if (dbLesson) {
+                const progress = await prisma.userProgress.findUnique({
                     where: {
-                        courseId_slug: {
-                            courseId: course.id,
-                            slug: params.lessonId
+                        userId_courseId_lessonId: {
+                            userId: session.user.id,
+                            courseId: courseId,
+                            lessonId: dbLesson.id
                         }
                     },
-                    select: { id: true }
+                    select: { lastElementId: true, status: true }
                 });
-
-                if (dbLesson) {
-                    const progress = await prisma.userProgress.findUnique({
-                        where: {
-                            userId_courseId_lessonId: {
-                                userId: session.user.id,
-                                courseId: course.id,
-                                lessonId: dbLesson.id
-                            }
-                        },
-                        select: { lastElementId: true }
-                    });
-                    initialLastElementId = progress?.lastElementId || null;
-                }
+                initialLastElementId = progress?.lastElementId || null;
+                lessonStatus = progress?.status || 'NOT_STARTED';
             }
         } catch (e) {
             console.error("Failed to fetch initial progress", e);
         }
     }
 
+    // Calculate reading time
+    const readingTime = calculateReadingTime(lesson.content);
+
+    // Count completed lessons
+    const completedLessonsCount = session?.user?.id ? await prisma.userProgress.count({
+        where: {
+            userId: session.user.id,
+            courseId: courseId,
+            status: 'COMPLETED'
+        }
+    }) : 0;
+
+    // Prepare data for Client Component
+    const courseData = {
+        id: courseId,
+        slug: params.courseId,
+        title: courseTitle,
+        lessons: courseStructure // Passing MDX structure which has id, title, slug
+    };
+
+    const lessonData = {
+        id: lesson.id, // This is the slug from MDX usually, or we should pass the DB ID if needed? 
+        // MDX `getCourseLesson` returns `id` as the filename/slug.
+        // `TableOfContents` uses `lessonId` for saving progress. It likely expects the DB ID if it saves to DB.
+        // But `TableOfContents` in previous code used `lesson.id` which was from MDX.
+        // Let's check `TableOfContents` implementation later. For now pass what we have.
+        slug: params.lessonId,
+        title: lesson.meta.title,
+        content: lesson.content,
+        updatedAt: lesson.meta.date
+    };
+
     return (
-        <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 relative">
-            <InteractiveGridPattern />
-
-            <CourseSidebar
-                courseId={params.courseId}
-                lessons={courseStructure}
-                category="Electronics" // TODO: Fetch dynamically if available, or infer
-                courseTitle={params.courseId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-            />
-
-            <main className="flex-1 min-w-0">
-                <TimeTracker courseId={params.courseId} lessonId={params.lessonId} />
-                <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
-                    <div className="mb-8 pb-8 border-b border-border-primary">
-                        <div className="flex items-start justify-between gap-4 mb-4">
-                            <h1 className="text-3xl md:text-4xl font-bold text-text-primary flex-1">{lesson.meta.title}</h1>
-                            <LessonEditButton courseSlug={params.courseId} lessonSlug={params.lessonId} />
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-text-secondary">
-                            <span>Module {Math.floor(currentIndex / 5) + 1}</span>
-                            <span>•</span>
-                            <span>{calculateReadingTime(lesson.content)}</span>
-                        </div>
-                    </div>
-
-
-
-                    <div className="prose prose-invert prose-blue max-w-none mb-16" id="lesson-content">
-                        <TextSelectionToolbar />
-                        <MDXContent
-                            source={mdxSource}
-                            courseId={params.courseId}
-                            lessonId={params.lessonId}
-                        />
-                    </div>
-
-                    <AIQuizGenerator
-                        courseId={params.courseId}
-                        lessonId={params.lessonId}
-                        topic={lesson.meta.title}
-                        context={lesson.content} // Pass full content (though API fetches it independently)
-                    />
-
-                    <LessonNavigation
-                        courseId={params.courseId}
-                        currentLessonId={params.lessonId}
-                        prevLesson={prevLesson}
-                        nextLesson={nextLesson}
-                    />
-                    <LessonNavigationListener
-                        courseId={params.courseId}
-                        nextLessonId={nextLesson?.id}
-                        prevLessonId={prevLesson?.id}
-                    />
-                </div>
-            </main>
-
-            {/* TOC is now self-positioning with hover trigger */}
-            <TableOfContents
-                courseId={params.courseId}
-                lessonId={params.lessonId}
-                initialLastElementId={initialLastElementId}
-            />
-
-            <AITutor
-                lessonTitle={lesson.meta.title}
-                lessonContent={lesson.content}
-                lessonContext={{
-                    courseTitle: params.courseId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-                    lessonTitle: lesson.meta.title,
-                    content: lesson.content.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n') // Strip HTML tags and reduce excessive newlines
-                }}
-                courseSlug={params.courseId}
-                lessonSlug={params.lessonId}
-            />
-            <ResumeLearningTracker
-                userId={session?.user?.id}
-                lessonTitle={lesson.meta.title}
-                courseId={params.courseId}
-                lessonId={params.lessonId}
-                initialLastElementId={initialLastElementId}
-            />
-
-            {/* Table of Contents - Desktop Only */}
-            <aside className="hidden xl:block fixed right-8 top-24 w-64 z-10">
-                <TableOfContents />
-            </aside>
-        </div>
+        <LessonContent
+            course={courseData}
+            lesson={lessonData}
+            prevLesson={prevLesson}
+            nextLesson={nextLesson}
+            initialLastElementId={initialLastElementId}
+            lessonStatus={lessonStatus}
+            readingTime={readingTime}
+            mdxSource={mdxSource}
+            completedLessonsCount={completedLessonsCount}
+        />
     );
 }

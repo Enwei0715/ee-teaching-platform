@@ -13,9 +13,10 @@ interface TableOfContentsProps {
     courseId?: string;
     lessonId?: string;
     initialLastElementId?: string | null;
+    onActiveHeadingChange?: (id: string) => void;
 }
 
-export default function TableOfContents({ courseId, lessonId, initialLastElementId }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -65,6 +66,10 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                     const id = entry.target.getAttribute('id');
                     if (id) {
                         setActiveId(id);
+                        // Call prop callback instead of dispatching event
+                        if (onActiveHeadingChange) {
+                            onActiveHeadingChange(id);
+                        }
                     }
                 }
             });

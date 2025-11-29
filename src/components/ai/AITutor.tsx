@@ -23,9 +23,10 @@ interface AITutorProps {
     activeHeadingId?: string;  // For progress-aware quiz
     courseSlug?: string;
     lessonSlug?: string;
+    lessonStatus?: string; // Add lessonStatus prop
 }
 
-export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug }: AITutorProps = {}) {
+export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug, lessonStatus }: AITutorProps = {}) {
     console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -35,6 +36,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
     ]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { data: session } = useSession();
@@ -44,6 +46,15 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
+
+    // Debug: Log active heading
+    useEffect(() => {
+        if (activeHeadingId) {
+            const element = document.getElementById(activeHeadingId);
+            const text = element?.innerText || "Element not found";
+            console.log(`[AITutor] Active Heading: "${activeHeadingId}"`, { text });
+        }
+    }, [activeHeadingId]);
 
     // Listen for "Ask AI" button from TextSelectionToolbar
     useEffect(() => {
@@ -158,7 +169,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
                     ${isExpanded
                         ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[600px] h-[70vh] md:h-[700px]'
-                        : 'fixed bottom-24 left-4 right-4 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[400px] h-[70vh] max-h-[600px] md:h-[600px]'
+                        : 'fixed bottom-2 right-2 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[450px] h-[70dvh] md:h-[600px]'
                     }`}>
                     {/* Header */}
                     <div className="bg-slate-900/50 border-b border-white/10 px-4 pt-4 flex justify-between items-start text-white">
@@ -277,7 +288,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || loading}
-                                        className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20"
+                                        className="shrink-0 p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20"
                                     >
                                         <Send size={18} />
                                     </button>
@@ -287,7 +298,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                     ) : (
                         <QuizTab
                             lessonContent={lessonContent}
-                            activeHeadingId={activeHeadingId}
+                            // Only pass activeHeadingId if lesson is IN_PROGRESS
+                            activeHeadingId={lessonStatus === 'IN_PROGRESS' ? activeHeadingId : undefined}
                             courseSlug={courseSlug}
                             lessonSlug={lessonSlug}
                         />

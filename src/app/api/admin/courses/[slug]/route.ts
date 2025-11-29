@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { ContentAnalyzer } from "@/lib/contentAnalyzer";
 
 export async function GET(
     request: Request,
@@ -117,6 +118,9 @@ export async function POST(
             }
         });
 
+        // Calculate sections metadata for smart quizzing
+        const sectionsMetadata = ContentAnalyzer.analyze(content);
+
         if (existingLesson) {
             await prisma.lesson.update({
                 where: { id: existingLesson.id },
@@ -126,6 +130,7 @@ export async function POST(
                     content: content,
                     order: meta.order || existingLesson.order,
                     slug: meta.slug || existingLesson.slug,
+                    sectionsMetadata: sectionsMetadata as any, // Cast to any for Json type compatibility if needed
                 }
             });
 
@@ -149,7 +154,8 @@ export async function POST(
                     content: content,
                     order: meta.order || 999,
                     courseId: course.id,
-                    published: true
+                    published: true,
+                    sectionsMetadata: sectionsMetadata as any,
                 }
             });
         }

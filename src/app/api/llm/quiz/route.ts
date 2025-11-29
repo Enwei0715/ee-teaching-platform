@@ -11,114 +11,47 @@ const openai = new OpenAI({
     },
 });
 
-interface Section {
-    title: string;
-    content: string;
-}
+// Helper to extract a random section from markdown content
+function extractRandomSection(content: string): { title: string, content: string } {
+    // Split by headers (H1, H2, H3)
+    const sections = content.split(/^#{1,3}\s+(.+)$/gm);
 
-/**
- * Calculates a "Quiz Worthiness" score for a section.
- * Higher score = better content for generating questions.
- */
-function calculateScore(section: { title: string, content: string }): number {
-    const { title, content } = section;
+    // The split results in [preamble, title1, content1, title2, content2, ...]
+    // We want to pair titles with content
+    const parsedSections: { title: string, content: string }[] = [];
 
-    // 1. Instant Disqualification (Blocklist)
-    // Filter out structural or low-value sections
-    const blocklist = ['reference', 'summary', 'conclusion', 'intro', 'setup', 'install', 'prerequisite', '參考', '結語', '小結', '前言'];
-    if (blocklist.some(term => title.toLowerCase().includes(term))) {
-        return 0;
-    }
+    for (let i = 1; i < sections.length; i += 2) {
+        const title = sections[i].trim();
+        const body = sections[i + 1].trim();
 
-    // 2. Strip Noise to find "Real Content"
-    // Remove code blocks, images, and links to evaluate the actual explanatory text
-    const textOnly = content
-        .replace(/```[\s\S]*?```/g, "") // Remove code blocks
-        .replace(/!\[.*?\]\(.*?\)/g, "") // Remove images
-        .replace(/\[.*?\]\(.*?\)/g, ""); // Remove links
-
-    // Filter out sections with very little actual text (e.g., just a header and an image)
-    if (textOnly.trim().length < 150) {
-        return 0;
-    }
-
-    // 3. Calculate Base Score
-    let score = textOnly.length;
-
-    // 4. Bonus Points for Explanatory Keywords
-    // These words suggest the section contains definitions, reasons, or examples
-    const keywords = ['because', 'means', 'example', 'however', 'therefore', 'defined as', '定義', '例如', '因此', '原理', '因為'];
-    keywords.forEach(word => {
-        if (textOnly.toLowerCase().includes(word)) {
-            score += 50;
+        // Filter out empty or too short sections, or "Summary"/"Conclusion"
+        if (body.length > 200 && !title.toLowerCase().includes('summary') && !title.toLowerCase().includes('conclusion')) {
+            parsedSections.push({ title, content: body });
         }
-    });
-
-    return score;
-}
-
-/**
- * Extracts a high-quality random section from markdown content using heuristic scoring.
- */
-function extractRandomSection(markdown: string): Section {
-    // Split by H2 or H3 headers (## or ###)
-    const sectionsRaw = markdown.split(/(?=\n#{2,3}\s)/);
-
-    // Map sections to objects and calculate scores
-    const scoredSections = sectionsRaw.map(raw => {
-        const titleMatch = raw.match(/^\n?#{2,3}\s+(.+)/);
-        const title = titleMatch ? titleMatch[1].trim() : "Main Content";
-        return {
-            title,
-            content: raw,
-            score: calculateScore({ title, content: raw })
-        };
-    });
-
-    // Filter out zero-score sections
-    const validSections = scoredSections.filter(s => s.score > 0);
-
-    // Fallback: If no sections pass the filter, use the highest scoring one (even if 0) or the longest
-    if (validSections.length === 0) {
-        // Sort by length descending as a last resort
-        const longestSection = scoredSections.sort((a, b) => b.content.length - a.content.length)[0];
-
-        if (!longestSection || longestSection.content.length < 50) {
-            return { title: "Full Lesson", content: markdown };
-        }
-        return { title: longestSection.title, content: longestSection.content };
     }
 
-    // Sort by score descending
-    validSections.sort((a, b) => b.score - a.score);
+    if (parsedSections.length === 0) {
+        // Fallback: just return a chunk of the content
+        return { title: "General Content", content: content.substring(0, 2000) };
+    }
 
-    // Select from the "Top Tier"
-    // Take the top 30% or top 3, whichever is larger, to ensure variety among good sections
-    const topTierCount = Math.max(3, Math.ceil(validSections.length * 0.3));
-    const topTier = validSections.slice(0, topTierCount);
-
-    // Randomly pick one from the top tier
-    const randomIndex = Math.floor(Math.random() * topTier.length);
-    const selectedSection = topTier[randomIndex];
-
-    console.log(`Quiz Selection: Picked "${selectedSection.title}" (Score: ${selectedSection.score}) from ${validSections.length} candidates.`);
-
-    return { title: selectedSection.title, content: selectedSection.content };
+    // Pick a random section
+    const randomIndex = Math.floor(Math.random() * parsedSections.length);
+    return parsedSections[randomIndex];
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
-        const body = await request.json();
-        console.log("API Request Body:", body);
+        const body = await req.json();
         const { courseSlug, lessonSlug, sectionContent, sectionTitle } = body;
 
         if (!courseSlug || !lessonSlug) {
             return NextResponse.json({ error: 'Course slug and lesson slug are required' }, { status: 400 });
         }
 
-        // If sectionContent is provided (from progress-aware quiz), use it directly
+        // Check if we have direct section content (from frontend selection)
         if (sectionContent && sectionTitle) {
-            console.log(`Using provided section: "${sectionTitle}"`);
+            console.log(`Generating quiz for specific section: "${sectionTitle}"`);
 
             try {
                 const completion = await openai.chat.completions.create({

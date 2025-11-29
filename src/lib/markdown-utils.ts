@@ -2,8 +2,8 @@
 export function extractHeaders(markdown: string) {
     const headers: { id: string; text: string; level: number; index: number }[] = [];
 
-    // Match H2 and H3 headers
-    const headerRegex = /^#{2,3}\s+(.+)$/gm;
+    // Match H1, H2 and H3 headers
+    const headerRegex = /^#{1,3}\s+(.+)$/gm;
     let match;
 
     while ((match = headerRegex.exec(markdown)) !== null) {
