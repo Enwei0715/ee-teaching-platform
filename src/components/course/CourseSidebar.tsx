@@ -194,25 +194,27 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
             </aside>
 
             {/* Mobile Floating Button */}
-            <button
-                className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
-                onClick={() => setIsMobileOpen(true)}
-                aria-label="Open Menu"
-            >
-                <PanelLeftOpen size={24} />
-            </button>
+            {!isMobileOpen && (
+                <button
+                    className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
+                    onClick={() => setIsMobileOpen(true)}
+                    aria-label="Open Menu"
+                >
+                    <PanelLeftOpen size={24} />
+                </button>
+            )}
 
             {/* Mobile Drawer Overlay */}
             {isMobileOpen && (
-                <div className="lg:hidden fixed inset-0 z-[100] flex">
+                <div className="lg:hidden fixed inset-0 z-[35] flex">
                     {/* Backdrop */}
                     <div
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 z-[99]"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 z-[35]"
                         onClick={() => setIsMobileOpen(false)}
                     />
 
                     {/* Drawer Panel */}
-                    <aside className="fixed inset-y-0 left-0 w-[85vw] max-w-xs h-full glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[100]">
+                    <aside className="fixed top-16 bottom-0 left-0 w-[85vw] max-w-xs glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[40]">
                         <SidebarHeader />
                         <SidebarContent isMobile={true} />
                     </aside>

@@ -114,7 +114,7 @@ export default function QuizTab({
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-6 scrollbar-hide">
                 {error && (
                     <div className="bg-red-900/30 border border-red-500/50 text-red-200 p-4 rounded-lg flex items-start gap-3">
                         <AlertCircle size={20} className="shrink-0 mt-0.5" />

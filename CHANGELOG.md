@@ -1,5 +1,12 @@
 # Project Changelog
 
+## v4.3.2 - AI Tutor & Sidebar Polish (2025-11-30)
+- **AI Tutor**:
+    - **UI Fixes**: Increased z-index to prevent footer occlusion and added bottom padding to ensure the last message is fully visible.
+    - **Quiz Tab**: Removed unnecessary scrollbars and improved layout for better usability.
+- **Mobile Navigation**:
+    - **Sidebar Occlusion Fix**: Adjusted mobile sidebar positioning to slide out *below* the sticky navbar, ensuring navigation controls remain accessible.
+
 ## v4.3.1 - Mobile Layout & Global Polish (2025-11-30)
 - **Global Layout**:
     - **Footer Cut-Off Fix**: Resolved global footer accessibility issue by enforcing `min-h-screen` on body and removing restrictive overflow settings.
