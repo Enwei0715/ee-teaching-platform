@@ -193,18 +193,14 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
                 </div>
             </aside>
 
-            {/* Mobile Sub-Navbar Trigger (Flow-based) */}
-            <div
-                className="lg:hidden w-full p-4 border-b border-white/10 bg-slate-950/30 backdrop-blur-md flex items-center gap-3 cursor-pointer mb-6 active:bg-white/5 transition-colors"
+            {/* Mobile Floating Button */}
+            <button
+                className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
                 onClick={() => setIsMobileOpen(true)}
+                aria-label="Open Menu"
             >
-                <PanelLeftOpen className="text-accent-primary" size={20} />
-                <div className="flex-1 min-w-0">
-                    <p className="text-xs text-text-secondary">Current Course</p>
-                    <h3 className="text-sm font-bold text-text-primary truncate">{courseTitle}</h3>
-                </div>
-                <ChevronRight className="text-text-secondary" size={16} />
-            </div>
+                <PanelLeftOpen size={24} />
+            </button>
 
             {/* Mobile Drawer Overlay */}
             {isMobileOpen && (
