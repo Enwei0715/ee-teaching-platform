@@ -24,7 +24,8 @@ export default withAuth(
           "/auth/signup",
           "/auth/register",
           "/auth/error",
-          "/courses/circuit-theory" // Free course
+          "/courses/circuit-theory", // Free course
+          "/api/test-algo" // Test endpoint
         ];
 
         // Check if path is public or a sub-path of a public route

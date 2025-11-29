@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { parseSections, scopeSections, scoreSections, selectBestSection } from '@/lib/ai/quiz-algorithm';
 import prisma from '@/lib/prisma';
 
 const openai = new OpenAI({
@@ -256,6 +257,8 @@ Focus on details that require understanding, not just recall.
                 response_format: { type: "json_object" },
                 temperature: 1.0, // High temperature for variety
             });
+
+            // ... (rest of the response handling logic) ...
 
             console.log("Google AI Response:", completion);
             const content = completion.choices[0].message.content;
