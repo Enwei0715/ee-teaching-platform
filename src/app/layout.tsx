@@ -41,7 +41,7 @@ export default async function RootLayout({
                         <HotkeysProvider>
                             <div className="flex flex-col min-h-screen">
                                 <Navbar />
-                                <main className="flex-1 w-full relative">
+                                <main className="flex-1 w-full relative pt-16">
                                     {/* Subtle Blueprint Grid Overlay */}
                                     <BackgroundGrid />
                                     <div className="relative z-10">

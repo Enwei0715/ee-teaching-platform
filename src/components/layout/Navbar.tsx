@@ -85,7 +85,7 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className="glass-heavy border-b border-border-primary sticky top-0 z-40">
+            <nav className="glass-heavy border-b border-border-primary fixed top-0 left-0 right-0 z-40 w-full">
                 <div className="w-full px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}

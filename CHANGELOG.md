@@ -1,5 +1,18 @@
 # Project Changelog
 
+## v4.3.0 - Smart Quiz Algorithm & Mobile Polish (2025-11-30)
+- **AI Quiz**:
+    - **Smart Selection Algorithm**: Implemented a 4-phase pipeline (Parse -> Scope -> Score -> Select) to intelligently choose high-quality content for quizzes.
+    - **Quality Scoring**: Sections are scored based on length, keywords, and blocklisted titles to avoid "fluff".
+    - **Progress Awareness**: Quiz now strictly respects the user's current reading progress (via `limitToHeadingId`).
+    - **Fallback Logic**: Robust fallback mechanisms ensure a quiz is always generated, even if no perfect section is found.
+- **Mobile Experience**:
+    - **Fixed Navbar Overlay**: Added `pt-16` to main layout and fixed Navbar positioning to prevent content from being hidden on mobile.
+    - **AI Tutor Responsiveness**: Updated AI Tutor to use dynamic viewport units (`95vw`, `70dvh`) on mobile and optimal fixed sizes on desktop.
+    - **Sidebar Trigger**: Fixed the floating sidebar button to be more accessible.
+- **Dev**:
+    - Added `test-algo` endpoint and script for verifying quiz logic.
+
 ## v4.2.2 - Quiz JSON Fix (2025-11-29)
 - **AI Quiz**:
     - Fixed `exttt` typo by strictly forbidding `\texttt` in system prompts.

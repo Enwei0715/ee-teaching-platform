@@ -169,7 +169,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
                     ${isExpanded
                         ? 'fixed inset-4 bottom-24 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[600px] h-[70vh] md:h-[700px]'
-                        : 'fixed bottom-2 right-2 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[90vw] md:w-[450px] h-[70dvh] md:h-[600px]'
+                        : 'fixed bottom-4 right-4 z-[60] md:absolute md:inset-auto md:bottom-16 md:right-0 w-[95vw] md:w-[450px] max-w-[calc(100vw-1rem)] h-[70dvh] md:h-[600px] md:max-h-[85vh]'
                     }`}>
                     {/* Header */}
                     <div className="bg-slate-900/50 border-b border-white/10 px-4 pt-4 flex justify-between items-start text-white">
