@@ -1,5 +1,10 @@
 # Project Changelog
 
+## v4.2.2 - Quiz JSON Fix (2025-11-29)
+- **AI Quiz**:
+    - Fixed `exttt` typo by strictly forbidding `\texttt` in system prompts.
+    - Enforced double-escaping for LaTeX backslashes in JSON output to prevent parsing errors.
+
 ## v4.2.1 - Quiz Stability & Visual Fixes (2025-11-29)
 - **AI Quiz**:
     - Reverted quiz generation logic to stable version (v4.1.0 era) to resolve "400 Bad Request" errors.
