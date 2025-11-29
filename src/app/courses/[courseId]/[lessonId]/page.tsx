@@ -222,7 +222,8 @@ ${fence}
     }
 
     // Calculate reading time
-    const readingTime = calculateReadingTime(lesson.content);
+    const readingTimeStr = calculateReadingTime(lesson.content);
+    const readingTime = parseInt(readingTimeStr) || 1;
 
     // Count completed lessons
     const completedLessonsCount = session?.user?.id ? await prisma.userProgress.count({
@@ -242,7 +243,7 @@ ${fence}
     };
 
     const lessonData = {
-        id: lesson.id, // This is the slug from MDX usually, or we should pass the DB ID if needed? 
+        id: lesson.lessonId, // This is the slug from MDX usually, or we should pass the DB ID if needed? 
         // MDX `getCourseLesson` returns `id` as the filename/slug.
         // `TableOfContents` uses `lessonId` for saving progress. It likely expects the DB ID if it saves to DB.
         // But `TableOfContents` in previous code used `lesson.id` which was from MDX.

@@ -58,16 +58,14 @@ export async function POST(req: Request) {
                     messages: [
                         {
                             role: "system",
-                            content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
+                            content: String.raw`Role: You are an expert Exam Creator for Electronic Engineering.
+Your goal is to test the user's deep understanding of the provided lesson context.
 
 **CURRENT FOCUS SECTION:** "${sectionTitle}"
 
 Task: Generate ONE multiple-choice question based EXCLUSIVELY on the content from this specific section.
-Do NOT ask about other parts of the lesson. Focus deeply on specific details, formulas, or concepts found ONLY in the provided section text.
 
 Output Format (Strict JSON):
-You must output valid JSON only. No conversational text before or after.
-Structure:
 {
   "question": "The question text here. Use LaTeX $...$ for math.",
   "options": [
@@ -77,27 +75,45 @@ Structure:
     "Option D text"
   ],
   "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
-  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
+  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain the concept directly."
 }
 
-=== CRITICAL RULES ===
-1. **RANDOMIZATION**: You MUST randomize the position of the correct answer. Do NOT always place it in the same position (e.g., do not always make 'C' correct). Ensure an even distribution of correct answers across A, B, C, and D.
-2. **CRITICAL JSON FORMATTING RULES:**
-   - **NO `\texttt`:** NEVER use the LaTeX command `\texttt`. It causes JSON parsing errors (interpreted as tab `\t`).
-     - BAD: `\texttt{ Si }`
-     - GOOD (Markdown): `Si` (backticks)
-     - GOOD (Math): `$\mathrm{ Si }$`
-   - **DOUBLE ESCAPE BACKSLASHES:** When writing LaTeX in JSON, you MUST double-escape all backslashes.
-     - BAD: `"unit": "$\text{V}$"` (Becomes `	ext{ V }`)
-     - GOOD: `"unit": "$\\text{V}$"`
-   - **Chemical/Variable Names:** Use Markdown backticks for code/variables (e.g., `int`, `Si`) or standard text.
-3. **Language:** Traditional Chinese for questions, English for technical terms
-4. **Quality:** Test understanding, not just recall
+=== GENERATION RULES ===
+
+1. **RANDOMIZATION (CRITICAL):**
+   - You MUST randomize the position of the correct answer.
+   - Do NOT always place the correct answer in the first or second slot.
+   - Ensure an even distribution of correct answers across indices 0, 1, 2, and 3.
+
+2. **EXPLANATION STYLE:**
+   - The \`explanation\` field MUST be **Option-Agnostic**.
+   - **FORBIDDEN:** Do NOT refer to "Option A", "The second option", or "The correct answer is...".
+   - **REQUIRED:** Explain the *concept* directly. (e.g., "Voltage is potential difference because...")
+
+3. **CRITICAL JSON & FORMATTING RULES:**
+   - **NO \`\\texttt\`:** NEVER use the LaTeX command \`\\texttt{...}\`. It breaks JSON parsing (interpreted as a tab character).
+     - BAD: \`\\texttt{Si}\`
+     - GOOD (Markdown Code): \`Si\` (wrapped in backticks)
+     - GOOD (Math Roman): \`$\\mathrm{Si}$\`
+   - **DOUBLE ESCAPE BACKSLASHES:** Inside the JSON string, ALL backslashes must be escaped.
+     - BAD: \`"unit": "$\\text{V}$"\`
+     - GOOD: \`"unit": "$\\\\text{V}$"\`
+   - **MDX MATH COMPATIBILITY:**
+     - Use ONLY single \`$\` for inline math and double \`$$\` for block math.
+     - **FORBIDDEN:** \`\\(\`, \`\\)\`, \`\\[\`, \`\\]\`.
+
+4. **LANGUAGE:**
+   - **Questions/Options:** Traditional Chinese (繁體中文).
+   - **Technical Terms:** Keep key terms in English (e.g., "Threshold Voltage", "PCB").
+
+5. **QUALITY CONTROL:**
+   - Questions must be based **EXCLUSIVELY** on the provided lesson context.
+   - Ignore "fluff" content like introductions, summaries, or video placeholders. Focus on definitions, formulas, and logic.
 `,
                         },
-                    {
-                        role: "user",
-                        content: `
+                        {
+                            role: "user",
+                            content: `
 Section: ${sectionTitle}
 Timestamp: ${Date.now()} (Use this to ensure uniqueness)
 
@@ -108,74 +124,72 @@ ${sectionContent}
 
 Generate a unique quiz question based on THIS section only.
 `
-                    }
+                        }
                     ],
-                model: "gemini-2.5-flash",
+                    model: "gemini-2.5-flash",
                     response_format: { type: "json_object" },
-                temperature: 1.0,
+                    temperature: 1.0,
                 });
 
-            const content = completion.choices[0].message.content;
-            if (!content) {
-                throw new Error("No content received from LLM");
-            }
+                const content = completion.choices[0].message.content;
+                if (!content) {
+                    throw new Error("No content received from LLM");
+                }
 
-            const quiz = JSON.parse(content);
-            if (typeof quiz.correctAnswerIndex === 'number') {
-                quiz.correctAnswer = quiz.correctAnswerIndex;
-            }
+                const quiz = JSON.parse(content);
+                if (typeof quiz.correctAnswerIndex === 'number') {
+                    quiz.correctAnswer = quiz.correctAnswerIndex;
+                }
 
-            return NextResponse.json({
-                ...quiz,
-                model: "gemini-2.5-flash",
-                sectionTitle: sectionTitle
-            });
-        } catch (aiError) {
-            console.error("AI Generation Failed:", aiError);
-            return NextResponse.json({ error: 'Failed to generate quiz', details: String(aiError) }, { status: 500 });
+                return NextResponse.json({
+                    ...quiz,
+                    model: "gemini-2.5-flash",
+                    sectionTitle: sectionTitle
+                });
+            } catch (aiError) {
+                console.error("AI Generation Failed:", aiError);
+                return NextResponse.json({ error: 'Failed to generate quiz', details: String(aiError) }, { status: 500 });
+            }
         }
-    }
 
         // Original behavior: Fetch lesson from DB and extract random section
         const lesson = await prisma.lesson.findFirst({
-        where: {
-            slug: lessonSlug,
-            course: {
-                slug: courseSlug
+            where: {
+                slug: lessonSlug,
+                course: {
+                    slug: courseSlug
+                }
+            },
+            select: {
+                title: true,
+                content: true,
+                questions: true
             }
-        },
-        select: {
-            title: true,
-            content: true,
-            questions: true
+        });
+
+        if (!lesson) {
+            return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
         }
-    });
 
-    if (!lesson) {
-        return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
-    }
+        try {
+            console.log("Calling Google AI Studio with lesson content...");
 
-    try {
-        console.log("Calling Google AI Studio with lesson content...");
+            // CRITICAL: Extract random section to ensure variety
+            const { title: sectionTitle, content: sectionContent } = extractRandomSection(lesson.content);
+            console.log(`Selected section: "${sectionTitle}" (${sectionContent.length} chars)`);
 
-        // CRITICAL: Extract random section to ensure variety
-        const { title: sectionTitle, content: sectionContent } = extractRandomSection(lesson.content);
-        console.log(`Selected section: "${sectionTitle}" (${sectionContent.length} chars)`);
-
-        const completion = await openai.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: `Role: You are an expert Electronics Engineering Professor creating exam questions.
+            const completion = await openai.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: String.raw`Role: You are an expert Exam Creator for Electronic Engineering.
+Your goal is to test the user's deep understanding of the provided lesson context.
 
 **CURRENT FOCUS SECTION:** "${sectionTitle}"
 
 Task: Generate ONE multiple-choice question based EXCLUSIVELY on the content from this specific section.
-Do NOT ask about other parts of the lesson. Focus deeply on specific details, formulas, or concepts found ONLY in the provided section text.
 
 Output Format (Strict JSON):
-You must output valid JSON only. No conversational text before or after.
-Structure:
 {
   "question": "The question text here. Use LaTeX $...$ for math.",
   "options": [
@@ -185,30 +199,45 @@ Structure:
     "Option D text"
   ],
   "correctAnswerIndex": 2, // 0-based index (0=A, 1=B, 2=C, 3=D)
-  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain why the correct answer is right and others are wrong."
+  "explanation": "Detailed explanation here. Use LaTeX $...$ for math formulas. Explain the concept directly."
 }
 
-Content Rules:
-1. **RANDOMIZATION**: You MUST randomize the position of the correct answer. Do NOT always place it in the same position. Ensure an even distribution across A, B, C, D.
-2. **CRITICAL JSON FORMATTING RULES:**
-   - **NO `\texttt`:** NEVER use the LaTeX command `\texttt`. It causes JSON parsing errors (interpreted as tab `\t`).
-     - BAD: `\texttt{ Si }`
-     - GOOD (Markdown): `Si` (backticks)
-     - GOOD (Math): `$\mathrm{ Si }$`
-   - **DOUBLE ESCAPE BACKSLASHES:** When writing LaTeX in JSON, you MUST double-escape all backslashes.
-     - BAD: `"unit": "$\text{V}$"` (Becomes `	ext{ V }`)
-     - GOOD: `"unit": "$\\text{V}$"`
-   - **Chemical/Variable Names:** Use Markdown backticks for code/variables (e.g., `int`, `Si`) or standard text.
-3. Difficulty: Match the level of the provided content.
-4. Language: Traditional Chinese (繁體中文) for text, English for standard terminology if applicable.
-5. **CRITICAL - SPECIFICITY**: 
-   - Ask about a specific detail, formula, calculation, or concept from THIS section.
-   - Avoid generic "What is X?" questions. Prefer "How does X affect Y?" or "Calculate Z given...".
-   - Test understanding, not just memorization.`
+=== GENERATION RULES ===
+
+1. **RANDOMIZATION (CRITICAL):**
+   - You MUST randomize the position of the correct answer.
+   - Do NOT always place the correct answer in the first or second slot.
+   - Ensure an even distribution of correct answers across indices 0, 1, 2, and 3.
+
+2. **EXPLANATION STYLE:**
+   - The \`explanation\` field MUST be **Option-Agnostic**.
+   - **FORBIDDEN:** Do NOT refer to "Option A", "The second option", or "The correct answer is...".
+   - **REQUIRED:** Explain the *concept* directly. (e.g., "Voltage is potential difference because...")
+
+3. **CRITICAL JSON & FORMATTING RULES:**
+   - **NO \`\\texttt\`:** NEVER use the LaTeX command \`\\texttt{...}\`. It breaks JSON parsing (interpreted as a tab character).
+     - BAD: \`\\texttt{Si}\`
+     - GOOD (Markdown Code): \`Si\` (wrapped in backticks)
+     - GOOD (Math Roman): \`$\\mathrm{Si}$\`
+   - **DOUBLE ESCAPE BACKSLASHES:** Inside the JSON string, ALL backslashes must be escaped.
+     - BAD: \`"unit": "$\\text{V}$"\`
+     - GOOD: \`"unit": "$\\\\text{V}$"\`
+   - **MDX MATH COMPATIBILITY:**
+     - Use ONLY single \`$\` for inline math and double \`$$\` for block math.
+     - **FORBIDDEN:** \`\\(\`, \`\\)\`, \`\\[\`, \`\\]\`.
+
+4. **LANGUAGE:**
+   - **Questions/Options:** Traditional Chinese (繁體中文).
+   - **Technical Terms:** Keep key terms in English (e.g., "Threshold Voltage", "PCB").
+
+5. **QUALITY CONTROL:**
+   - Questions must be based **EXCLUSIVELY** on the provided lesson context.
+   - Ignore "fluff" content like introductions, summaries, or video placeholders. Focus on definitions, formulas, and logic.
+`,
                     },
-            {
-                role: "user",
-                content: `
+                    {
+                        role: "user",
+                        content: `
 Lesson: ${lesson.title}
 Focused Section: ${sectionTitle}
 Timestamp: ${Date.now()} (Use this to ensure uniqueness)
@@ -221,56 +250,56 @@ ${sectionContent}
 Generate a unique and challenging question that tests a specific concept from THIS section.
 Focus on details that require understanding, not just recall.
                         `
-            }
+                    }
                 ],
-        model: "gemini-2.5-flash",
-            response_format: { type: "json_object" },
-        temperature: 1.0, // High temperature for variety
+                model: "gemini-2.5-flash",
+                response_format: { type: "json_object" },
+                temperature: 1.0, // High temperature for variety
             });
 
-    console.log("Google AI Response:", completion);
-    const content = completion.choices[0].message.content;
-    console.log("Google AI Response Content:", content);
+            console.log("Google AI Response:", completion);
+            const content = completion.choices[0].message.content;
+            console.log("Google AI Response Content:", content);
 
-    if (!content) {
-        throw new Error("No content received from LLM");
-    }
+            if (!content) {
+                throw new Error("No content received from LLM");
+            }
 
-    const quiz = JSON.parse(content);
+            const quiz = JSON.parse(content);
 
-    // Map correctAnswerIndex to correctAnswer for frontend compatibility
-    if (typeof quiz.correctAnswerIndex === 'number') {
-        quiz.correctAnswer = quiz.correctAnswerIndex;
-    }
+            // Map correctAnswerIndex to correctAnswer for frontend compatibility
+            if (typeof quiz.correctAnswerIndex === 'number') {
+                quiz.correctAnswer = quiz.correctAnswerIndex;
+            }
 
-    return NextResponse.json({
-        ...quiz,
-        model: "gemini-2.5-flash",
-        sectionTitle: sectionTitle  // Include which section was tested
-    });
+            return NextResponse.json({
+                ...quiz,
+                model: "gemini-2.5-flash",
+                sectionTitle: sectionTitle  // Include which section was tested
+            });
 
-} catch (aiError) {
-    console.error("AI Generation Failed:", aiError);
+        } catch (aiError) {
+            console.error("AI Generation Failed:", aiError);
 
-    // 3. Fallback: Use a random question from the database
-    if (lesson.questions && lesson.questions.length > 0) {
-        console.log("Using fallback question from database.");
-        const backupQuestion = lesson.questions[Math.floor(Math.random() * lesson.questions.length)];
+            // 3. Fallback: Use a random question from the database
+            if (lesson.questions && lesson.questions.length > 0) {
+                console.log("Using fallback question from database.");
+                const backupQuestion = lesson.questions[Math.floor(Math.random() * lesson.questions.length)];
 
-        return NextResponse.json({
-            question: backupQuestion.question,
-            options: backupQuestion.options,
-            correctAnswer: backupQuestion.correctAnswer,
-            explanation: backupQuestion.explanation || "Standard database question.",
-            model: "Database Fallback"
-        });
-    }
+                return NextResponse.json({
+                    question: backupQuestion.question,
+                    options: backupQuestion.options,
+                    correctAnswer: backupQuestion.correctAnswer,
+                    explanation: backupQuestion.explanation || "Standard database question.",
+                    model: "Database Fallback"
+                });
+            }
 
-    return NextResponse.json({ error: 'Failed to generate quiz and no backup available', details: String(aiError) }, { status: 500 });
-}
+            return NextResponse.json({ error: 'Failed to generate quiz and no backup available', details: String(aiError) }, { status: 500 });
+        }
 
     } catch (error) {
-    console.error('Error in quiz API:', error);
-    return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 });
-}
+        console.error('Error in quiz API:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: String(error) }, { status: 500 });
+    }
 }

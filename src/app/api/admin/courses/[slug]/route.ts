@@ -130,7 +130,7 @@ export async function POST(
                     content: content,
                     order: meta.order || existingLesson.order,
                     slug: meta.slug || existingLesson.slug,
-                    sectionsMetadata: sectionsMetadata as any, // Cast to any for Json type compatibility if needed
+
                 }
             });
 
@@ -155,7 +155,7 @@ export async function POST(
                     order: meta.order || 999,
                     courseId: course.id,
                     published: true,
-                    sectionsMetadata: sectionsMetadata as any,
+
                 }
             });
         }

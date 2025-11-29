@@ -19,7 +19,7 @@ export class ContentAnalyzer {
     static parseSections(content: string): Section[] {
         const lines = content.split('\n');
         const sections: Section[] = [];
-        let currentSection: Partial<Section> | null = null;
+        let currentSection: { title?: string; startIndex?: number } | null = null;
         let buffer: string[] = [];
         let startIndex = 0;
 
@@ -52,11 +52,11 @@ export class ContentAnalyzer {
         });
 
         // Push last section
-        if (currentSection && buffer.length > 0) {
+        if (currentSection && (currentSection as any).title && buffer.length > 0) {
             sections.push({
-                title: currentSection.title!,
+                title: (currentSection as any).title,
                 content: buffer.join('\n').trim(),
-                startIndex: currentSection.startIndex!,
+                startIndex: (currentSection as any).startIndex || 0,
                 endIndex: lines.length - 1
             });
         }

@@ -128,16 +128,12 @@ export default function LessonContent({
                             <div id="lesson-content" className="relative">
                                 <MDXContent
                                     source={mdxSource}
-                                    components={mdxComponents}
+
                                     courseId={course.slug}
                                     lessonId={lesson.slug}
                                 />
                                 <TextSelectionToolbar
-                                    lessonContext={{
-                                        courseTitle: course.title,
-                                        lessonTitle: lesson.title,
-                                        content: lesson.content
-                                    }}
+
                                 />
                             </div>
                         </article>
@@ -217,8 +213,8 @@ export default function LessonContent({
             <ResumeLearningTracker
                 courseId={course.id}
                 lessonId={lesson.id}
-                totalLessons={course.lessons.length}
-                completedLessons={completedLessonsCount}
+                lessonTitle={lesson.title}
+
             />
         </div>
     );

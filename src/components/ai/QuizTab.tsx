@@ -15,11 +15,11 @@ interface Quiz {
 }
 
 interface QuizTabProps {
-    lessonContent: string;
-    activeHeadingId: string;
-    courseSlug: string;
-    lessonSlug: string;
-    lessonStatus: string;
+    lessonContent?: string;
+    activeHeadingId?: string;
+    courseSlug?: string;
+    lessonSlug?: string;
+    lessonStatus?: string;
 }
 
 export default function QuizTab({
