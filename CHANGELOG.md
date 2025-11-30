@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.5 - Visual Customization (2025-11-30)
+- **UI Enhancements**:
+    - **Homepage Theme**: Updated the particle network to use a vibrant blue color scheme (#0032fa) and increased the background grid opacity to 0.3 for a more distinct, tech-focused look.
+
 ## v4.4.4 - UI Polish (2025-11-30)
 - **UI Enhancements**:
     - **Particle Background**: Optimized the homepage particle effect by increasing the particle density to 300 and setting a hard limit of 500 to balance aesthetics and performance.
