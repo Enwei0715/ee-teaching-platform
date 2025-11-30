@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { addXP, updateStreak, calculateLessonXP } from "@/lib/gamification";
+import { addXP, updateStreak, calculateLessonXP, calculateQuizXP } from "@/lib/gamification";
 
 export async function GET(
     request: Request,
@@ -122,23 +122,33 @@ export async function POST(
         if (completed) {
             const wasAlreadyCompleted = existingProgress?.status === 'COMPLETED' || existingProgress?.status === 'REVIEWING';
 
-            if (!wasAlreadyCompleted) {
-                // First time completion
+            // Calculate Base XP
+            let baseXP = 0;
+            if (body.source === 'quiz') {
+                // Quiz XP
+                baseXP = calculateQuizXP('Intermediate');
+            } else {
+                // Lesson XP
                 const lessonContent = await prisma.lesson.findUnique({
                     where: { id: lesson.id },
                     select: { content: true }
                 });
-
-                xpGained = calculateLessonXP({
+                baseXP = calculateLessonXP({
                     contentLength: lessonContent?.content?.length || 0,
-                    difficulty: 'Intermediate' // Default to Intermediate as field doesn't exist yet
+                    difficulty: 'Intermediate'
                 });
+            }
 
-                xpResult = await addXP(session.user.id, xpGained);
-            } else if (body.source === 'quiz') {
-                // Practice XP for repeating quiz
+            // Apply Logic: Full XP for first time, 1/10th for repeat/review
+            if (!wasAlreadyCompleted) {
+                xpGained = baseXP;
+            } else {
+                // 1/10th XP for review/repeat
+                xpGained = Math.max(1, Math.round(baseXP / 10));
                 isPractice = true;
-                xpGained = 5; // Fixed amount for practice
+            }
+
+            if (xpGained > 0) {
                 xpResult = await addXP(session.user.id, xpGained);
             }
         }

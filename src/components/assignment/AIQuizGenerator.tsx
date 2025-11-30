@@ -4,8 +4,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
 import { generateQuiz, Quiz } from '@/lib/llm-service';
 import QuizCard from './QuizCard';
-import { useProgress } from '@/hooks/useProgress';
+import { useLessonProgress } from '@/context/LessonProgressContext';
 import { calculateQuizXP } from '@/lib/xp';
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
+import { Zap, Trophy } from 'lucide-react';
 
 interface AIQuizGeneratorProps {
     courseId: string;
@@ -18,7 +21,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic, context }: 
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { markLessonComplete } = useProgress();
+    const { markAsComplete } = useLessonProgress();
     const containerRef = useRef<HTMLDivElement>(null);
 
     const potentialXP = calculateQuizXP();
@@ -56,8 +59,33 @@ export default function AIQuizGenerator({ courseId, lessonId, topic, context }: 
     };
 
     const handleComplete = async () => {
-        // Mark lesson as complete
-        markLessonComplete(courseId, lessonId);
+        // Mark lesson as complete with 'quiz' source
+        console.log("🏆 [AIQuizGenerator] Quiz Completed! Awarding XP...");
+        const result = await markAsComplete('quiz');
+
+        if (result?.gamification?.xpGained > 0) {
+            // Trigger Confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#EAB308', '#A855F7', '#3B82F6']
+            });
+
+            toast.success(
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold">Quiz Completed!</span>
+                    <span className="flex items-center gap-1 text-sm">
+                        <Zap size={14} className="text-yellow-500 fill-yellow-500" />
+                        You earned {result.gamification.xpGained} XP
+                    </span>
+                </div>
+            );
+        } else {
+            toast.success('Quiz Completed!', {
+                icon: <Trophy size={18} className="text-yellow-500" />,
+            });
+        }
     };
 
     return (

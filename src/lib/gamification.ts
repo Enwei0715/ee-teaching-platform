@@ -127,11 +127,15 @@ export async function checkBadges(userId: string) {
     // This would be called after specific events
 }
 
-import { calculatePotentialXP, Difficulty } from './xp';
+import { calculatePotentialXP, calculateQuizXP as calcQuizXP, Difficulty } from './xp';
 
 export function calculateLessonXP(options: { contentLength?: number; difficulty?: Difficulty } = {}): number {
     const { contentLength = 0, difficulty = 'Intermediate' } = options;
     return calculatePotentialXP(contentLength, difficulty);
+}
+
+export function calculateQuizXP(difficulty: Difficulty = 'Intermediate'): number {
+    return calcQuizXP(difficulty);
 }
 
 export function calculateProjectXP(difficulty: Difficulty = 'Intermediate'): number {
