@@ -2,7 +2,7 @@
 
 ## v4.4.4 - UI Polish (2025-11-30)
 - **UI Enhancements**:
-    - **Particle Background**: Optimized the homepage particle effect by increasing the particle density to 150 and setting a hard limit of 200 to balance aesthetics and performance.
+    - **Particle Background**: Optimized the homepage particle effect by increasing the particle density to 300 and setting a hard limit of 500 to balance aesthetics and performance.
 
 ## v4.4.3 - Database Cleanup & Critical Fixes (2025-11-30)
 - **Database**:
