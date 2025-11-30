@@ -138,10 +138,10 @@ export async function POST(
             await prisma.userProgress.updateMany({
                 where: {
                     lessonId: existingLesson.id,
-                    completed: true
+                    status: 'COMPLETED'
                 },
                 data: {
-                    completed: false
+                    status: 'IN_PROGRESS'
                 }
             });
         } else {

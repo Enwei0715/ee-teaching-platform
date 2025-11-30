@@ -48,13 +48,13 @@ export async function POST(
                 },
             },
             update: {
-                completed: true,
+                status: 'COMPLETED',
             },
             create: {
                 userId: session.user.id,
                 courseId: course.id,
                 lessonId: lesson.id,
-                completed: true,
+                status: 'COMPLETED',
                 timeSpent: 0,
             },
         });

@@ -26,14 +26,14 @@ export async function POST(request: Request) {
                 },
             },
             update: {
-                completed: completed ?? true,
+                status: completed ? 'COMPLETED' : undefined,
                 timeSpent: { increment: timeSpent || 0 },
             },
             create: {
                 userId: session.user.id,
                 courseId,
                 lessonId,
-                completed: completed ?? true,
+                status: completed ? 'COMPLETED' : 'IN_PROGRESS',
                 timeSpent: timeSpent || 0,
             },
         });
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
                     };
                 }
 
-                if (curr.completed) {
+                if (curr.status === 'COMPLETED') {
                     acc[curr.courseId].completedLessons.push(curr.lessonId);
                 }
 

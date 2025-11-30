@@ -47,7 +47,7 @@ export default async function DashboardPage() {
             userId: true,
             courseId: true,
             lessonId: true,
-            completed: true,
+            status: true,
             timeSpent: true,
             lastElementId: true,  // Include for precise resume
             updatedAt: true,
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
 
         // Strictly match by ID to avoid slug mismatches
         const courseProgress = progress.filter((p: any) => p.courseId === course.uuid);
-        const courseLessonsCompleted = courseProgress.filter((p: any) => p.completed && lessonIds.has(p.lessonId)).length;
+        const courseLessonsCompleted = courseProgress.filter((p: any) => p.status === 'COMPLETED' && lessonIds.has(p.lessonId)).length;
 
         const percentage = totalLessons > 0 ? Math.min(100, Math.round((courseLessonsCompleted / totalLessons) * 100)) : 0;
 
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
         // Find next lesson
         let nextLesson = null;
         for (const lesson of lessons) {
-            const isCompleted = courseProgress.some((p: any) => p.lessonId === lesson.uuid && p.completed);
+            const isCompleted = courseProgress.some((p: any) => p.lessonId === lesson.uuid && p.status === 'COMPLETED');
             if (!isCompleted) {
                 nextLesson = { ...lesson, slug: lesson.id };
                 break;
@@ -130,7 +130,7 @@ export default async function DashboardPage() {
     }
 
     // Stats Calculations
-    const completedLessons = progress.filter((p: any) => p.completed).length;
+    const completedLessons = progress.filter((p: any) => p.status === 'COMPLETED').length;
 
     // Courses in progress: strictly > 0 completed AND < total lessons
     const coursesInProgressCount = allCourses.filter(course => {

@@ -59,7 +59,7 @@ export async function POST(request: Request) {
                 userId: session.user.id,
                 courseId: course.id,
                 lessonId: lesson.id,
-                completed: false,
+                status: 'IN_PROGRESS',
                 timeSpent: seconds,
             },
         });
