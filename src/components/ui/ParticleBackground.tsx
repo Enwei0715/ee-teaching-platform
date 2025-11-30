@@ -91,7 +91,8 @@ export default function ParticleBackground() {
                         density: {
                             enable: true,
                         },
-                        value: 80,
+                        value: 150,
+                        limit: { value: 200 },
                     },
                     opacity: {
                         value: 0.3,

@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.4 - UI Polish (2025-11-30)
+- **UI Enhancements**:
+    - **Particle Background**: Optimized the homepage particle effect by increasing the particle density to 150 and setting a hard limit of 200 to balance aesthetics and performance.
+
 ## v4.4.3 - Database Cleanup & Critical Fixes (2025-11-30)
 - **Database**:
     - **Schema Cleanup**: Removed the deprecated `completed` boolean column from the `UserProgress` table in favor of the `status` enum.
