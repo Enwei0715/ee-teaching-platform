@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.8 - Fine-tuning (2025-11-30)
+- **UI Enhancements**:
+    - **Particle Background**: Adjusted particle density to 200 (limit 300) for the optimal balance of visual richness and performance.
+
 ## v4.4.7 - Visual Consistency (2025-11-30)
 - **UI Enhancements**:
     - **Global Grid**: Extended the background grid pattern to the Homepage (`/`) in addition to the About page, ensuring a consistent technical aesthetic across key landing pages.
