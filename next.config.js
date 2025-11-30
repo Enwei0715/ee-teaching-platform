@@ -2,11 +2,7 @@
 const nextConfig = {
     transpilePackages: ['next-mdx-remote'],
     experimental: {
-        serverComponentsExternalPackages: ['prisma', '@prisma/client', 'katex'],
-    },
-    webpack: (config) => {
-        config.externals = [...(config.externals || []), 'katex'];
-        return config;
+        serverComponentsExternalPackages: ['prisma', '@prisma/client'],
     },
 };
 
