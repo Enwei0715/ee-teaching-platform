@@ -2,14 +2,17 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface Props {
     userId?: string;
     lessonTitle: string;
 }
 
-export default function ResumeLearningTracker({ userId, lessonTitle, courseId, lessonId, initialLastElementId }: Props & { courseId?: string, lessonId?: string, initialLastElementId?: string | null }) {
+export default function ResumeLearningTracker({ userId: propUserId, lessonTitle, courseId, lessonId, initialLastElementId }: Props & { courseId?: string, lessonId?: string, initialLastElementId?: string | null }) {
     const pathname = usePathname();
+    const { data: session } = useSession();
+    const userId = propUserId || session?.user?.id;
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Restore scroll position on mount if requested

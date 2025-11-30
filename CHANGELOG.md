@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.2 - Time Tracking Stability (2025-11-30)
+- **Time Tracking**:
+    - **UserId Fallback**: Fixed a bug where `ResumeLearningTracker` failed to initialize if `userId` wasn't passed as a prop. Implemented a fallback to retrieve `userId` directly from the user session, ensuring time tracking works reliably in all contexts.
+
 ## v4.4.1 - Time Tracking Fix (2025-11-30)
 - **Time Tracking**:
     - **Frontend**: Updated `ResumeLearningTracker` to calculate and send precise time deltas (in seconds) to the API, ensuring accurate tracking of time spent on each lesson.
