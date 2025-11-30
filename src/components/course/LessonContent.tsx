@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Clock, Calendar, Edit } from 'lucide-react';
 import { useEditMode } from '@/context/EditModeContext';
