@@ -314,7 +314,26 @@ Focus on details that require understanding, not just recall.
                 throw new Error("No content received from LLM");
             }
 
-            const quiz = JSON.parse(content);
+            // Helper to sanitize JSON (fix bad backslashes from LaTeX)
+            const sanitizeJson = (str: string) => {
+                return str.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
+            };
+
+            let quiz;
+            try {
+                // Try parsing directly first
+                quiz = JSON.parse(content);
+            } catch (parseError) {
+                console.warn("JSON Parse Failed. Attempting to sanitize...", parseError);
+                try {
+                    const sanitizedContent = sanitizeJson(content);
+                    console.log("Sanitized Content:", sanitizedContent);
+                    quiz = JSON.parse(sanitizedContent);
+                } catch (retryError) {
+                    console.error("Sanitization Failed:", retryError);
+                    throw new Error("Failed to parse AI response as JSON");
+                }
+            }
 
             // Map correctAnswerIndex to correctAnswer for frontend compatibility
             if (typeof quiz.correctAnswerIndex === 'number') {

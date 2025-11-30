@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Clock, Calendar } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight, Clock, Calendar, Edit } from 'lucide-react';
+import { useEditMode } from '@/context/EditModeContext';
 import MDXContent from '@/components/mdx/MDXContent';
 import CourseSidebar from '@/components/course/CourseSidebar';
 import AITutor from '@/components/ai/AITutor';
@@ -48,9 +49,30 @@ export default function LessonContent({
     mdxSource,
     completedLessonsCount
 }: LessonContentProps) {
+    const router = useRouter();
+    const { isEditMode } = useEditMode();
+
     // State for progress-aware quiz
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
     const [scrollProgress, setScrollProgress] = useState(0);
+
+    // Navigation Hotkeys Listener
+    useEffect(() => {
+        const handleNext = () => {
+            if (nextLesson) router.push(`/courses/${course.slug}/${nextLesson.slug}`);
+        };
+        const handlePrev = () => {
+            if (prevLesson) router.push(`/courses/${course.slug}/${prevLesson.slug}`);
+        };
+
+        window.addEventListener('nav-next-lesson', handleNext);
+        window.addEventListener('nav-prev-lesson', handlePrev);
+
+        return () => {
+            window.removeEventListener('nav-next-lesson', handleNext);
+            window.removeEventListener('nav-prev-lesson', handlePrev);
+        };
+    }, [nextLesson, prevLesson, course.slug, router]);
 
     // Debug: Log active heading change
     useEffect(() => {
@@ -119,8 +141,15 @@ export default function LessonContent({
                                     </div>
                                     <div className="flex items-center gap-1.5 bg-bg-tertiary px-3 py-1.5 rounded-full">
                                         <Calendar size={16} className="text-accent-primary" />
-                                        <span>{new Date(lesson.updatedAt).toLocaleDateString()}</span>
+                                        <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                     </div>
+                                    {isEditMode && (
+                                        <Link href={`/admin/courses/${course.id}/lessons/${lesson.id}`}>
+                                            <button className="glass-ghost px-3 py-1 rounded-lg border border-white/20 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
+                                                <Edit size={14} /> Edit Lesson
+                                            </button>
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
 

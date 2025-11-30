@@ -1,5 +1,12 @@
 # Project Changelog
 
+## v4.3.7 - Regression Fixes (2025-11-30)
+- **UI Fixes**:
+    - **Lesson Date**: Fixed "Invalid Date" display by adding a safe check and fallback ("Recently updated") for lessons with missing timestamps.
+    - **Edit Button**: Restored the missing "Edit Lesson" button in the lesson header (visible only in Edit Mode).
+- **Interaction**:
+    - **Hotkeys**: Fixed broken Left/Right arrow key navigation between lessons by re-implementing event listeners in `LessonContent`.
+
 ## v4.3.6 - Robust Quiz Scoping & ID Standardization (2025-11-30)
 - **AI Quiz**:
     - **Fuzzy Matching**: Implemented robust "Fuzzy Matching" for section IDs. The system now ignores punctuation and special characters when comparing frontend and backend IDs, resolving the "Section 1 Loop" bug caused by minor format differences (e.g., "1.1" vs "1-1").
