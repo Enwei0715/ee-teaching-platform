@@ -1,6 +1,6 @@
 import { checkAdmin } from "@/lib/admin-auth";
 import Link from "next/link";
-import { LayoutDashboard, BookOpen, FileText, Users, Settings, LogOut, FolderKanban, MessageSquare } from "lucide-react";
+import { LayoutDashboard, BookOpen, FileText, Users, Settings, LogOut, FolderKanban, MessageSquare, History as HistoryIcon } from "lucide-react";
 import DigitalGridBackground from "@/components/ui/DigitalGridBackground";
 
 export default async function AdminLayout({
@@ -45,6 +45,10 @@ export default async function AdminLayout({
                     <Link href="/admin/users" className="flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-400 hover:bg-gray-900 hover:text-white rounded-lg transition-colors whitespace-nowrap">
                         <Users size={20} />
                         <span className="hidden lg:inline">Users</span>
+                    </Link>
+                    <Link href="/admin/changelog" className="flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-400 hover:bg-gray-900 hover:text-white rounded-lg transition-colors whitespace-nowrap">
+                        <HistoryIcon size={20} />
+                        <span className="hidden lg:inline">Changelog</span>
                     </Link>
                 </nav>
 

@@ -10,7 +10,10 @@ import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
 import { EditModeProvider } from "@/context/EditModeContext";
 import BackgroundGrid from "@/components/layout/BackgroundGrid";
+import FeedbackWidget from "@/components/feedback/FeedbackWidget";
+import FloatingActionGroup from "@/components/layout/FloatingActionGroup";
 import prisma from "@/lib/prisma";
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -48,6 +51,9 @@ export default async function RootLayout({
                                 </div>
                             </main>
                             <ShortcutsModal />
+                            <FloatingActionGroup />
+                            <FeedbackWidget hideTrigger={true} />
+                            <Toaster richColors position="top-center" />
                             <Footer settings={settings} links={links} />
                         </HotkeysProvider>
                     </EditModeProvider>

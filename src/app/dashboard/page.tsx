@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, Trophy, Clock, Activity, PlayCircle } from "lucide-react";
+import { BookOpen, Trophy, Clock, Activity, PlayCircle, Zap } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { getAllCourses, getCourseStructure } from "@/lib/mdx";
 import OscilloscopeBackground from "@/components/ui/OscilloscopeBackground";
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
     // Fetch user data including streak
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { streak: true }
+        select: { streak: true, xp: true, level: true }
     });
 
     // Fetch user progress including lastElementId for precise resume
@@ -198,15 +198,28 @@ export default async function DashboardPage() {
                         </div>
                     </div>
                     <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 mb-3">
                             <div className="p-3 bg-blue-900/30 text-blue-400 rounded-lg">
-                                <Clock size={24} />
+                                <Zap size={24} />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Time Learned</p>
-                                <h3 className="text-2xl font-bold text-white">{timeFormatted}</h3>
+                                <p className="text-sm text-gray-400">Current Level</p>
+                                <div className="flex items-baseline gap-2">
+                                    <h3 className="text-2xl font-bold text-white">{user?.level || 1}</h3>
+                                    <span className="text-xs text-gray-500">({user?.xp || 0} XP)</span>
+                                </div>
                             </div>
                         </div>
+                        {/* Level Progress Bar */}
+                        <div className="w-full bg-gray-800 rounded-full h-2 mb-1">
+                            <div
+                                className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                style={{ width: `${Math.min(100, ((user?.xp || 0) % 100))}%` }} // Simplified progress logic: 100 XP per level for now
+                            ></div>
+                        </div>
+                        <p className="text-xs text-gray-500 text-right">
+                            {100 - ((user?.xp || 0) % 100)} XP to next level
+                        </p>
                     </div>
                     <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
                         <div className="flex items-center gap-4">
@@ -214,7 +227,7 @@ export default async function DashboardPage() {
                                 <Activity size={24} />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Current Streak</p>
+                                <p className="text-sm text-gray-400">Day Streak</p>
                                 <h3 className="text-2xl font-bold text-white">{streak} Day{streak !== 1 ? 's' : ''}</h3>
                             </div>
                         </div>

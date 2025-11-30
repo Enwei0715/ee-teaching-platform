@@ -20,9 +20,11 @@ interface Props {
     lessons: Lesson[];
     category?: string;
     courseTitle?: string;
+    hideMobileTrigger?: boolean;
 }
 
-export default function CourseSidebar({ courseId, lessons, category = "Courses", courseTitle = "Course" }: Props) {
+export default function CourseSidebar(props: Props) {
+    const { courseId, lessons, category = "Courses", courseTitle = "Course", hideMobileTrigger = false } = props;
     const pathname = usePathname();
     const { data: session } = useSession();
     const [progressMap, setProgressMap] = useState<Record<string, string>>({});
@@ -198,6 +200,13 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
         </>
     );
 
+    // Event listener for external open trigger (e.g. MobileLessonBar)
+    useEffect(() => {
+        const handleOpen = () => setIsMobileOpen(true);
+        window.addEventListener('open-course-sidebar', handleOpen);
+        return () => window.removeEventListener('open-course-sidebar', handleOpen);
+    }, []);
+
     return (
         <>
             {/* Desktop Sidebar */}
@@ -211,8 +220,8 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
                 </div>
             </aside>
 
-            {/* Mobile Floating Button */}
-            {!isMobileOpen && (
+            {/* Mobile Floating Button - Only show if not hidden */}
+            {!isMobileOpen && !props.hideMobileTrigger && (
                 <button
                     className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
                     onClick={() => setIsMobileOpen(true)}

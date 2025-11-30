@@ -11,6 +11,10 @@ import remarkMath from 'remark-math';
 import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 import HexagonalBackground from '@/components/ui/HexagonalBackground';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import ProjectCompletionButton from '@/components/project/ProjectCompletionButton';
 
 interface Props {
     params: { slug: string };
@@ -47,6 +51,35 @@ export default async function ProjectPage({ params }: Props) {
 
     if (!project) {
         notFound();
+    }
+
+    // Check completion status
+    const session = await getServerSession(authOptions);
+    let isCompleted = false;
+
+    if (session?.user?.id) {
+        // We need to find the project ID first since MDX doesn't have it directly
+        // But wait, our API uses slug to find ID. 
+        // Ideally we should fetch the project from DB to get ID if we want to check userProject table.
+        // Or we can rely on the API to handle the check, but for initial state we need to know.
+
+        // Let's fetch the project from DB by slug to get its ID
+        const dbProject = await prisma.project.findUnique({
+            where: { slug: params.slug },
+            select: { id: true }
+        });
+
+        if (dbProject) {
+            const userProject = await prisma.userProject.findUnique({
+                where: {
+                    userId_projectId: {
+                        userId: session.user.id,
+                        projectId: dbProject.id
+                    }
+                }
+            });
+            isCompleted = !!userProject;
+        }
     }
 
     // Defensive: Wrap MDX serialization in try-catch to prevent crashes
@@ -149,7 +182,7 @@ export default async function ProjectPage({ params }: Props) {
                             <div className="w-5 h-5 mr-2 rounded border border-accent-primary flex items-center justify-center text-xs font-mono text-accent-primary">B</div>
                             Bill of Materials
                         </h3>
-                        <ul className="space-y-2 text-text-secondary text-sm">
+                        <ul className="space-y-2 text-text-secondary text-sm mb-8">
                             {project.meta.materials && project.meta.materials.length > 0 ? (
                                 project.meta.materials.map((material: string, index: number) => (
                                     <li key={index} className="flex justify-between">
@@ -160,6 +193,14 @@ export default async function ProjectPage({ params }: Props) {
                                 <li className="text-text-secondary/50 italic">No materials listed</li>
                             )}
                         </ul>
+
+                        {/* Completion Button */}
+                        <div className="pt-6 border-t border-white/10">
+                            <ProjectCompletionButton
+                                projectSlug={project.slug}
+                                initialCompleted={isCompleted}
+                            />
+                        </div>
                     </div>
                 </aside>
             </div>

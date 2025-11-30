@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { calculateReadingTime } from '@/lib/utils';
 import { useEditMode } from '@/context/EditModeContext';
 import { StatusIcon } from '@/components/course/StatusIcon';
+import { calculatePotentialXP } from '@/lib/xp';
 
 interface Lesson {
     id: string;
@@ -88,8 +89,13 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                             </div>
                         </div>
 
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
-                            <PlayCircle size={20} />
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-medium text-yellow-500/80 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20 whitespace-nowrap">
+                                +{calculatePotentialXP(lesson.content.length)} XP
+                            </span>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
+                                <PlayCircle size={20} />
+                            </div>
                         </div>
                     </Link>
 

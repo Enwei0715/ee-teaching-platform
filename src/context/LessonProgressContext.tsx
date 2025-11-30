@@ -5,7 +5,7 @@ interface LessonProgressContextType {
     currentLessonId: string;
     status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWING';
     setStatus: (status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWING') => void;
-    markAsComplete: () => void;
+    markAsComplete: (source?: string) => Promise<any>;
     startLesson: () => void;
     enterReviewMode: () => void;
 }
@@ -31,33 +31,40 @@ export function LessonProgressProvider({
     });
     const [currentLessonId] = useState(lessonId);
 
-    const updateStatus = async (newStatus: 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWING', completed = false) => {
+    const updateStatus = async (newStatus: 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWING', completed = false, source: string = 'lesson') => {
         try {
-            // Optimistic update
-            setStatus(newStatus);
+            // Optimistic update only if not already completed (to avoid flickering if just getting practice XP)
+            if (status !== 'COMPLETED' && status !== 'REVIEWING') {
+                setStatus(newStatus);
+            }
             console.log(`🔄 [Context] Status updated to: ${newStatus}`);
 
-            await fetch(`/api/courses/${courseId}/progress`, {
+            const response = await fetch(`/api/courses/${courseId}/progress`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     lessonId: currentLessonId,
                     status: newStatus,
-                    completed
+                    completed,
+                    source // Pass the source (e.g., 'quiz')
                 })
             });
+            return await response.json();
         } catch (error) {
             console.error("Failed to update status:", error);
+            return null;
         }
     };
 
     const startLesson = () => updateStatus('IN_PROGRESS');
 
-    const markAsComplete = () => {
-        if (status !== 'COMPLETED' && status !== 'REVIEWING') {
-            console.log("✅ [Context] Marking as complete...");
-            updateStatus('COMPLETED', true);
+    const markAsComplete = (source: string = 'lesson') => {
+        // Always attempt to update status if it's a quiz, to trigger Practice XP
+        if (source === 'quiz' || (status !== 'COMPLETED' && status !== 'REVIEWING')) {
+            console.log(`✅ [Context] Marking as complete (Source: ${source})...`);
+            return updateStatus('COMPLETED', true, source);
         }
+        return Promise.resolve(null);
     };
 
     const enterReviewMode = () => {

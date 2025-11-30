@@ -212,6 +212,7 @@ export const getCourseStructure = async (courseSlug: string) => {
 
     return lessons.map(lesson => ({
         id: lesson.slug,
+        slug: lesson.slug, // Explicitly add slug
         uuid: lesson.id,
         title: lesson.title,
         description: lesson.description || undefined,

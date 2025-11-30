@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Clock, Calendar, Edit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Calendar, Edit, Zap, Trophy, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import { useEditMode } from '@/context/EditModeContext';
 import MDXContent from '@/components/mdx/MDXContent';
 import CourseSidebar from '@/components/course/CourseSidebar';
@@ -12,8 +14,10 @@ import TextSelectionToolbar from '@/components/ai/TextSelectionToolbar';
 import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
 import TableOfContents from '@/components/course/TableOfContents';
 import AIQuizGenerator from '@/components/assignment/AIQuizGenerator';
+import MobileLessonBar from '@/components/course/MobileLessonBar';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { useLessonProgress } from '@/context/LessonProgressContext';
+import { calculatePotentialXP } from '@/lib/xp';
 
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
 
@@ -22,7 +26,7 @@ interface LessonContentProps {
         id: string;
         slug: string;
         title: string;
-        lessons: any[]; // Type this properly if possible
+        lessons: any[];
     };
     lesson: {
         id: string;
@@ -31,8 +35,8 @@ interface LessonContentProps {
         content: string;
         updatedAt: Date | string;
     };
-    prevLesson: any; // Type this properly
-    nextLesson: any; // Type this properly
+    prevLesson: any;
+    nextLesson: any;
     initialLastElementId: string | null;
     lessonStatus: string;
     readingTime: number;
@@ -54,6 +58,8 @@ export default function LessonContent({
     const router = useRouter();
     const { isEditMode } = useEditMode();
 
+    const potentialXP = calculatePotentialXP(lesson.content.length);
+
     // State for progress-aware quiz
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -61,7 +67,6 @@ export default function LessonContent({
     // Navigation Hotkeys Listener
     useEffect(() => {
         const handleNext = () => {
-            // Note: nextLesson comes from getCourseStructure where 'id' is the slug
             if (nextLesson) router.push(`/courses/${course.slug}/${nextLesson.id}`);
         };
         const handlePrev = () => {
@@ -85,8 +90,6 @@ export default function LessonContent({
     // Context for real-time updates
     const { startLesson, enterReviewMode, markAsComplete } = useLessonProgress();
 
-    // Initial State Logic handled by LessonProgressContext now
-
     // Scroll progress listener
     useEffect(() => {
         const handleScroll = () => {
@@ -105,10 +108,35 @@ export default function LessonContent({
             (entries) => {
                 if (entries[0].isIntersecting) {
                     console.log("🎯 [LessonContent] Reached AI Quiz section! Triggering completion...");
-                    markAsComplete();
+                    markAsComplete().then((result: any) => {
+                        // Check if XP was awarded
+                        if (result?.gamification?.xpGained > 0) {
+                            // Trigger Confetti
+                            confetti({
+                                particleCount: 100,
+                                spread: 70,
+                                origin: { y: 0.6 },
+                                colors: ['#EAB308', '#A855F7', '#3B82F6'] // Yellow, Purple, Blue
+                            });
+
+                            toast.success(
+                                <div className="flex flex-col gap-1">
+                                    <span className="font-bold">Lesson Completed!</span>
+                                    <span className="flex items-center gap-1 text-sm">
+                                        <Zap size={14} className="text-yellow-500 fill-yellow-500" />
+                                        You earned {result.gamification.xpGained} XP
+                                    </span>
+                                </div>
+                            );
+                        } else if (result?.status === 'COMPLETED') {
+                            toast.success('Lesson Completed!', {
+                                icon: <Trophy size={18} className="text-yellow-500" />,
+                            });
+                        }
+                    });
                 }
             },
-            { threshold: 0.1 } // Trigger when 10% of quiz section is visible
+            { threshold: 0.1 }
         );
 
         const quizSection = document.getElementById('ai-quiz');
@@ -118,9 +146,6 @@ export default function LessonContent({
 
         return () => observer.disconnect();
     }, []);
-
-    // MDX Components - can be extended here
-    const mdxComponents = {};
 
     return (
         <div className="min-h-screen bg-bg-primary pb-20 relative">
@@ -138,15 +163,16 @@ export default function LessonContent({
                 <CourseSidebar
                     courseId={course.slug}
                     lessons={course.lessons}
-                    category="Electronics" // TODO: Fetch category dynamically
+                    category="Electronics"
                     courseTitle={course.title}
+                    hideMobileTrigger={true}
                 />
 
                 {/* Main Content Wrapper */}
                 <div className="flex-1 container mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8">
                     {/* Main Article */}
                     <main className="flex-1 min-w-0">
-                        {/* Breadcrumbs (Visible on all devices) */}
+                        {/* Breadcrumbs */}
                         <nav className="flex items-center text-sm text-text-secondary mb-6 overflow-x-auto whitespace-nowrap pb-2">
                             <Link href="/courses" className="hover:text-text-primary transition-colors">Courses</Link>
                             <ChevronRight size={16} className="mx-2" />
@@ -171,6 +197,10 @@ export default function LessonContent({
                                         <Calendar size={16} className="text-accent-primary" />
                                         <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                     </div>
+                                    <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-500/20">
+                                        <Zap size={16} className="text-yellow-500" />
+                                        <span className="text-yellow-500 font-medium">+{potentialXP} XP</span>
+                                    </div>
                                     {isEditMode && (
                                         <Link href={`/admin/courses/${course.slug}?file=${lesson.slug}.mdx`}>
                                             <button className="glass-ghost px-3 py-1 rounded-lg border border-white/20 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
@@ -185,19 +215,16 @@ export default function LessonContent({
                             <div id="lesson-content" className="relative">
                                 <MDXContent
                                     source={mdxSource}
-
                                     courseId={course.slug}
                                     lessonId={lesson.slug}
                                 />
-                                <TextSelectionToolbar
-
-                                />
+                                <TextSelectionToolbar />
                             </div>
                         </article>
 
                         <hr className="border-border-primary my-12" />
 
-                        {/* Restored Quiz Section */}
+                        {/* Quiz Section */}
                         <section id="ai-quiz" className="mb-20">
                             <AIQuizGenerator
                                 courseId={course.slug}
@@ -229,14 +256,29 @@ export default function LessonContent({
                                     href={`/courses/${course.slug}/${nextLesson.id}`}
                                     className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
                                 >
-                                    <div>
+                                    <div className="text-right">
                                         <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Next</div>
                                         <div className="font-medium">{nextLesson.title}</div>
+                                        <div className="text-xs text-yellow-500 font-medium mt-1">
+                                            +{calculatePotentialXP(nextLesson.content?.length || 0)} XP
+                                        </div>
                                     </div>
                                     <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                             ) : (
-                                <div />
+                                <Link
+                                    href={`/courses/${course.slug}`}
+                                    className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
+                                >
+                                    <div className="text-right">
+                                        <div className="text-xs text-white/80 uppercase tracking-wider">Finish</div>
+                                        <div className="font-bold">Complete Course</div>
+                                        <div className="text-xs text-yellow-300 font-medium mt-1">
+                                            +100 XP Bonus
+                                        </div>
+                                    </div>
+                                    <CheckCircle size={20} />
+                                </Link>
                             )}
                         </div>
                     </main>
@@ -247,6 +289,7 @@ export default function LessonContent({
                         lessonId={lesson.id}
                         initialLastElementId={initialLastElementId}
                         onActiveHeadingChange={setActiveHeadingId}
+                        hideMobileTrigger={true}
                     />
                 </div>
             </div>
@@ -263,6 +306,7 @@ export default function LessonContent({
                 activeHeadingId={activeHeadingId}
                 courseSlug={course.slug}
                 lessonSlug={lesson.slug}
+                hideTrigger={true}
             />
 
             {/* Resume Learning Tracker */}
@@ -270,8 +314,10 @@ export default function LessonContent({
                 courseId={course.slug}
                 lessonId={lesson.id}
                 lessonTitle={lesson.title}
-
             />
+
+            {/* Mobile Bottom Action Bar */}
+            <MobileLessonBar />
         </div>
     );
 }

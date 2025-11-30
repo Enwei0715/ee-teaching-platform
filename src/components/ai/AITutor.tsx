@@ -26,9 +26,10 @@ interface AITutorProps {
     courseSlug?: string;
     lessonSlug?: string;
     lessonStatus?: string; // Add lessonStatus prop
+    hideTrigger?: boolean;
 }
 
-export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug, lessonStatus }: AITutorProps = {}) {
+export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug, lessonStatus, hideTrigger }: AITutorProps = {}) {
     console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
 
     // Use context for real-time status updates
@@ -339,16 +340,18 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                 </div>
             )}
 
-            {/* Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
-                    ? 'bg-gray-800 text-white rotate-90'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    }`}
-            >
-                {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
-            </button>
+            {/* Toggle Button - Only show if not hidden */}
+            {!hideTrigger && (
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 ${isOpen
+                        ? 'bg-gray-800 text-white rotate-90'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                >
+                    {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+                </button>
+            )}
         </div>,
         document.body
     );

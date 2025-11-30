@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import EditableImage from '@/components/ui/EditableImage';
 import EditableText from '@/components/ui/EditableText';
-import { Menu, X, Search, User, LogOut, Bot, PenTool, BookOpen, Folder, MessageSquare, Info, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Search, User, LogOut, Bot, PenTool, BookOpen, Folder, MessageSquare, Info, LayoutDashboard, History as HistoryIcon } from 'lucide-react';
 import SearchCommand from '@/components/search/SearchCommand';
 import { useSession, signOut } from 'next-auth/react';
 import { useEditMode } from '@/context/EditModeContext';
@@ -200,6 +200,14 @@ export default function Navbar() {
                                             {/* Menu Items */}
                                             <div className="flex flex-col gap-1">
                                                 <Link
+                                                    href={`/u/${session.user?.id}`}
+                                                    className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-200 hover:bg-white/10 rounded-lg transition-all duration-200 group"
+                                                    onClick={() => setIsUserMenuOpen(false)}
+                                                >
+                                                    <User size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+                                                    My Profile
+                                                </Link>
+                                                <Link
                                                     href="/dashboard"
                                                     className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-200 hover:bg-white/10 rounded-lg transition-all duration-200 group"
                                                     onClick={() => setIsUserMenuOpen(false)}
@@ -231,6 +239,15 @@ export default function Navbar() {
                                                         Write a Post
                                                     </Link>
                                                 )}
+
+                                                <Link
+                                                    href="/changelog"
+                                                    className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-200 hover:bg-white/10 rounded-lg transition-all duration-200 group"
+                                                    onClick={() => setIsUserMenuOpen(false)}
+                                                >
+                                                    <HistoryIcon size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+                                                    Changelog
+                                                </Link>
                                             </div>
 
                                             <div className="h-px bg-white/10 my-1 mx-2" />
@@ -346,12 +363,28 @@ export default function Navbar() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link
+                                        href={`/u/${session.user?.id}`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-white/5 text-gray-200 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10"
+                                    >
+                                        <User size={16} />
+                                        Profile
+                                    </Link>
+                                    <Link
                                         href="/dashboard"
                                         onClick={() => setIsMenuOpen(false)}
                                         className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-accent-primary text-white text-sm font-medium hover:bg-accent-primary/90 transition-colors"
                                     >
                                         <LayoutDashboard size={16} />
                                         Dashboard
+                                    </Link>
+                                    <Link
+                                        href="/changelog"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-white/5 text-gray-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-colors border border-white/10"
+                                    >
+                                        <HistoryIcon size={16} />
+                                        Changelog
                                     </Link>
                                     <button
                                         onClick={() => {

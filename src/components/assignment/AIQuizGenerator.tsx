@@ -5,6 +5,7 @@ import { Sparkles } from 'lucide-react';
 import { generateQuiz, Quiz } from '@/lib/llm-service';
 import QuizCard from './QuizCard';
 import { useProgress } from '@/hooks/useProgress';
+import { calculateQuizXP } from '@/lib/xp';
 
 interface AIQuizGeneratorProps {
     courseId: string;
@@ -13,13 +14,14 @@ interface AIQuizGeneratorProps {
     context: string;
 }
 
-export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGeneratorProps) {
+export default function AIQuizGenerator({ courseId, lessonId, topic, context }: AIQuizGeneratorProps) {
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { markLessonComplete } = useProgress();
     const containerRef = useRef<HTMLDivElement>(null);
-    const topAnchorRef = useRef<HTMLDivElement>(null);
+
+    const potentialXP = calculateQuizXP();
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -53,25 +55,15 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
         console.log("Verified:", explanation);
     };
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
+        // Mark lesson as complete
         markLessonComplete(courseId, lessonId);
     };
 
     return (
-        <div ref={containerRef} className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10 min-h-[60vh] min-h-[400px] flex flex-col justify-center">
-            <div ref={topAnchorRef} className="absolute -top-24 left-0 w-full h-1" /> {/* Invisible Top Anchor with offset */}
-            <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-500/20 backdrop-blur-sm rounded-full shadow-lg mb-4 text-indigo-400">
-                    <Sparkles size={24} />
-                </div>
-                <h2 className="text-2xl font-bold text-text-primary mb-2">Test Your Knowledge</h2>
-                <p className="text-text-secondary max-w-md mx-auto">
-                    Ready to check your understanding? Generate a personalized quiz based on this lesson using AI.
-                </p>
-            </div>
-
+        <div ref={containerRef}>
             {!quiz ? (
-                <div className="flex justify-center flex-1 items-center">
+                <div className="flex flex-col justify-center flex-1 items-center text-center p-4">
                     <button
                         onClick={handleGenerate}
                         disabled={loading}
@@ -89,6 +81,11 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
                             </>
                         )}
                     </button>
+                    <p className="text-gray-500 mt-4 max-w-sm">
+                        Ready to check your understanding? Generate a personalized quiz based on this lesson using AI.
+                        <br />
+                        <span className="text-yellow-500 font-medium text-sm mt-2 inline-block">Complete this to earn +{potentialXP} XP!</span>
+                    </p>
                 </div>
             ) : (
                 <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
@@ -117,14 +114,11 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
                         </>
                     )}
                 </div>
-            )
-            }
+            )}
 
-            {
-                error && (
-                    <p className="text-center text-red-500 mt-4 text-sm">{error}</p>
-                )
-            }
-        </div >
+            {error && (
+                <p className="text-center text-red-500 mt-4 text-sm">{error}</p>
+            )}
+        </div>
     );
 }

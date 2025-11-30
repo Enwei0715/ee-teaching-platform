@@ -27,6 +27,46 @@ model User {
   progress      UserProgress[]
   occupation    String?
   major         String?
+  
+  // Gamification
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  badges        UserBadge[]
+  certificates  Certificate[]
+  userProjects  UserProject[]
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  issuedAt  DateTime @default(now())
+  code      String   @unique
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  name        String
+  description String
+  icon        String      // Lucide icon name or image URL
+  condition   String      // Description of how to earn it
+  users       UserBadge[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, badgeId])
 }
 
 model Account {
@@ -130,8 +170,20 @@ model Project {
   materials    String[]
   technologies String[]
   features     String[]
+  userProjects UserProject[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model UserProject {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+  
+  @@unique([userId, projectId])
 }
 
 model Course {
@@ -145,6 +197,7 @@ model Course {
   published   Boolean  @default(false)
   lessons     Lesson[]
   userProgress UserProgress[]
+  certificates Certificate[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

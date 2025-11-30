@@ -15,9 +15,10 @@ interface TableOfContentsProps {
     lessonId?: string;
     initialLastElementId?: string | null;
     onActiveHeadingChange?: (id: string) => void;
+    hideMobileTrigger?: boolean;
 }
 
-export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange, hideMobileTrigger = false }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -173,6 +174,13 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         }
     };
 
+    // Event listener for external open trigger
+    useEffect(() => {
+        const handleOpen = () => setIsMobileOpen(true);
+        window.addEventListener('open-toc', handleOpen);
+        return () => window.removeEventListener('open-toc', handleOpen);
+    }, []);
+
     // Don't render if no headings found
     if (items.length === 0) {
         return null;
@@ -180,14 +188,16 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
 
     return (
         <>
-            {/* Mobile Trigger Button */}
-            <button
-                onClick={() => setIsMobileOpen(true)}
-                className="lg:hidden fixed bottom-32 right-4 z-50 p-3 glass-heavy rounded-full text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-                title="Table of Contents"
-            >
-                <List size={20} />
-            </button>
+            {/* Mobile Trigger Button - Only show if not hidden */}
+            {!hideMobileTrigger && (
+                <button
+                    onClick={() => setIsMobileOpen(true)}
+                    className="lg:hidden fixed bottom-32 right-4 z-50 p-3 glass-heavy rounded-full text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    title="Table of Contents"
+                >
+                    <List size={20} />
+                </button>
+            )}
 
             {/* Mobile Drawer */}
             {isMobileOpen && (

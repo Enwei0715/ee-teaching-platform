@@ -1,264 +1,157 @@
-# Project Changelog
+## v1.0.0 - Platform Inception & Vision (2025-11-19)
 
-## v4.4.9 - Dashboard Layout Polish (2025-11-30)
-- **UI Enhancements**:
-    - **Resume Card**: Refactored the "Continue Learning" card layout in the Dashboard. Moved the "Resume" button to the bottom to allow course and lesson titles to expand horizontally, improving readability for long titles.
+* **feat**:
 
-## v4.4.8 - Fine-tuning (2025-11-30)
-- **UI Enhancements**:
-    - **Particle Background**: Adjusted particle density to 200 (limit 300) for the optimal balance of visual richness and performance.
+  * 這一版主要解決「沒有明確產品定位與教學路線圖」的問題。定義四級學習族群與平台願景，拉出從入門到專業的完整路徑，同時設計網站地圖與資訊架構，涵蓋首頁、課程、部落格、專案與未來後台，確保後續所有功能、內容與 UI 決策都有一套穩定且可長期擴充的藍圖。
 
-## v4.4.7 - Visual Consistency (2025-11-30)
-- **UI Enhancements**:
-    - **Global Grid**: Extended the background grid pattern to the Homepage (`/`) in addition to the About page, ensuring a consistent technical aesthetic across key landing pages.
+## v1.1.0 - App Skeleton & Content Engine (2025-11-20)
 
-## v4.4.6 - Visual Refinements (2025-11-30)
-- **UI Enhancements**:
-    - **About Page**: Applied the background grid pattern specifically to the "About Me" page for better visual consistency.
-    - **Theme Adjustment**: Reverted particle colors to a subtle white/transparent theme for a cleaner look.
+* **feat**:
 
-## v4.4.5 - Visual Customization (2025-11-30)
-- **UI Enhancements**:
-    - **Homepage Theme**: Updated the particle network to use a vibrant blue color scheme (#0032fa) and increased the background grid opacity to 0.3 for a more distinct, tech-focused look.
+  * 這一版補上「缺乏穩定程式骨架與內容管線」的問題。初始化 Next.js App Router 專案，設定 TypeScript 與 Tailwind 主題，實作 Navbar、Footer 與首頁 Hero，並導入 MDX 內容引擎與課程播放器頁面結構。從此課程、Blog、專案都能透過統一的 MDX 管線管理，為之後真正塞入教學內容打好技術地基。
 
-## v4.4.4 - UI Polish (2025-11-30)
-- **UI Enhancements**:
-    - **Particle Background**: Optimized the homepage particle effect by increasing the particle density to 300 and setting a hard limit of 500 to balance aesthetics and performance.
+## v1.1.1 - Env & Day1 Design Decisions (2025-11-21)
 
-## v4.4.3 - Database Cleanup & Critical Fixes (2025-11-30)
-- **Database**:
-    - **Schema Cleanup**: Removed the deprecated `completed` boolean column from the `UserProgress` table in favor of the `status` enum.
-- **Bug Fixes**:
-    - **Time Tracking**: Resolved the root cause of the `timeSpent` issue. `ResumeLearningTracker` was incorrectly receiving the Course UUID instead of the Slug, causing API calls to fail with 404. It now correctly uses the slug, ensuring progress and time are saved.
+* **fix**:
 
-## v4.4.2 - Time Tracking Stability (2025-11-30)
-- **Time Tracking**:
-    - **UserId Fallback**: Fixed a bug where `ResumeLearningTracker` failed to initialize if `userId` wasn't passed as a prop. Implemented a fallback to retrieve `userId` directly from the user session, ensuring time tracking works reliably in all contexts.
+  * 這一版針對「開發環境不穩、規格分散」的問題進行修補。修正本機無法偵測 Node.js 的狀況，調整 PowerShell 政策與環境變數，讓 `node -v`、npm 及 dev server 都能穩定運作。同時整理 Day 1 的所有設計決策與課程路線圖，寫成文件與日誌，避免日後忘記當初的技術與產品取捨，確保團隊在同一套規格上前進。
 
-## v4.4.1 - Time Tracking Fix (2025-11-30)
-- **Time Tracking**:
-    - **Frontend**: Updated `ResumeLearningTracker` to calculate and send precise time deltas (in seconds) to the API, ensuring accurate tracking of time spent on each lesson.
-    - **Backend**: Modified the progress API to `increment` the `timeSpent` value in the database instead of overwriting it, preventing data loss during concurrent or frequent updates.
-    - **Periodic Sync**: Implemented a 30-second heartbeat to save time spent even when the user is not scrolling.
+---
 
-## v4.4.0 - Perfected Lesson State & Real-Time Sync (2025-11-30)
-- **Real-Time State Logic**:
-    - **Instant Feedback**: Refactored `LessonProgressContext` to use optimistic state initialization, ensuring lesson status icons (Play/Check) update *instantly* on entry without waiting for API responses.
-    - **Smart Auto-Start**: New lessons now automatically transition to `IN_PROGRESS` immediately upon visit, with background database synchronization.
-    - **Review Mode**: Re-visiting completed lessons now correctly triggers `REVIEWING` mode, preserving the `COMPLETED` status in the database while updating the UI context.
-    - **Persistence Fix**: Resolved a critical bug where the API implicitly reverted `COMPLETED` status to `REVIEWING`, ensuring completion status is now sticky and reliable.
-- **Bug Fixes**:
-    - **Course Sidebar**: Fixed status icon staleness by ensuring the sidebar consumes real-time context for the active lesson.
-    - **Table of Contents**: Fixed syntax errors and removed redundant logic, delegating state management to the centralized Context.
-    - **API Reliability**: Hardened the progress API to prioritize explicit client-side status updates over implicit server-side logic.
+## v2.0.0 - Auth, Membership & Forum Foundation (2025-11-22)
 
-## v4.3.8 - Real-Time Sync & Quiz Polish (2025-11-30)
-- **Real-Time State Sync**:
-    - **Instant Updates**: Implemented `LessonProgressContext` to ensure the sidebar checkmark and AI Tutor "Review Mode" update immediately upon lesson completion without a page refresh.
-    - **Context Provider**: Wrapped lesson pages with `LessonProgressProvider` for efficient client-side state management.
-- **AI Quiz**:
-    - **Scroll Fix**: Resolved scroll jumping issues in `AIQuizGenerator` by forcing the view to center on the quiz card during loading and generation states.
-    - **Layout Stability**: Enforced minimum height on the quiz container to prevent layout collapse during state transitions.
+* **feat**:
 
-## v4.3.7 - Regression Fixes (2025-11-30)
-- **UI Fixes**:
-    - **Lesson Date**: Fixed "Invalid Date" display by adding a safe check and fallback ("Recently updated") for lessons with missing timestamps.
-    - **Edit Button**: Restored the missing "Edit Lesson" button in the lesson header (visible only in Edit Mode).
-- **Interaction**:
-    - **Hotkeys**: Fixed broken Left/Right arrow key navigation between lessons by re-implementing event listeners in `LessonContent`.
+  * 這一版是平台第一次「能力躍遷」，從純內容網站升級成有會員與社群的學習系統。導入 NextAuth.js + Prisma/SQLite，完成註冊、登入與 session 流程，建立 Forum 的 Post/Comment 模型與 API，並實作列表、詳情與留言介面。學生不再只是「看文章」，而是可以登入、發文、留言，分享錯誤觀念與解題心得，為之後所有互動式教學奠定基礎。
 
-## v4.3.6 - Robust Quiz Scoping & ID Standardization (2025-11-30)
-- **AI Quiz**:
-    - **Fuzzy Matching**: Implemented robust "Fuzzy Matching" for section IDs. The system now ignores punctuation and special characters when comparing frontend and backend IDs, resolving the "Section 1 Loop" bug caused by minor format differences (e.g., "1.1" vs "1-1").
-    - **Selection Strategy**: Updated the quiz selection algorithm to pick randomly from *any* section with a score >= 150, removing the restrictive "Top 30%" filter to ensure broader content coverage.
-    - **Deep Logging**: Added detailed debug logs to the quiz API to trace ID mismatches in production.
-- **Codebase**:
-    - **Standardization**: Created `src/lib/content-utils.ts` as the single source of truth for ID generation across the app.
-    - **Verification**: Added `scripts/verify-id-logic.ts` to automatically test ID generation rules.
+## v2.0.1 - System Recovery & LLM Feature Cleanup (2025-11-22)
 
-## v4.3.5 - Quiz Logic Fixes & Cleanup (2025-11-30)
-- **AI Quiz**:
-    - **Spoiler Fix**: Implemented "Fail-Safe Slicing" to prevent questions about unread sections. If the user's location is unknown, it defaults to the first section.
-    - **Standardized IDs**: Unified section ID generation between frontend and backend to ensure accurate progress tracking.
-    - **Dynamic UI**: Quiz Tab now clearly indicates "Progress-Aware Quiz" (for active lessons) vs. "Full Lesson Review" (for completed lessons).
-    - **Auto-Scroll Fix**: Resolved issue where generating a new quiz caused the page to scroll to the bottom.
-    - **Layout Fix**: Fixed math symbol alignment in quiz options.
-- **Project Cleanup**:
-    - Removed redundant files (`LessonQuiz.tsx`, `Quiz.tsx`, `markdown-utils.ts`) and the unused `/assignments` route.
+* **refactor**:
 
-## v4.3.4 - AI Quiz & UI Stability (2025-11-30)
-- **AI Quiz**:
-    - **Prompt Fix**: Updated system prompt to strictly enforce LaTeX formatting rules, preventing plain text artifacts in math formulas.
-- **UI/UX**:
-    - **Visual Polish**: Fixed math formula alignment, added table borders, and implemented custom dark scrollbars globally.
-    - **AI Tutor**: Resolved z-index layering issue where the footer obscured the chat window by moving the component to a React Portal.
-    - **Layout**: Fixed background bleed-through in AI Tutor with a new backdrop overlay.
+  * 這一版專注在修補前幾天 LLM 試驗造成的技術債。回復或重建 Tailwind 設定、清理破壞 build 的 TypeScript 型別錯誤與未使用 import，並暫時移除不穩定的 AIQuizGenerator、AITutor 等元件，只留下未來可重用的架構。目標是讓專案恢復到「可以正常開發與部署」的狀態，而不被半成品的 AI 功能拖著走。
 
-## v4.3.3 - Quiz UI/UX Polish (2025-11-30)
-- **Quiz UI/UX**:
-    - **Layout & Typography**: Fixed option button alignment, math formula rendering, and text baseline issues.
-    - **QuizChat**: Optimized layout by removing width constraints and implementing auto-tab switching for "Ask AI Tutor".
-    - **QuizCard**: Made width dynamic, fixed background transparency issues, and implemented auto-scroll to top on new questions.
-    - **AI Tutor**: Fixed input box sizing, scrollbar styling, and z-index layering issues (footer occlusion).
-    - **Visuals**: Enhanced "Focusing on..." badge contrast and localized text.
+---
 
-## v4.3.2 - AI Tutor & Sidebar Polish (2025-11-30)
-- **AI Tutor**:
-    - **UI Fixes**: Increased z-index to prevent footer occlusion and added bottom padding to ensure the last message is fully visible.
-    - **Quiz Tab**: Removed unnecessary scrollbars and improved layout for better usability.
-- **Mobile Navigation**:
-    - **Sidebar Occlusion Fix**: Adjusted mobile sidebar positioning to slide out *below* the sticky navbar, ensuring navigation controls remain accessible.
+## v3.0.0 - LLM Assignments, Real LLM & DB Migration (2025-11-23)
 
-## v4.3.1 - Mobile Layout & Global Polish (2025-11-30)
-- **Global Layout**:
-    - **Footer Cut-Off Fix**: Resolved global footer accessibility issue by enforcing `min-h-screen` on body and removing restrictive overflow settings.
-    - **Sticky Navbar**: Switched Navbar from `fixed` to `sticky` for natural content flow and better mobile compatibility.
-- **Mobile Experience**:
-    - **Breadcrumbs**: Restored breadcrumb navigation on mobile devices with horizontal scrolling support.
-    - **Content Occlusion**: Removed manual padding hacks (`pt-16`) in favor of native sticky positioning.
+* **feat**:
 
-## v4.3.0 - Smart Quiz Algorithm & Mobile Polish (2025-11-30)
-- **AI Quiz**:
-    - **Smart Selection Algorithm**: Implemented a 4-phase pipeline (Parse -> Scope -> Score -> Select) to intelligently choose high-quality content for quizzes.
-    - **Quality Scoring**: Sections are scored based on length, keywords, and blocklisted titles to avoid "fluff".
-    - **Progress Awareness**: Quiz now strictly respects the user's current reading progress (via `limitToHeadingId`).
-    - **Fallback Logic**: Robust fallback mechanisms ensure a quiz is always generated, even if no perfect section is found.
-- **Mobile Experience**:
-    - **Fixed Navbar Overlay**: Added `pt-16` to main layout and fixed Navbar positioning to prevent content from being hidden on mobile.
-    - **AI Tutor Responsiveness**: Updated AI Tutor to use dynamic viewport units (`95vw`, `70dvh`) on mobile and optimal fixed sizes on desktop.
-    - **Sidebar Trigger**: Fixed the floating sidebar button to be more accessible.
-- **Dev**:
-    - Added `test-algo` endpoint and script for verifying quiz logic.
+  * 這一版把平台從「有課程、有會員」推進到「能靠 AI 幫忙練習與產生題目」的階段。新增 LLM-assisted Assignment 流程與 VerificationPanel，讓學生在每個章節結束後透過 AI 小測驗檢查理解，還可標記 AI 解說錯誤並分享到論壇。後端則正式改用 OpenRouter 等真實 LLM，並把核心資料遷移到 PostgreSQL/Prisma，建立 User、Course、Lesson、UserProgress 等 schema，使整個系統從原本偏 prototype 的檔案型內容，升級成可營運的資料庫式產品。
 
-## v4.2.2 - Quiz JSON Fix (2025-11-29)
-- **AI Quiz**:
-    - Fixed `exttt` typo by strictly forbidding `\texttt` in system prompts.
-    - Enforced double-escaping for LaTeX backslashes in JSON output to prevent parsing errors.
+## v3.1.0 - Markdown, LaTeX & Manual Quiz Support (2025-11-23)
 
-## v4.2.1 - Quiz Stability & Visual Fixes (2025-11-29)
-- **AI Quiz**:
-    - Reverted quiz generation logic to stable version (v4.1.0 era) to resolve "400 Bad Request" errors.
-    - Restored `gemini-2.5-flash` model usage with `json_object` response format.
-- **UI**:
-    - Fixed Lesson Page background to use `InteractiveGridPattern` (matching Course Page) instead of plain background.
+* **feat**:
 
-## v4.2.0 - Smart Quiz & Mobile Navigation (2025-11-29)
-**Current Release**
-- **Navigation**:
-    - **Mobile UX**: Replaced floating sidebar trigger with a flow-based "Sub-Navbar" for better accessibility.
-    - **Breadcrumbs**: Fixed fake sidebar breadcrumbs to dynamically show `Courses > [Course Title]`.
-    - Removed hardcoded category labels.
-- **Architecture**:
-    - **Server/Client Split**: Refactored `LessonPage` into Server Component and `LessonContent` Client Component for better performance and state management.
-- **AI Quiz**:
-    - **Progress Awareness**: Quiz now respects user's reading progress, generating questions only from read sections when "In Progress".
-    - **Database Optimization**: Pre-calculating and storing `sectionsMetadata` on lesson save to speed up quiz generation.
-    - **Smart Scoring**: Implemented heuristic scoring to select high-quality content sections (filtering noise, rewarding explanations).
-    - **Randomization**: Enforced strict answer position randomization (A/B/C/D) to prevent predictability.
-    - **Quality Control**: Added blocklist for low-value sections (Summary, Reference, etc.).
+  * 這一版解決「工程內容無法完整呈現」與「測驗過度依賴 LLM」的問題。導入 react-markdown、remark-gfm、remark-math、rehype-katex 等工具，讓課程與 Blog 可以安全顯示表格與 LaTeX 公式，支援工程數學與電路推導。新增 QuizQuestion 資料表與手動題庫機制，確保在 LLM 出錯或無回應時仍有穩定題目可用，提升課程品質控制能力。
 
-## v4.1.0 - UX Polish & Navigation Intelligence (2025-11-28)
-- **Navigation**:
-    - Integrated Breadcrumb navigation into the Course Sidebar (Desktop & Mobile).
-    - Fixed Desktop Sidebar sticky positioning (flush with Navbar).
-    - Fixed Mobile Sidebar Z-Index to correctly cover the Navbar.
-- **Dashboard**:
-    - Redesigned "Continue Learning" section with vertical stack and `ResumeCard` integration.
-    - Implemented precise resume positioning using `lastElementId`.
-    - Applied glassmorphism styling to dashboard empty states.
-- **Logic**:
-    - Implemented 4-state learning logic (`NOT_STARTED`, `IN_PROGRESS`, `REVIEWING`, `COMPLETED`).
-    - Restricted "Resume Learning" floating card visibility to Home and Courses pages only.
-    - Optimized Resume Learning save logic (removed debounce for instant feel).
-- **AI Tutor**:
-    - Added Tabbed Interface (Chat vs. Quiz).
-    - Implemented Collapsible Sidebar "Focus Mode" for distraction-free learning.
-    - Added Notion-style Table of Contents (TOC).
-    - Restored "Ask AI" button integration.
-- **Tech**:
-    - Migrated `tsparticles` to v3.
-    - Added `localStorage` persistence and keyboard shortcut (`Ctrl+B`) for sidebar state.
+## v3.1.1 - Dashboard & Time Tracking Foundation (2025-11-23)
 
-## v4.0.0 - MDX Stability & Visual Refinements (2025-11-27)
-- **Core**:
-    - Implemented `ErrorBoundary` to handle MDX rendering failures gracefully.
-    - Added `ProgressBar` MDX component.
-- **UI**:
-    - Adjusted `InteractiveDotGrid` opacity and added it to Forum pages.
-    - Updated text colors for better contrast in dark mode.
-- **Fixes**:
-    - Resolved lesson slug and content UI rebuild issues.
-    - Fixed mobile typography and math overflow scrolling.
-    - Prevented mobile layout blowout from KaTeX equations.
+* **feat**:
 
-## v3.0.0 - Auth & Mobile Experience Overhaul (2025-11-26)
-- **Auth**:
-    - Complete overhaul of Sign-Up/Login flows.
-    - Added Particle Backgrounds to auth pages.
-    - Implemented OAuth onboarding flow.
-- **Mobile**:
-    - Major mobile layout fixes (AI Tutor border, Admin Editor scrollbars).
-    - Refined mobile AI Tutor layout and aesthetics.
-    - Disabled AI Tutor expansion on mobile for better usability.
-- **UI**:
-    - Implemented "Glass Heavy" design system across the application.
-    - Refactored input logic for distinct Touch vs. Mouse experiences (Profile Card tilt).
-    - Enhanced dashboard waves and footer buttons.
-- **Fixes**:
-    - Fixed blog creation failures (Admin & Public).
-    - Resolved build errors (missing exports/imports).
-    - Fixed footer refresh in admin panel.
+  * 這一版補齊「看不到自己學了多少」的缺口。設計學習時間紀錄機制與 Dashboard 顯示邏輯，計算每門課與每個學生的累計學習時數，並將 Dashboard 改成 dynamic render，避免 Prisma cache 導致資料顯示延遲。學生從此可以看到更具體的時間投入，平台也有基礎數據支撐後續學習分析功能。
 
-## v2.0.0 - Interactive UI & AI Context (2025-11-26)
-- **UI**:
-    - Introduced `InteractiveGridPattern` and dynamic background effects.
-    - Implemented mobile-first responsive design updates.
-- **AI**:
-    - Implemented text-selection based AI Tutor with lesson context awareness.
-    - Refactored TextSelectionToolbar to use portal and improved event handling.
-    - Updated toolbar positioning to use fixed coordinates for scroll support.
-- **Fixes**:
-    - Removed `onAskAI` prop to resolve server/client boundary errors.
-    - Fixed AI Tutor context stability.
+---
 
-## v1.5.0 - Content Management System (2025-11-25)
-- **Admin**:
-    - Implemented comprehensive Admin CMS for Courses and Projects.
-    - Redesigned Course Cards with Responsive Web Design (RWD).
-    - Enhanced Course Editor and updated site logo.
-- **Core**:
-    - Refactored CourseSidebar to sync progress with the database.
-    - Optimized SSG (Static Site Generation) and UserProgress tracking.
-- **Fixes**:
-    - Resolved hydration errors and broken SVG rendering.
-    - Fixed client-side errors by rendering MDX descriptions on server.
-    - Fixed Chat Interface layout (horizontal scroll disabled).
-    - Fixed UI/UX issues: Mobile scroll, Navbar logo, Card underlines.
+## v3.2.0 - Schema Refinement & LaTeX Everywhere (2025-11-24)
 
-## v1.1.0 - Advanced Features & LaTeX Support (2025-11-24)
-- **Auth**: Added GitHub and Google OAuth login support.
-- **Quiz**:
-    - Implemented AI Quiz system with DB-backed lesson content.
-    - Added fallback logic for quiz generation.
-    - Enhanced Quiz UI with larger inputs.
-- **Math**:
-    - Enabled LaTeX rendering support across MDX (Lessons, Blogs, Projects) using KaTeX.
-    - Added LaTeX syntax preprocessing for MDX compatibility.
-- **Forum**:
-    - Enhanced Forum UI with Markdown support (remarkGfm).
-    - Improved error recovery and fixed admin footer overlap.
-- **Media**:
-    - Added video URL support and reading time calculation.
-    - Implemented YouTube URL verification.
+* **refactor**:
 
-## v1.0.0 - Initial Release & Database Migration (2025-11-23)
-- **Core**:
-    - Migrated content storage from file-system to PostgreSQL (via Prisma).
-    - Established core data models (User, Course, Lesson, Progress).
-- **Feature**:
-    - Initial Home Page with real DB data.
-    - Time Tracking API implementation.
-- **Fixes**:
-    - Resolved Prisma Vercel caching issues.
-    - Fixed async page rendering bugs in dashboard and search.
-    - Fixed build errors (missing components, tsconfig exclusions).
+  * 這一版著重在「資料結構整理與公式顯示普及」。調整 BlogPost 與 Course schema，移除不再使用的欄位並加入 image、duration 等更貼近實際呈現需求的資料；在 Blog、Project、Lesson 中統一加入 videoUrl 支援影音內容。AI 測驗 API 被強化為可一次讀取大段章節內容，並在全站導入 LaTeX 顯示，確保不論在哪個頁面都可以穩定呈現工程公式。
+
+## v3.2.1 - AI Quiz Hardening & MDX Safety (2025-11-24)
+
+* **fix**:
+
+  * 這一版專門處理「AI 測驗與 MDX 易壞」的痛點。修正 slug 與 UUID 混用造成的外鍵錯誤與 404，為 Prisma P2003 等錯誤補上保護，避免 session 過期時整個 API 崩潰。針對 AI 測驗，加入上下文長度限制與回退策略，當 LLM 失敗時可退回手動題庫；同時在處理論壇貼文與內嵌 code 時加上 try/catch 與自動包裝成 code block，避免單一不合法內容就讓整頁爆炸。
+
+---
+
+## v3.3.0 - Admin CMS, Edit Mode & User Progress (2025-11-25)
+
+* **feat**:
+
+  * 這一版讓平台從「工程師才能改內容」進化到「可以用後台與 inline 編輯維護」。擴充 Admin CMS，完成 Courses/Projects CRUD，讓課程與專案改用系統管理而非手動改檔。新增全域 Edit Mode 與 EditModeControls，支援 Navbar、Footer、Blog 標題、Projects 介紹與 Forum 主視覺的即時編輯。後端則調整 UserProgress schema、修正 slug/UUID 寫入問題與設定級聯刪除，讓進度資料更準確也更易維護。
+
+## v3.3.1 - Layout Stability & Mobile UX Fixes (2025-11-25)
+
+* **fix**:
+
+  * 這一版主要是「體驗修補與視覺穩定」。全站調整 overflow 與水平捲動設定，修補多個頁面的橫向捲軸問題；調整 Navbar Logo 在小螢幕的排版與 hover 效果，讓導覽列更清晰；優化 AI Tutor 的氣泡換行與 MDX 圖片/SVG 的排版，避免被撐爆或變形。這些看似細節的修正，大幅提升整體介面專業度與可用性。
+
+---
+
+## v4.0.0 - Interactive UI, RWD Grid & Auth Overhaul (2025-11-26)
+
+* **feat**:
+
+  * 這一版是體驗面的大型改版，把平台從「能用」提升到「有質感、可長期展示」。導入 InteractiveGridPattern 與科技感背景，設計統一的 RWD 網格規則並套用 glassmorphism 卡片，讓首頁與關鍵頁面看起來像成熟產品。同時重構登入與註冊流程，加入 OAuth onboarding 與粒子背景，提升新用戶第一次進站的理解與信任感，並針對行動裝置修正多項側邊欄與遮罩問題。
+
+## v4.0.1 - Touch Performance & Admin Editing (2025-11-26)
+
+* **perf**:
+
+  * 這一版聚焦在「觸控裝置效能與可編輯性」。在手機與平板上關閉跟隨滑鼠的重運算背景效果，改用 tap ripple 作為互動回饋，顯著降低 GPU 和 CPU 負擔。同步優化 Admin Editor 的捲動與工具列固定方式，避免在小螢幕上無法看到完整編輯區或工具被捲出畫面，使內容維護在各種裝置上都實際可用。
+
+---
+
+## v4.1.0 - MDX Stability & Visual Refinement (2025-11-27)
+
+* **fix**:
+
+  * 這一版針對「內容 rendering 偶爾炸掉、視覺仍不夠成熟」的問題做系統性修正。為 MDX 渲染加上額外錯誤保護與預設 wrapper，處理自訂元件與 raw code 混用的極端情況，避免一段錯誤內容拉垮整頁。同步微調暗色配色、文字顏色與 code block 對比，調整課程與 Blog 列表的間距和陰影，讓長時間閱讀更舒適，也讓畫面層次更清楚。
+
+---
+
+## v4.2.0 - Navigation Intelligence & Tutor Upgrade (2025-11-28)
+
+* **feat**:
+
+  * 這一版解決「學生回來後不知道要接著學哪裡」與「AI 助教缺乏導學能力」的問題。重構課程側邊欄與 Dashboard「繼續學習」區，讓系統根據完成度與章節重要性建議下一步學習目標，而非僅僅線性下一節。AI Tutor 則升級為可切換不同模式、理解目前課程上下文的助教，讓問答過程更貼近真實家教而不是單純聊天機器人。
+
+---
+
+## v4.3.0 - Smart Quiz Core & Mobile Navigation (2025-11-29)
+
+* **feat**:
+
+  * 這一版把測驗從「單純生成題目」推進到「真正會看你學到哪裡」。導入 Smart Quiz 出題演算法，綜合考量已讀章節、尚未覆蓋內容與題目多樣性，避免重複出相同類型的題目。同時重構 LessonPage server/client 分工與 sectionsMetadata 計算，使測驗能精準對應內容段落，並微調行動端底部導覽列與側邊欄滑動行為，讓手機使用者在練習時也保持操作順暢。
+
+## v4.3.1 - Quiz JSON & State Resilience (2025-11-29)
+
+* **fix**:
+
+  * 這一版主要強化測驗在「有 LaTeX 與特殊字元時不會炸掉」。修正 AI 測驗 JSON 序列化與反序列化邏輯，處理反斜線與數學符號，避免解析失敗或題目內容被截斷。同步改善測驗狀態在重新整理與頁面切換後的恢復機制，降低學生答題到一半意外失去進度的風險，讓 Smart Quiz 在真實使用情境下更可靠。
+
+---
+
+## v5.0.0 - Real-Time Lesson State & Smart Resume (2025-11-30)
+
+* **feat**:
+
+  * 這一版是「學習狀態體驗」的大改版，把進度更新從延遲幾秒變成幾乎即時。導入 LessonProgressContext 與 Provider，讓課時狀態由 client 主導、server 同步，並明確定義 IN_PROGRESS 與 REVIEWING 模式，確保 COMPLETED 永遠不會被 API 意外降級。Resume Learning 按鈕也經過重設，會從真實最新進度計算最合理的下一課，讓學生回來不再迷路。
+
+## v5.0.1 - Time Tracking Accuracy & Stability (2025-11-30)
+
+* **fix**:
+
+  * 這一版專注在「學習時間會被吃掉或算錯」的問題。將 ResumeLearningTracker 改為以前端累計加上週期性同步，後端 API 也改為使用累加邏輯而非覆寫，避免在多分頁或網路抖動下 timeSpent 被倒扣或重設。加入 userId/session 取得失敗時的 fallback 機制，確保在登入延遲、關閉分頁或連線中斷時，時間紀錄的行為清楚且可預期。
+
+## v5.1.0 - DB Cleanup & Visual Final Polish (2025-11-30)
+
+* **refactor**:
+
+  * 這一版是這輪衝刺的總整理與收尾。清除 UserProgress 中已棄用的 completed 布林欄位，統一改用 status enum 與 slug 為主鍵，簡化進度與時間查詢邏輯，降低未來維護成本。視覺上則完成 Dashboard「繼續學習」卡片、背景 grid、粒子背景與按鈕樣式等最後一輪打磨，讓整個平台在功能與外觀上都達到可以對外展示與長期營運的品質水準。
+
+---
+
+## v5.2.0 - Gamification, Command Palette & Public Profile (2025-12-01)
+
+* **feat**:
+
+  * 這一版是「互動與個人化」的重大升級。新增 Command Palette (Cmd+K)，提供全站快速導航與搜尋，讓使用者能瞬間跳轉至任何課程或功能。導入完整的遊戲化系統 (Gamification)，包含 XP 經驗值、等級與每日學習連續紀錄 (Streak)，並在 Dashboard 顯著展示，提升學習動力。同時推出公開個人檔案 (Public Profile)，展示使用者的等級、徽章與完課證書，讓學習成就能夠被看見與分享。
+
+## v5.2.1 - Dynamic XP & Syntax Hardening (2025-12-01)
+
+* **feat**:
+
+  * 這一版解決「XP 計算過於死板」與「程式碼語法錯誤」的問題。實作動態 XP 計算邏輯 (Dynamic XP)，根據課程內容長度與難度自動計算經驗值，並在前端即時顯示預估獎勵，讓學習回饋感更真實。同時修復了 `AIQuizGenerator` 與 `LessonContent` 中因編輯失誤造成的語法損壞，並將 XP 邏輯抽離為共用模組，確保前後端計算一致且穩定。此外，新增了 Canvas Confetti 慶祝動畫與課程列表的 XP 標籤，大幅提升完成課程時的成就感與視覺回饋。

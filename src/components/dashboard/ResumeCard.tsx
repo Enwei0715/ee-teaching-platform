@@ -42,7 +42,7 @@ export default function ResumeCard({ courseTitle, lessonTitle, resumeLink, statu
     };
 
     return (
-        <div className="glass-panel rounded-2xl p-6 flex flex-col items-start gap-6 hover:shadow-lg hover:shadow-indigo-600/10 transition-all group relative">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col md:flex-row md:items-center items-start gap-6 hover:shadow-lg hover:shadow-indigo-600/10 transition-all group relative">
             {/* Dismiss Button (Top Right) */}
             {status === 'REVIEWING' && (
                 <button
@@ -55,7 +55,7 @@ export default function ResumeCard({ courseTitle, lessonTitle, resumeLink, statu
             )}
 
             {/* Top Section: Icon & Text */}
-            <div className="flex items-start gap-4 w-full">
+            <div className="flex items-start gap-4 w-full md:flex-1">
                 {/* Icon */}
                 <div className="p-3 bg-indigo-600/20 backdrop-blur-sm rounded-xl text-indigo-400 flex-shrink-0 mt-1">
                     <BookOpen size={28} />
@@ -90,10 +90,10 @@ export default function ResumeCard({ courseTitle, lessonTitle, resumeLink, statu
             </div>
 
             {/* Bottom Section: Actions */}
-            <div className="w-full flex justify-end pt-2 border-t border-white/5">
+            <div className="w-full md:w-auto flex justify-end pt-2 md:pt-0 border-t md:border-t-0 border-white/5">
                 <Link
                     href={resumeLink}
-                    className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 w-full sm:w-auto"
+                    className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 w-full md:w-auto whitespace-nowrap"
                 >
                     Resume
                     <ArrowRight size={18} />

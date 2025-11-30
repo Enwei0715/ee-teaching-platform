@@ -25,8 +25,11 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
         setShowExplanation(true);
         onVerify(quiz.explanation);
 
-        if (index === quiz.correctAnswer && onComplete) {
-            onComplete();
+        if (index === quiz.correctAnswer) {
+            // Delay slightly to let the user see the correct feedback
+            setTimeout(() => {
+                if (onComplete) onComplete();
+            }, 1500);
         }
     };
 

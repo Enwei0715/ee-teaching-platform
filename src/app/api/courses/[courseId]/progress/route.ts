@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { addXP, updateStreak, calculateLessonXP } from "@/lib/gamification";
 
 export async function GET(
     request: Request,
@@ -110,14 +111,36 @@ export async function POST(
 
         let newStatus = existingProgress?.status || 'IN_PROGRESS';
 
-        // Logic: Calculate new status
-        if (status) {
-            // Explicit status update from client (Priority)
-            newStatus = status;
-        } else if (completed) {
-            newStatus = 'COMPLETED';
-        } else if (!existingProgress) {
-            newStatus = 'IN_PROGRESS';
+        // Gamification: Update Streak
+        const streakResult = await updateStreak(session.user.id);
+
+        let xpResult = null;
+        let isPractice = false;
+        let xpGained = 0;
+
+        // Gamification: Award XP
+        if (completed) {
+            const wasAlreadyCompleted = existingProgress?.status === 'COMPLETED' || existingProgress?.status === 'REVIEWING';
+
+            if (!wasAlreadyCompleted) {
+                // First time completion
+                const lessonContent = await prisma.lesson.findUnique({
+                    where: { id: lesson.id },
+                    select: { content: true }
+                });
+
+                xpGained = calculateLessonXP({
+                    contentLength: lessonContent?.content?.length || 0,
+                    difficulty: 'Intermediate' // Default to Intermediate as field doesn't exist yet
+                });
+
+                xpResult = await addXP(session.user.id, xpGained);
+            } else if (body.source === 'quiz') {
+                // Practice XP for repeating quiz
+                isPractice = true;
+                xpGained = 5; // Fixed amount for practice
+                xpResult = await addXP(session.user.id, xpGained);
+            }
         }
 
         let progress;
@@ -143,7 +166,16 @@ export async function POST(
             });
         }
 
-        return NextResponse.json(progress);
+        return NextResponse.json({
+            ...progress,
+            gamification: {
+                streak: streakResult?.streak || 0,
+                streakUpdated: streakResult?.updated || false,
+                xpGained,
+                isPractice,
+                xp: xpResult
+            }
+        });
     } catch (error) {
         console.error("Error updating course progress:", error);
         return new NextResponse("Internal Server Error", { status: 500 });
