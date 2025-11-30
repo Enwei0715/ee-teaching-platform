@@ -24,7 +24,7 @@ export function LessonProgressProvider({
     courseId: string;
 }) {
     // Initialize state with optimistic transitions
-    const [status, setStatus] = useState(() => {
+    const [status, setStatus] = useState<'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWING'>(() => {
         if (initialStatus === 'NOT_STARTED') return 'IN_PROGRESS';
         if (initialStatus === 'COMPLETED') return 'REVIEWING';
         return initialStatus;
