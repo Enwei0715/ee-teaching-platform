@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { List, X } from 'lucide-react';
 import { generateSectionId } from '@/lib/content-utils';
-import { useLessonProgress } from '@/context/LessonProgressContext';
 
 interface TocItem {
     id: string;
@@ -16,19 +15,15 @@ interface TableOfContentsProps {
     lessonId?: string;
     initialLastElementId?: string | null;
     onActiveHeadingChange?: (id: string) => void;
-    onComplete?: () => void;
 }
 
-export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange, onComplete }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
     const isRestoredRef = useRef(false); // Prevent saving during initial load
-
-    // Context for real-time updates
-    const { markAsComplete } = useLessonProgress();
 
     // Extract headings from DOM
     useEffect(() => {
@@ -50,6 +45,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                 }
             });
 
+            console.log("📑 [TOC] Extracted items:", tocItems);
             setItems(tocItems);
         };
 
@@ -71,6 +67,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
+                    console.log("👁️ [TOC] Intersecting:", id);
                     if (id) {
                         setActiveId(id);
                         // Call prop callback instead of dispatching event
@@ -142,9 +139,6 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                 return;
             }
 
-            // Check if this is the last item in the TOC
-            const isLastItem = items.length > 0 && activeId === items[items.length - 1].id;
-
             // Save to database
             (async () => {
                 try {
@@ -153,27 +147,19 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             lessonId,
-                            lastElementId: activeId,
-                            completed: isLastItem ? true : undefined
+                            lastElementId: activeId
                         })
                     });
-                    console.log(`💾 Saved position: ${activeId}${isLastItem ? ' (COMPLETED)' : ''}`);
+                    console.log(`💾 Saved position: ${activeId}`);
                     lastSavedIdRef.current = activeId; // Update ref after successful save
-
-                    // Trigger completion callback if applicable
-                    if (isLastItem) {
-                        if (onComplete) onComplete();
-                        markAsComplete(); // Update global context
-                    }
                 } catch (error) {
                     console.error('Failed to save position:', error);
-                    // Fail silently - don't break UI on network errors
                 }
             })();
         }, 1000); // 1 second debounce
 
         return () => clearTimeout(saveTimer);
-    }, [activeId, courseId, lessonId, items, onComplete]);
+    }, [activeId, courseId, lessonId]);
 
     // Scroll to section on click
     const handleClick = (id: string) => {

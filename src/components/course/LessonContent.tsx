@@ -13,6 +13,7 @@ import ResumeLearningTracker from '@/components/course/ResumeLearningTracker';
 import TableOfContents from '@/components/course/TableOfContents';
 import AIQuizGenerator from '@/components/assignment/AIQuizGenerator';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { useLessonProgress } from '@/context/LessonProgressContext';
 
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
 
@@ -57,19 +58,6 @@ export default function LessonContent({
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
     const [scrollProgress, setScrollProgress] = useState(0);
 
-    // Lifted state for Lesson Status to support real-time updates
-    const [currentStatus, setCurrentStatus] = useState(lessonStatus);
-
-    // Sync state with prop if it changes (e.g. revalidation)
-    useEffect(() => {
-        setCurrentStatus(lessonStatus);
-    }, [lessonStatus]);
-
-    const handleLessonComplete = () => {
-        console.log("🎉 Lesson Completed! Updating UI state...");
-        setCurrentStatus('COMPLETED');
-    };
-
     // Navigation Hotkeys Listener
     useEffect(() => {
         const handleNext = () => {
@@ -94,6 +82,11 @@ export default function LessonContent({
         console.log(`[LessonContent] Active Heading Changed: "${activeHeadingId}"`);
     }, [activeHeadingId]);
 
+    // Context for real-time updates
+    const { startLesson, enterReviewMode, markAsComplete } = useLessonProgress();
+
+    // Initial State Logic handled by LessonProgressContext now
+
     // Scroll progress listener
     useEffect(() => {
         const handleScroll = () => {
@@ -104,6 +97,26 @@ export default function LessonContent({
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Intersection Observer for Completion (AI Quiz Section)
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    console.log("🎯 [LessonContent] Reached AI Quiz section! Triggering completion...");
+                    markAsComplete();
+                }
+            },
+            { threshold: 0.1 } // Trigger when 10% of quiz section is visible
+        );
+
+        const quizSection = document.getElementById('ai-quiz');
+        if (quizSection) {
+            observer.observe(quizSection);
+        }
+
+        return () => observer.disconnect();
     }, []);
 
     // MDX Components - can be extended here
@@ -234,7 +247,6 @@ export default function LessonContent({
                         lessonId={lesson.id}
                         initialLastElementId={initialLastElementId}
                         onActiveHeadingChange={setActiveHeadingId}
-                        onComplete={handleLessonComplete}
                     />
                 </div>
             </div>
@@ -251,7 +263,6 @@ export default function LessonContent({
                 activeHeadingId={activeHeadingId}
                 courseSlug={course.slug}
                 lessonSlug={lesson.slug}
-                lessonStatus={currentStatus}
             />
 
             {/* Resume Learning Tracker */}

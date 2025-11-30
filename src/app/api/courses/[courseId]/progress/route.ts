@@ -66,7 +66,7 @@ export async function POST(
 
     try {
         const body = await request.json();
-        const { lessonId, lastElementId, timeSpent, completed } = body;
+        const { lessonId, lastElementId, timeSpent, completed, status } = body;
 
         if (!lessonId) {
             return new NextResponse("Missing lessonId", { status: 400 });
@@ -111,11 +111,11 @@ export async function POST(
         let newStatus = existingProgress?.status || 'IN_PROGRESS';
 
         // Logic: Calculate new status
-        if (completed) {
+        if (status) {
+            // Explicit status update from client (Priority)
+            newStatus = status;
+        } else if (completed) {
             newStatus = 'COMPLETED';
-        } else if (existingProgress?.status === 'COMPLETED') {
-            // If it was COMPLETED and we are updating progress (not finishing), switch to REVIEWING
-            newStatus = 'REVIEWING';
         } else if (!existingProgress) {
             newStatus = 'IN_PROGRESS';
         }

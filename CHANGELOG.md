@@ -1,5 +1,16 @@
 # Project Changelog
 
+## v4.4.0 - Perfected Lesson State & Real-Time Sync (2025-11-30)
+- **Real-Time State Logic**:
+    - **Instant Feedback**: Refactored `LessonProgressContext` to use optimistic state initialization, ensuring lesson status icons (Play/Check) update *instantly* on entry without waiting for API responses.
+    - **Smart Auto-Start**: New lessons now automatically transition to `IN_PROGRESS` immediately upon visit, with background database synchronization.
+    - **Review Mode**: Re-visiting completed lessons now correctly triggers `REVIEWING` mode, preserving the `COMPLETED` status in the database while updating the UI context.
+    - **Persistence Fix**: Resolved a critical bug where the API implicitly reverted `COMPLETED` status to `REVIEWING`, ensuring completion status is now sticky and reliable.
+- **Bug Fixes**:
+    - **Course Sidebar**: Fixed status icon staleness by ensuring the sidebar consumes real-time context for the active lesson.
+    - **Table of Contents**: Fixed syntax errors and removed redundant logic, delegating state management to the centralized Context.
+    - **API Reliability**: Hardened the progress API to prioritize explicit client-side status updates over implicit server-side logic.
+
 ## v4.3.8 - Real-Time Sync & Quiz Polish (2025-11-30)
 - **Real-Time State Sync**:
     - **Instant Updates**: Implemented `LessonProgressContext` to ensure the sidebar checkmark and AI Tutor "Review Mode" update immediately upon lesson completion without a page refresh.

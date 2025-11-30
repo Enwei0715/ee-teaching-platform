@@ -256,7 +256,11 @@ ${fence}
     };
 
     return (
-        <LessonProgressProvider initialStatus={lessonStatus} lessonId={lessonData.id}>
+        <LessonProgressProvider
+            initialStatus={lessonStatus as any}
+            lessonId={lessonData.id}
+            courseId={params.courseId}
+        >
             <LessonContent
                 course={courseData}
                 lesson={lessonData}

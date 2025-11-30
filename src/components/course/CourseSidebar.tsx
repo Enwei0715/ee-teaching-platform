@@ -33,6 +33,10 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
     // Context for real-time updates
     const { currentLessonId, status: currentLessonStatus } = useLessonProgress();
 
+    useEffect(() => {
+        console.log("sidebar render", { currentLessonId, currentLessonStatus });
+    }, [currentLessonId, currentLessonStatus]);
+
     // Load collapsed state from localStorage on mount
     useEffect(() => {
         setIsMounted(true);

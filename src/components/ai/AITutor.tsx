@@ -35,6 +35,10 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
     const { status: contextStatus } = useLessonProgress();
     const currentStatus = contextStatus || lessonStatus;
 
+    useEffect(() => {
+        console.log("🤖 [AITutor] Status Update:", { contextStatus, lessonStatus, final: currentStatus });
+    }, [contextStatus, lessonStatus]);
+
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [activeTab, setActiveTab] = useState<'chat' | 'quiz'>('chat');
@@ -75,6 +79,10 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
             // If event has detail with text, populate input
             if (e?.detail?.text) {
                 setInput(e.detail.text);
+            }
+            // Switch tab if requested (e.g. from QuizChat)
+            if (e?.detail?.switchToTab) {
+                setActiveTab(e.detail.switchToTab);
             }
         };
         window.addEventListener('open-ai-tutor', handleOpen);
