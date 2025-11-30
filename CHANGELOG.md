@@ -1,5 +1,13 @@
 # Project Changelog
 
+## v4.3.4 - AI Quiz & UI Stability (2025-11-30)
+- **AI Quiz**:
+    - **Prompt Fix**: Updated system prompt to strictly enforce LaTeX formatting rules, preventing plain text artifacts in math formulas.
+- **UI/UX**:
+    - **Visual Polish**: Fixed math formula alignment, added table borders, and implemented custom dark scrollbars globally.
+    - **AI Tutor**: Resolved z-index layering issue where the footer obscured the chat window by moving the component to a React Portal.
+    - **Layout**: Fixed background bleed-through in AI Tutor with a new backdrop overlay.
+
 ## v4.3.3 - Quiz UI/UX Polish (2025-11-30)
 - **Quiz UI/UX**:
     - **Layout & Typography**: Fixed option button alignment, math formula rendering, and text baseline issues.
