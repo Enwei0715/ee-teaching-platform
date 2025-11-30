@@ -1,5 +1,5 @@
 
-import { generateHeadingId } from '../utils';
+import { generateSectionId } from '../content-utils';
 
 export interface Section {
     id: string;
@@ -46,7 +46,7 @@ export function parseSections(markdown: string): Section[] {
 
             // Start new section
             const title = headerMatch[2].trim();
-            const id = generateHeadingId(title);
+            const id = generateSectionId(title);
 
             currentSection = {
                 id: id,
@@ -81,6 +81,9 @@ export function parseSections(markdown: string): Section[] {
  * If currentHeadingId is null, returns ALL sections (Review Mode).
  * If provided, returns sections up to (and including) the current heading.
  */
+// Helper for fuzzy comparison (strips punctuation)
+const fuzzyNormalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
+
 export function scopeSections(sections: Section[], currentHeadingId: string | null): Section[] {
     console.log(`[Scoper] Scoping for ID: "${currentHeadingId}"`);
 
@@ -89,30 +92,26 @@ export function scopeSections(sections: Section[], currentHeadingId: string | nu
         return sections;
     }
 
-    // Normalize IDs for comparison (simple lowercase + alphanumeric only)
-    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const targetId = normalize(currentHeadingId);
+    // 1. Fuzzy Match Target
+    const normalizedTarget = fuzzyNormalize(currentHeadingId);
 
+    // 2. Find Index using Fuzzy Comparison
     const foundIndex = sections.findIndex(s => {
-        const sId = normalize(s.id);
-        // Exact match or Prefix match (to handle potential suffixes)
-        return sId === targetId || targetId.startsWith(sId);
+        // Compare against ID and Title for maximum robustness
+        return fuzzyNormalize(s.id) === normalizedTarget ||
+            fuzzyNormalize(s.title) === normalizedTarget;
     });
 
-    if (foundIndex === -1) {
-        console.warn(`[Scoper] Warning: Current heading ID "${currentHeadingId}" not found in sections. Defaulting to FIRST SECTION to prevent spoilers.`);
-        // CRITICAL FAIL-SAFE: Return only the first section
+    // 3. Handle Result
+    if (foundIndex !== -1) {
+        console.log(`[Scoper] Match Found! Target: "${currentHeadingId}" -> Index: ${foundIndex} ("${sections[foundIndex].title}")`);
+        // Slice is end-exclusive, so +1 to include the current section
+        return sections.slice(0, foundIndex + 1);
+    } else {
+        console.warn(`[Scoper] Target "${currentHeadingId}" (norm: ${normalizedTarget}) NOT FOUND. Defaulting to Section 1 to prevent spoilers.`);
+        // Fallback: Return only the first section (safest bet)
         return sections.slice(0, 1);
     }
-
-    // Slice from 0 to foundIndex + 1 (to include the current section)
-    const slicedSections = sections.slice(0, foundIndex + 1);
-
-    console.log(`[Scoper] Current ID: "${currentHeadingId}", Found at index: ${foundIndex} (Matched: "${sections[foundIndex].title}"), Cutting at index: ${foundIndex + 1}`);
-    console.log(`[Scoper] Original count: ${sections.length}, Scoped count: ${slicedSections.length}`);
-    console.log(`[Scoper] Included sections:`, slicedSections.map(s => s.title));
-
-    return slicedSections;
 }
 
 /**
@@ -187,30 +186,25 @@ export function scoreSections(sections: Section[]): ScoredSection[] {
 export function selectBestSection(scoredSections: ScoredSection[]): ScoredSection | null {
     if (scoredSections.length === 0) return null;
 
-    // 1. Filter by minimum score
-    let candidates = scoredSections.filter(s => s.score >= 50);
+    // 1. Filter by minimum score (Threshold Strategy)
+    // User requested to pick ANY section above a certain score, not just the top %
+    const SCORE_THRESHOLD = 150;
+    let candidates = scoredSections.filter(s => s.score >= SCORE_THRESHOLD);
 
     // 2. Fallback if no candidates
     if (candidates.length === 0) {
-        console.log("[Selector] No sections passed minimum score. Falling back to highest scoring section.");
+        console.log(`[Selector] No sections passed threshold (${SCORE_THRESHOLD}). Falling back to highest scoring section.`);
         // Sort by score descending
         const sorted = [...scoredSections].sort((a, b) => b.score - a.score);
         return sorted[0];
     }
 
-    // 3. Sort by score descending
-    candidates.sort((a, b) => b.score - a.score);
+    console.log(`[Selector] Candidate Pool: ${candidates.length} sections (Score >= ${SCORE_THRESHOLD})`);
+    candidates.forEach(s => console.log(`  - [${s.score}] ${s.title}`));
 
-    // 4. Take top 30%
-    const poolSize = Math.ceil(candidates.length * 0.3);
-    const pool = candidates.slice(0, poolSize);
-
-    console.log(`[Selector] Pool Size: ${pool.length} (Top 30% of ${candidates.length} candidates)`);
-    pool.forEach(s => console.log(`  - [${s.score}] ${s.title}`));
-
-    // 5. Random Selection
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const selected = pool[randomIndex];
+    // 3. Random Selection from ALL valid candidates
+    const randomIndex = Math.floor(Math.random() * candidates.length);
+    const selected = candidates[randomIndex];
 
     console.log(`[Selector] Selected: "${selected.title}" (Score: ${selected.score})`);
     return selected;

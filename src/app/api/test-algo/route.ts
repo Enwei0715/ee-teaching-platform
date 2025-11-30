@@ -1,44 +1,44 @@
 import { NextResponse } from 'next/server';
-import { parseSections, scopeSections, scoreSections } from '@/lib/ai/quiz-algorithm';
+import { parseSections } from '@/lib/ai/quiz-algorithm';
+import { generateSectionId } from '@/lib/content-utils';
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { markdown, currentHeadingId } = body;
+        const { lessonContent, targetHeadingText } = await req.json();
 
-        if (!markdown) {
-            return NextResponse.json({ error: 'Markdown content is required' }, { status: 400 });
+        if (!lessonContent) {
+            return NextResponse.json({ error: "lessonContent is required" }, { status: 400 });
         }
 
-        console.log("--- Test Algo Start ---");
+        // 1. Run the parser (Backend Logic)
+        const sections = parseSections(lessonContent);
 
-        // Phase 1: Parse
-        const sections = parseSections(markdown);
+        // 2. Simulate Frontend ID Generation (Frontend Logic)
+        // This simulates what TableOfContents.tsx does now
+        const frontendTargetId = generateSectionId(targetHeadingText || '');
 
-        // Phase 2: Scope
-        const scopedSections = scopeSections(sections, currentHeadingId || null);
+        // 3. Find Match
+        // The backend parser uses generateSectionId internally for section.id
+        const matchIndex = sections.findIndex(s => s.id === frontendTargetId);
 
-        // Phase 3: Score
-        const scoredSections = scoreSections(scopedSections);
-
-        console.log("--- Test Algo End ---");
-
+        // 4. Return Verbose Debug Info
         return NextResponse.json({
-            originalCount: sections.length,
-            scopedCount: scopedSections.length,
-            sections: sections.map(s => ({ id: s.id, title: s.title })),
-            scopedSections: scopedSections.map(s => ({ id: s.id, title: s.title })),
-            scoredSections: scoredSections.map(s => ({
-                id: s.id,
-                title: s.title,
-                score: s.score,
-                reasons: s.reasons
-            })),
-            logs: "Check server console for detailed logs"
+            status: matchIndex !== -1 ? "MATCH_FOUND" : "MATCH_FAILED",
+            debug_info: {
+                received_heading_text: targetHeadingText,
+                generated_frontend_id: frontendTargetId,
+                found_index: matchIndex,
+                total_sections: sections.length
+            },
+            backend_parsed_sections: sections.map((s, i) => ({
+                index: i,
+                original_title: s.title,
+                generated_id: s.id,
+                is_match: s.id === frontendTargetId
+            }))
         });
 
-    } catch (error) {
-        console.error("Test Algo Error:", error);
-        return NextResponse.json({ error: String(error) }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
     }
 }

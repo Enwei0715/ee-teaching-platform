@@ -186,6 +186,28 @@ Generate a unique quiz question based on THIS section only.
             // 1. Parse
             const sections = parseSections(lesson.content);
 
+            // --- QUIZ DEBUG START ---
+            console.log("--- QUIZ DEBUG START ---");
+            console.log("1. Target ID (from Frontend):", limitToHeadingId);
+            console.log("2. Parsed Sections Count:", sections.length);
+            console.log("3. First 3 Section IDs:", sections.slice(0, 3).map(s => s.id));
+
+            const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const targetNormalized = normalize(limitToHeadingId || '');
+
+            const matchIndex = sections.findIndex(s =>
+                normalize(s.id) === targetNormalized || normalize(s.title) === targetNormalized
+            );
+
+            console.log("4. Normalized Match Target:", targetNormalized);
+            console.log("5. Found Match Index:", matchIndex);
+
+            if (matchIndex === -1 && limitToHeadingId) {
+                console.warn("⚠️ MISMATCH DETECTED! Defaulting to Section 1.");
+            }
+            console.log("--- QUIZ DEBUG END ---");
+            // --- QUIZ DEBUG END ---
+
             // 2. Scope (Fail-Safe Slicing applied here)
             const scopedSections = scopeSections(sections, limitToHeadingId);
 

@@ -16,6 +16,8 @@ interface TableOfContentsProps {
     onActiveHeadingChange?: (id: string) => void;
 }
 
+import { generateSectionId } from '@/lib/content-utils';
+
 export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
@@ -34,8 +36,9 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
             const tocItems: TocItem[] = [];
 
             headings.forEach((heading) => {
-                const id = heading.getAttribute('id');
                 const text = heading.textContent?.trim();
+                // Use standardized ID generation to match Backend
+                const id = text ? generateSectionId(text) : heading.getAttribute('id');
                 const level = parseInt(heading.tagName.charAt(1)) as 2 | 3;
 
                 if (id && text) {

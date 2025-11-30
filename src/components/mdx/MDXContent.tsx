@@ -12,6 +12,7 @@ interface Props {
 export default function MDXContent({ source, courseId, lessonId }: Props) {
     const componentsWithContext = {
         ...mdxComponents,
+        Quiz: () => null, // Legacy component placeholder to prevent crashes
     };
 
     return <MDXRemote {...source} components={componentsWithContext} />;

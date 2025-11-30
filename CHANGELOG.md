@@ -1,5 +1,14 @@
 # Project Changelog
 
+## v4.3.6 - Robust Quiz Scoping & ID Standardization (2025-11-30)
+- **AI Quiz**:
+    - **Fuzzy Matching**: Implemented robust "Fuzzy Matching" for section IDs. The system now ignores punctuation and special characters when comparing frontend and backend IDs, resolving the "Section 1 Loop" bug caused by minor format differences (e.g., "1.1" vs "1-1").
+    - **Selection Strategy**: Updated the quiz selection algorithm to pick randomly from *any* section with a score >= 150, removing the restrictive "Top 30%" filter to ensure broader content coverage.
+    - **Deep Logging**: Added detailed debug logs to the quiz API to trace ID mismatches in production.
+- **Codebase**:
+    - **Standardization**: Created `src/lib/content-utils.ts` as the single source of truth for ID generation across the app.
+    - **Verification**: Added `scripts/verify-id-logic.ts` to automatically test ID generation rules.
+
 ## v4.3.5 - Quiz Logic Fixes & Cleanup (2025-11-30)
 - **AI Quiz**:
     - **Spoiler Fix**: Implemented "Fail-Safe Slicing" to prevent questions about unread sections. If the user's location is unknown, it defaults to the first section.
