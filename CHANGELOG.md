@@ -1,5 +1,10 @@
 # Project Changelog
 
+## v4.4.6 - Visual Refinements (2025-11-30)
+- **UI Enhancements**:
+    - **About Page**: Applied the background grid pattern specifically to the "About Me" page for better visual consistency.
+    - **Theme Adjustment**: Reverted particle colors to a subtle white/transparent theme for a cleaner look.
+
 ## v4.4.5 - Visual Customization (2025-11-30)
 - **UI Enhancements**:
     - **Homepage Theme**: Updated the particle network to use a vibrant blue color scheme (#0032fa) and increased the background grid opacity to 0.3 for a more distinct, tech-focused look.
