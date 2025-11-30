@@ -16,8 +16,8 @@ export default function BackgroundGrid() {
         return <InteractiveGridPattern />;
     }
 
-    // Show simple grid on About page
-    if (pathname === '/about') {
+    // Show simple grid on Home and About page
+    if (pathname === '/about' || pathname === '/') {
         return (
             <div
                 className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.15]"

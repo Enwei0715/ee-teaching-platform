@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.7 - Visual Consistency (2025-11-30)
+- **UI Enhancements**:
+    - **Global Grid**: Extended the background grid pattern to the Homepage (`/`) in addition to the About page, ensuring a consistent technical aesthetic across key landing pages.
+
 ## v4.4.6 - Visual Refinements (2025-11-30)
 - **UI Enhancements**:
     - **About Page**: Applied the background grid pattern specifically to the "About Me" page for better visual consistency.
