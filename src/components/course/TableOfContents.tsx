@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { List, X } from 'lucide-react';
+import { generateSectionId } from '@/lib/content-utils';
+import { useLessonProgress } from '@/context/LessonProgressContext';
 
 interface TocItem {
     id: string;
@@ -14,17 +16,19 @@ interface TableOfContentsProps {
     lessonId?: string;
     initialLastElementId?: string | null;
     onActiveHeadingChange?: (id: string) => void;
+    onComplete?: () => void;
 }
 
-import { generateSectionId } from '@/lib/content-utils';
-
-export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange, onComplete }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
     const isRestoredRef = useRef(false); // Prevent saving during initial load
+
+    // Context for real-time updates
+    const { markAsComplete } = useLessonProgress();
 
     // Extract headings from DOM
     useEffect(() => {
@@ -155,6 +159,12 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                     });
                     console.log(`💾 Saved position: ${activeId}${isLastItem ? ' (COMPLETED)' : ''}`);
                     lastSavedIdRef.current = activeId; // Update ref after successful save
+
+                    // Trigger completion callback if applicable
+                    if (isLastItem) {
+                        if (onComplete) onComplete();
+                        markAsComplete(); // Update global context
+                    }
                 } catch (error) {
                     console.error('Failed to save position:', error);
                     // Fail silently - don't break UI on network errors
@@ -163,7 +173,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         }, 1000); // 1 second debounce
 
         return () => clearTimeout(saveTimer);
-    }, [activeId, courseId, lessonId, items]);
+    }, [activeId, courseId, lessonId, items, onComplete]);
 
     // Scroll to section on click
     const handleClick = (id: string) => {

@@ -1,5 +1,13 @@
 # Project Changelog
 
+## v4.3.8 - Real-Time Sync & Quiz Polish (2025-11-30)
+- **Real-Time State Sync**:
+    - **Instant Updates**: Implemented `LessonProgressContext` to ensure the sidebar checkmark and AI Tutor "Review Mode" update immediately upon lesson completion without a page refresh.
+    - **Context Provider**: Wrapped lesson pages with `LessonProgressProvider` for efficient client-side state management.
+- **AI Quiz**:
+    - **Scroll Fix**: Resolved scroll jumping issues in `AIQuizGenerator` by forcing the view to center on the quiz card during loading and generation states.
+    - **Layout Stability**: Enforced minimum height on the quiz container to prevent layout collapse during state transitions.
+
 ## v4.3.7 - Regression Fixes (2025-11-30)
 - **UI Fixes**:
     - **Lesson Date**: Fixed "Invalid Date" display by adding a safe check and fallback ("Recently updated") for lessons with missing timestamps.

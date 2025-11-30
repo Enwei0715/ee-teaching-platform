@@ -57,13 +57,27 @@ export default function LessonContent({
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
     const [scrollProgress, setScrollProgress] = useState(0);
 
+    // Lifted state for Lesson Status to support real-time updates
+    const [currentStatus, setCurrentStatus] = useState(lessonStatus);
+
+    // Sync state with prop if it changes (e.g. revalidation)
+    useEffect(() => {
+        setCurrentStatus(lessonStatus);
+    }, [lessonStatus]);
+
+    const handleLessonComplete = () => {
+        console.log("🎉 Lesson Completed! Updating UI state...");
+        setCurrentStatus('COMPLETED');
+    };
+
     // Navigation Hotkeys Listener
     useEffect(() => {
         const handleNext = () => {
-            if (nextLesson) router.push(`/courses/${course.slug}/${nextLesson.slug}`);
+            // Note: nextLesson comes from getCourseStructure where 'id' is the slug
+            if (nextLesson) router.push(`/courses/${course.slug}/${nextLesson.id}`);
         };
         const handlePrev = () => {
-            if (prevLesson) router.push(`/courses/${course.slug}/${prevLesson.slug}`);
+            if (prevLesson) router.push(`/courses/${course.slug}/${prevLesson.id}`);
         };
 
         window.addEventListener('nav-next-lesson', handleNext);
@@ -145,7 +159,7 @@ export default function LessonContent({
                                         <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                     </div>
                                     {isEditMode && (
-                                        <Link href={`/admin/courses/${course.id}/lessons/${lesson.id}`}>
+                                        <Link href={`/admin/courses/${course.slug}?file=${lesson.slug}.mdx`}>
                                             <button className="glass-ghost px-3 py-1 rounded-lg border border-white/20 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
                                                 <Edit size={14} /> Edit Lesson
                                             </button>
@@ -184,7 +198,7 @@ export default function LessonContent({
                         <div className="mt-12 flex justify-between items-center pt-8 border-t border-border-primary">
                             {prevLesson ? (
                                 <Link
-                                    href={`/courses/${course.slug}/${prevLesson.slug}`}
+                                    href={`/courses/${course.slug}/${prevLesson.id}`}
                                     className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
                                 >
                                     <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -199,7 +213,7 @@ export default function LessonContent({
 
                             {nextLesson ? (
                                 <Link
-                                    href={`/courses/${course.slug}/${nextLesson.slug}`}
+                                    href={`/courses/${course.slug}/${nextLesson.id}`}
                                     className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
                                 >
                                     <div>
@@ -220,6 +234,7 @@ export default function LessonContent({
                         lessonId={lesson.id}
                         initialLastElementId={initialLastElementId}
                         onActiveHeadingChange={setActiveHeadingId}
+                        onComplete={handleLessonComplete}
                     />
                 </div>
             </div>
@@ -236,7 +251,7 @@ export default function LessonContent({
                 activeHeadingId={activeHeadingId}
                 courseSlug={course.slug}
                 lessonSlug={lesson.slug}
-                lessonStatus={lessonStatus}
+                lessonStatus={currentStatus}
             />
 
             {/* Resume Learning Tracker */}

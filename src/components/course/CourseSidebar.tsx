@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { ChevronRight, ChevronDown, PanelLeftClose, PanelLeftOpen, CheckCircle2, Circle, Lock, PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StatusIcon } from '@/components/course/StatusIcon';
+import { useLessonProgress } from '@/context/LessonProgressContext';
 
 interface Lesson {
     id: string;
@@ -28,6 +29,9 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+    // Context for real-time updates
+    const { currentLessonId, status: currentLessonStatus } = useLessonProgress();
 
     // Load collapsed state from localStorage on mount
     useEffect(() => {
@@ -77,7 +81,14 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
         fetchProgress();
     }, [session, courseId]);
 
-    const completedCount = lessons.filter(l => progressMap[l.id] === 'COMPLETED' || progressMap[l.id] === 'REVIEWING').length;
+    const completedCount = lessons.filter(l => {
+        // Check if this lesson is the current one being viewed
+        if (l.id === currentLessonId) {
+            return currentLessonStatus === 'COMPLETED' || currentLessonStatus === 'REVIEWING';
+        }
+        return progressMap[l.id] === 'COMPLETED' || progressMap[l.id] === 'REVIEWING';
+    }).length;
+
     const totalLessons = lessons.length;
     const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
@@ -141,6 +152,9 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
                     {lessons.map((lesson, index) => {
                         const isActive = pathname === `/courses/${courseId}/${lesson.id}`;
 
+                        // Use real-time status for current lesson, fallback to fetched map for others
+                        const displayStatus = (lesson.id === currentLessonId) ? currentLessonStatus : progressMap[lesson.id];
+
                         return (
                             <li key={lesson.id}>
                                 <Link
@@ -159,7 +173,7 @@ export default function CourseSidebar({ courseId, lessons, category = "Courses",
 
                                     <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "text-text-secondary/30 group-hover:text-text-secondary/70")}>
                                         <StatusIcon
-                                            status={progressMap[lesson.id]}
+                                            status={displayStatus}
                                             index={index}
                                             className="w-4 h-4"
                                         />

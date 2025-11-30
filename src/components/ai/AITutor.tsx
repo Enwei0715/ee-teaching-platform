@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import QuizTab from './QuizTab';
+import { useLessonProgress } from '@/context/LessonProgressContext';
 
 interface LessonContext {
     courseTitle: string;
@@ -29,6 +30,11 @@ interface AITutorProps {
 
 export default function AITutor({ lessonTitle, lessonContent, lessonContext, activeHeadingId, courseSlug, lessonSlug, lessonStatus }: AITutorProps = {}) {
     console.log("AITutor Rendered. Context:", lessonContext ? "YES" : "NO", lessonContext?.lessonTitle);
+
+    // Use context for real-time status updates
+    const { status: contextStatus } = useLessonProgress();
+    const currentStatus = contextStatus || lessonStatus;
+
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [activeTab, setActiveTab] = useState<'chat' | 'quiz'>('chat');
@@ -316,10 +322,10 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                         <QuizTab
                             lessonContent={lessonContent}
                             // Only pass activeHeadingId if lesson is IN_PROGRESS
-                            activeHeadingId={lessonStatus === 'IN_PROGRESS' ? activeHeadingId : undefined}
+                            activeHeadingId={currentStatus === 'IN_PROGRESS' ? activeHeadingId : undefined}
                             courseSlug={courseSlug}
                             lessonSlug={lessonSlug}
-                            lessonStatus={lessonStatus}
+                            lessonStatus={currentStatus}
                         />
                     )}
                 </div>

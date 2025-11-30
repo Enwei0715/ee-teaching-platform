@@ -13,6 +13,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import LessonContent from '@/components/course/LessonContent';
+import { LessonProgressProvider } from '@/context/LessonProgressContext';
 
 interface Props {
     params: {
@@ -255,16 +256,18 @@ ${fence}
     };
 
     return (
-        <LessonContent
-            course={courseData}
-            lesson={lessonData}
-            prevLesson={prevLesson}
-            nextLesson={nextLesson}
-            initialLastElementId={initialLastElementId}
-            lessonStatus={lessonStatus}
-            readingTime={readingTime}
-            mdxSource={mdxSource}
-            completedLessonsCount={completedLessonsCount}
-        />
+        <LessonProgressProvider initialStatus={lessonStatus} lessonId={lessonData.id}>
+            <LessonContent
+                course={courseData}
+                lesson={lessonData}
+                prevLesson={prevLesson}
+                nextLesson={nextLesson}
+                initialLastElementId={initialLastElementId}
+                lessonStatus={lessonStatus}
+                readingTime={readingTime}
+                mdxSource={mdxSource}
+                completedLessonsCount={completedLessonsCount}
+            />
+        </LessonProgressProvider>
     );
 }

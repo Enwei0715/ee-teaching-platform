@@ -19,6 +19,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
     const [error, setError] = useState<string | null>(null);
     const { markLessonComplete } = useProgress();
     const containerRef = useRef<HTMLDivElement>(null);
+    const topAnchorRef = useRef<HTMLDivElement>(null);
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -34,12 +35,18 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
         }
     };
 
-    // Scroll to question when quiz is generated
+    // Scroll to question when quiz is generated or loading starts
     useEffect(() => {
-        if (quiz && containerRef.current) {
-            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (loading || (quiz && !loading)) {
+            // Use setTimeout to ensure DOM update finishes and override default browser scroll
+            setTimeout(() => {
+                containerRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
         }
-    }, [quiz]);
+    }, [quiz, loading]);
 
     const handleVerify = (explanation: string) => {
         // Placeholder for future verification logic
@@ -51,7 +58,8 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
     };
 
     return (
-        <div ref={containerRef} className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10">
+        <div ref={containerRef} className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10 min-h-[60vh] min-h-[400px] flex flex-col justify-center">
+            <div ref={topAnchorRef} className="absolute -top-24 left-0 w-full h-1" /> {/* Invisible Top Anchor with offset */}
             <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-500/20 backdrop-blur-sm rounded-full shadow-lg mb-4 text-indigo-400">
                     <Sparkles size={24} />
@@ -63,7 +71,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
             </div>
 
             {!quiz ? (
-                <div className="flex justify-center">
+                <div className="flex justify-center flex-1 items-center">
                     <button
                         onClick={handleGenerate}
                         disabled={loading}
@@ -83,9 +91,9 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
                     </button>
                 </div>
             ) : (
-                <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-12">
+                        <div className="flex flex-col items-center justify-center py-12 h-full min-h-[300px]">
                             <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
                             <p className="text-indigo-600 font-medium">Generating new question...</p>
                         </div>
