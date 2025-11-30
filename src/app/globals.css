@@ -116,9 +116,9 @@
     min-width: min-content !important;
   }
 
-  /* 行內公式 */
+  /* 行內公式 - 恢復基本樣式，按文字順序顯示 */
   .katex {
-    display: inline-block;
+    display: inline;
   }
 
   /* Prose 內容 - 防止水平溢出但允許子元素滾動 */
@@ -150,6 +150,22 @@
   .prose pre {
     overflow-x: auto;
     max-width: 100%;
+  }
+
+  /* Inline code styling in prose */
+  .prose code {
+    background-color: rgba(110, 118, 129, 0.4);
+    color: #e3e8ef;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: 400;
+  }
+
+  /* Prevent double background in code blocks */
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
   }
 
   .prose table {
@@ -210,5 +226,17 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Hide number input spinners globally (fixes Quiz option spinner bug) */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }

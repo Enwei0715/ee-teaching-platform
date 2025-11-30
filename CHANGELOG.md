@@ -1,5 +1,13 @@
 # Project Changelog
 
+## v4.3.3 - Quiz UI/UX Polish (2025-11-30)
+- **Quiz UI/UX**:
+    - **Layout & Typography**: Fixed option button alignment, math formula rendering, and text baseline issues.
+    - **QuizChat**: Optimized layout by removing width constraints and implementing auto-tab switching for "Ask AI Tutor".
+    - **QuizCard**: Made width dynamic, fixed background transparency issues, and implemented auto-scroll to top on new questions.
+    - **AI Tutor**: Fixed input box sizing, scrollbar styling, and z-index layering issues (footer occlusion).
+    - **Visuals**: Enhanced "Focusing on..." badge contrast and localized text.
+
 ## v4.3.2 - AI Tutor & Sidebar Polish (2025-11-30)
 - **AI Tutor**:
     - **UI Fixes**: Increased z-index to prevent footer occlusion and added bottom padding to ensure the last message is fully visible.

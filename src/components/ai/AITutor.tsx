@@ -163,7 +163,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
     }
 
     return (
-        <div className="fixed bottom-6 right-6 z-[100]">
+        <div className="fixed bottom-6 right-6 z-[200]">
             {/* Chat Window */}
             {isOpen && (
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
@@ -226,7 +226,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                         <>
                             {/* Messages */}
                             <div className="flex-1 relative min-h-0 bg-transparent">
-                                <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 pb-20 space-y-4 scroll-smooth overscroll-contain">
+                                <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 pb-20 space-y-4 scroll-smooth overscroll-contain custom-scrollbar">
                                     {messages.map((msg, idx) => (
                                         <div
                                             key={idx}
@@ -275,9 +275,9 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                                         onChange={(e) => setInput(e.target.value)}
                                         onKeyDown={handleKeyDown}
                                         placeholder="Ask a question... (Shift+Enter for new line)"
-                                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none min-h-[42px] max-h-[120px]"
+                                        className="flex-1 bg-slate-800 border-transparent text-white placeholder-gray-400 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none min-h-[80px] max-h-[120px] custom-scrollbar"
                                         disabled={loading}
-                                        rows={1}
+                                        rows={3}
                                         style={{ height: 'auto' }}
                                         onInput={(e) => {
                                             const target = e.target as HTMLTextAreaElement;

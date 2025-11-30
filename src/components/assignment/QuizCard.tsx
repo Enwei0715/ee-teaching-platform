@@ -31,19 +31,30 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
     };
 
     return (
-        <div className="glass-panel border border-white/10 rounded-lg p-6 shadow-lg my-4">
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Quiz Time!</h3>
+        <div className="glass-heavy border-2 border-indigo-400/30 rounded-lg p-5 shadow-2xl my-4">
+            <h3 className="text-xl font-bold text-text-primary mb-3">Quiz Time!</h3>
 
             {/* Section Focus Badge */}
             {quiz.sectionTitle && quiz.sectionTitle !== "Full Lesson" && (
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30">
-                    <span className="text-xs font-medium text-indigo-300">
-                        📍 Focusing on: {quiz.sectionTitle}
+                <div className="mb-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 border border-indigo-400/50 shadow-lg">
+                    <span className="text-xs font-semibold text-white flex items-center">
+                        🎯 專注章節：
+                        <span className="inline-block ml-1">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
+                                rehypePlugins={[rehypeKatex]}
+                                components={{
+                                    p: ({ children }) => <span className="inline">{children}</span>,
+                                }}
+                            >
+                                {quiz.sectionTitle}
+                            </ReactMarkdown>
+                        </span>
                     </span>
                 </div>
             )}
 
-            <div className="text-text-primary mb-6 prose prose-invert prose-lg max-w-none">
+            <div className="text-text-primary mb-4 prose prose-invert prose-xl max-w-none">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
                     rehypePlugins={[rehypeKatex]}
@@ -58,7 +69,7 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                         key={index}
                         onClick={() => handleSelect(index)}
                         disabled={selectedOption !== null}
-                        className={`w-full text-left px-4 py-3 rounded-md border transition-colors ${selectedOption === index
+                        className={`w-full text-left px-4 py-5 rounded-md border transition-colors flex items-center ${selectedOption === index
                             ? index === quiz.correctAnswer
                                 ? 'bg-green-500/20 border-green-400 text-green-300'
                                 : 'bg-red-500/20 border-red-400 text-red-300'
@@ -67,17 +78,28 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                                 : 'border-white/20 hover:bg-white/5 text-text-primary hover:border-indigo-400/50'
                             }`}
                     >
-                        <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
-                        <div className="inline-block align-middle">
-                            <ReactMarkdown
-                                remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
-                                rehypePlugins={[rehypeKatex]}
-                                components={{
-                                    p: ({ children }) => <span className="m-0">{children}</span>
-                                }}
-                            >
-                                {option}
-                            </ReactMarkdown>
+                        <div className="flex items-center gap-4 w-full">
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold ${selectedOption === index
+                                ? index === quiz.correctAnswer
+                                    ? 'bg-green-500 border-green-500 text-white'
+                                    : 'bg-red-500 border-red-500 text-white'
+                                : selectedOption !== null && index === quiz.correctAnswer
+                                    ? 'bg-green-500 border-green-500 text-white'
+                                    : 'border-gray-500 text-gray-400'
+                                }`}>
+                                {String.fromCharCode(65 + index)}
+                            </div>
+                            <div className="flex-1 prose prose-invert prose-base max-w-none" style={{ lineHeight: '1.75' }}>
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
+                                    rehypePlugins={[rehypeKatex]}
+                                    components={{
+                                        p: ({ children }) => <p className="m-0 flex items-center" style={{ verticalAlign: 'middle' }}>{children}</p>
+                                    }}
+                                >
+                                    {option}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </button>
                 ))}

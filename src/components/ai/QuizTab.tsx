@@ -114,7 +114,13 @@ export default function QuizTab({
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-6 scrollbar-hide">
+            <div
+                className="flex-1 overflow-y-auto p-4 pb-32 space-y-6 custom-scrollbar"
+                style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#475569 transparent',
+                }}
+            >
                 {error && (
                     <div className="bg-red-900/30 border border-red-500/50 text-red-200 p-4 rounded-lg flex items-start gap-3">
                         <AlertCircle size={20} className="shrink-0 mt-0.5" />
@@ -171,13 +177,24 @@ export default function QuizTab({
                     <div className="space-y-4">
                         {/* Section Info */}
                         {quiz.sectionTitle && (
-                            <div className="text-xs text-indigo-400 bg-indigo-900/30 px-3 py-1.5 rounded-lg inline-block">
-                                📖 Topic: {quiz.sectionTitle}
+                            <div className="text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-500 border border-indigo-400/50 shadow-lg px-4 py-2 rounded-lg inline-flex items-center">
+                                🎯 專注章節：
+                                <span className="inline-block ml-1">
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm, remarkMath]}
+                                        rehypePlugins={[rehypeKatex]}
+                                        components={{
+                                            p: ({ children }) => <span className="inline">{children}</span>,
+                                        }}
+                                    >
+                                        {quiz.sectionTitle}
+                                    </ReactMarkdown>
+                                </span>
                             </div>
                         )}
 
                         {/* Question */}
-                        <div className="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+                        <div className="bg-slate-800/50 border border-white/10 rounded-xl p-4 max-h-64 overflow-y-auto custom-scrollbar">
                             <div className="prose prose-invert prose-sm max-w-none">
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath]}
@@ -189,7 +206,7 @@ export default function QuizTab({
                         </div>
 
                         {/* Options */}
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             {quiz.options.map((option, index) => {
                                 const isSelected = selectedAnswer === index;
                                 const isCorrect = index === quiz.correctAnswer;
@@ -201,7 +218,7 @@ export default function QuizTab({
                                         key={index}
                                         onClick={() => handleAnswerSelect(index)}
                                         disabled={showResult}
-                                        className={`w-full text-left p-4 rounded-lg border transition-all ${showCorrect
+                                        className={`w-full text-left p-5 rounded-lg border transition-all ${showCorrect
                                             ? 'bg-green-900/30 border-green-500 text-green-200'
                                             : showWrong
                                                 ? 'bg-red-900/30 border-red-500 text-red-200'
@@ -210,18 +227,21 @@ export default function QuizTab({
                                                     : 'bg-slate-800/30 border-white/10 text-gray-300 hover:bg-slate-800/50 hover:border-white/20'
                                             } ${showResult ? 'cursor-default' : 'cursor-pointer'}`}
                                     >
-                                        <div className="flex items-start gap-3">
-                                            <div className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold ${showCorrect ? 'bg-green-500 border-green-500 text-white' :
+                                        <div className="flex items-center gap-4">
+                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold ${showCorrect ? 'bg-green-500 border-green-500 text-white' :
                                                 showWrong ? 'bg-red-500 border-red-500 text-white' :
                                                     isSelected ? 'bg-indigo-500 border-indigo-500 text-white' :
-                                                        'border-gray-500'
+                                                        'border-gray-500 text-gray-400'
                                                 }`}>
                                                 {String.fromCharCode(65 + index)}
                                             </div>
-                                            <div className="flex-1 prose prose-invert prose-sm max-w-none">
+                                            <div className="flex-1 prose prose-invert prose-sm max-w-none" style={{ lineHeight: '1.75' }}>
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm, remarkMath]}
                                                     rehypePlugins={[rehypeKatex]}
+                                                    components={{
+                                                        p: ({ children }) => <p className="m-0 flex items-center" style={{ verticalAlign: 'middle' }}>{children}</p>,
+                                                    }}
                                                 >
                                                     {option}
                                                 </ReactMarkdown>

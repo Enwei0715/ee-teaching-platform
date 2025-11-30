@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
 import { generateQuiz, Quiz } from '@/lib/llm-service';
 import QuizCard from './QuizCard';
@@ -18,6 +18,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { markLessonComplete } = useProgress();
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -33,6 +34,13 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
         }
     };
 
+    // Scroll to top of quiz when a new quiz is generated
+    useEffect(() => {
+        if (quiz && containerRef.current) {
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [quiz]);
+
     const handleVerify = (explanation: string) => {
         // Placeholder for future verification logic
         console.log("Verified:", explanation);
@@ -43,7 +51,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
     };
 
     return (
-        <div className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10">
+        <div ref={containerRef} className="my-12 p-8 glass-panel border-2 border-indigo-400/30 rounded-2xl shadow-2xl relative z-10">
             <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-500/20 backdrop-blur-sm rounded-full shadow-lg mb-4 text-indigo-400">
                     <Sparkles size={24} />
@@ -101,11 +109,14 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
                         </>
                     )}
                 </div>
-            )}
+            )
+            }
 
-            {error && (
-                <p className="text-center text-red-500 mt-4 text-sm">{error}</p>
-            )}
-        </div>
+            {
+                error && (
+                    <p className="text-center text-red-500 mt-4 text-sm">{error}</p>
+                )
+            }
+        </div >
     );
 }

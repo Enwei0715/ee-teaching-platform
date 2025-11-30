@@ -50,9 +50,12 @@ export default function QuizChat({ context }: QuizChatProps) {
         const question = input.trim();
         const fullQuery = `I have a question about this quiz:\n\n${context}\n\nMy Question: ${question}`;
 
-        // Dispatch event to open AI Tutor
+        // Dispatch event to open AI Tutor and switch to assistant tab
         const event = new CustomEvent('open-ai-tutor', {
-            detail: { text: fullQuery }
+            detail: {
+                text: fullQuery,
+                switchToTab: 'chat'  // Switch to assistant/chat tab
+            }
         });
         window.dispatchEvent(event);
 
@@ -60,7 +63,7 @@ export default function QuizChat({ context }: QuizChatProps) {
     };
 
     return (
-        <div className="mt-6 border-t border-indigo-500/20 pt-6 w-full max-w-md mx-auto">
+        <div className="mt-6 border-t border-indigo-500/20 pt-6 w-full">
             <h4 className="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">
                 <Bot size={16} className="text-indigo-400" />
                 Ask a follow-up question
@@ -78,7 +81,7 @@ export default function QuizChat({ context }: QuizChatProps) {
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'}`}>
                                     {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                                 </div>
-                                <div className={`text-sm p-3 rounded-lg max-w-[85%] ${msg.role === 'user' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800/80 border border-indigo-500/20 text-gray-200 prose prose-sm prose-invert max-w-none shadow-sm'}`}>
+                                <div className={`text-sm p-3 rounded-lg ${msg.role === 'user' ? 'bg-indigo-600 text-white shadow-md max-w-[90%] break-words' : 'bg-slate-800/80 border border-indigo-500/20 text-gray-200 prose prose-sm prose-invert max-w-none shadow-sm flex-1'}`}>
                                     {msg.role === 'user' ? (
                                         msg.content
                                     ) : (
