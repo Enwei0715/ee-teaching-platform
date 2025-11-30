@@ -76,9 +76,7 @@ export default function QuizTab({
                 body: JSON.stringify({
                     courseSlug,
                     lessonSlug,
-                    // We can optionally pass limitToHeadingId if the backend supported it, 
-                    // but the reverted backend (8ae1d3b) doesn't seem to have that logic visible in the snippet.
-                    // It had `extractRandomSection`.
+                    limitToHeadingId: activeHeadingId
                 })
             });
 
@@ -148,9 +146,14 @@ export default function QuizTab({
                             <>
                                 <Sparkles size={48} className="text-indigo-400" />
                                 <div>
-                                    <h3 className="text-white font-bold text-lg mb-2">Progress-Aware Quiz</h3>
+                                    <h3 className="text-white font-bold text-lg mb-2">
+                                        {lessonStatus === 'IN_PROGRESS' ? 'Progress-Aware Quiz' : 'Full Lesson Review'}
+                                    </h3>
                                     <p className="text-gray-400 text-sm max-w-md">
-                                        Test your understanding! We'll only ask about sections you've already read.
+                                        {lessonStatus === 'IN_PROGRESS'
+                                            ? "Test your understanding! We'll only ask about sections you've already read."
+                                            : "Challenge yourself! Questions will be drawn from the entire lesson content."
+                                        }
                                     </p>
                                 </div>
                                 <button
@@ -239,9 +242,6 @@ export default function QuizTab({
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm, remarkMath]}
                                                     rehypePlugins={[rehypeKatex]}
-                                                    components={{
-                                                        p: ({ children }) => <p className="m-0 flex items-center" style={{ verticalAlign: 'middle' }}>{children}</p>,
-                                                    }}
                                                 >
                                                     {option}
                                                 </ReactMarkdown>

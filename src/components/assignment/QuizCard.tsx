@@ -93,9 +93,6 @@ export default function QuizCard({ quiz, onVerify, onComplete }: QuizCardProps) 
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
                                     rehypePlugins={[rehypeKatex]}
-                                    components={{
-                                        p: ({ children }) => <p className="m-0 flex items-center" style={{ verticalAlign: 'middle' }}>{children}</p>
-                                    }}
                                 >
                                     {option}
                                 </ReactMarkdown>

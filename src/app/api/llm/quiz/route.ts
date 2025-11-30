@@ -44,7 +44,7 @@ function extractRandomSection(content: string): { title: string, content: string
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { courseSlug, lessonSlug, sectionContent, sectionTitle } = body;
+        const { courseSlug, lessonSlug, sectionContent, sectionTitle, limitToHeadingId } = body;
 
         if (!courseSlug || !lessonSlug) {
             return NextResponse.json({ error: 'Course slug and lesson slug are required' }, { status: 400 });
@@ -52,8 +52,12 @@ export async function POST(req: Request) {
 
         // Check if we have direct section content (from frontend selection)
         if (sectionContent && sectionTitle) {
+            // ... (Existing direct section logic - keeping it as is for now if needed, or we can unify)
+            // For now, let's focus on the main flow which uses the pipeline when no specific section is forced.
+            // Actually, the user request implies we should use the pipeline for the general "Generate Quiz" case.
+            // The "direct section" case is likely for "Quiz Me on This Section" button.
+            // We will keep the direct section logic as a fast path.
             console.log(`Generating quiz for specific section: "${sectionTitle}"`);
-
             try {
                 const completion = await openai.chat.completions.create({
                     messages: [
@@ -157,7 +161,7 @@ Generate a unique quiz question based on THIS section only.
             }
         }
 
-        // Original behavior: Fetch lesson from DB and extract random section
+        // Standard Flow: Fetch lesson and use Algorithm Pipeline
         const lesson = await prisma.lesson.findFirst({
             where: {
                 slug: lessonSlug,
@@ -177,11 +181,25 @@ Generate a unique quiz question based on THIS section only.
         }
 
         try {
-            console.log("Calling Google AI Studio with lesson content...");
+            console.log("Starting Quiz Generation Pipeline...");
 
-            // CRITICAL: Extract random section to ensure variety
-            const { title: sectionTitle, content: sectionContent } = extractRandomSection(lesson.content);
-            console.log(`Selected section: "${sectionTitle}" (${sectionContent.length} chars)`);
+            // 1. Parse
+            const sections = parseSections(lesson.content);
+
+            // 2. Scope (Fail-Safe Slicing applied here)
+            const scopedSections = scopeSections(sections, limitToHeadingId);
+
+            // 3. Score
+            const scoredSections = scoreSections(scopedSections);
+
+            // 4. Select
+            const selectedSection = selectBestSection(scoredSections);
+
+            if (!selectedSection) {
+                throw new Error("No valid section found for quiz generation.");
+            }
+
+            console.log(`Selected section for quiz: "${selectedSection.title}"`);
 
             const completion = await openai.chat.completions.create({
                 messages: [
@@ -190,7 +208,7 @@ Generate a unique quiz question based on THIS section only.
                         content: String.raw`Role: You are an expert Exam Creator for Electronic Engineering.
 Your goal is to test the user's deep understanding of the provided lesson context.
 
-**CURRENT FOCUS SECTION:** "${sectionTitle}"
+**CURRENT FOCUS SECTION:** "${selectedSection.title}"
 
 Task: Generate ONE multiple-choice question based EXCLUSIVELY on the content from this specific section.
 
@@ -248,12 +266,12 @@ Output Format (Strict JSON):
                         role: "user",
                         content: `
 Lesson: ${lesson.title}
-Focused Section: ${sectionTitle}
+Focused Section: ${selectedSection.title}
 Timestamp: ${Date.now()} (Use this to ensure uniqueness)
 
 Section Content:
 """
-${sectionContent}
+${selectedSection.content}
 """
 
 Generate a unique and challenging question that tests a specific concept from THIS section.
@@ -265,8 +283,6 @@ Focus on details that require understanding, not just recall.
                 response_format: { type: "json_object" },
                 temperature: 1.0, // High temperature for variety
             });
-
-            // ... (rest of the response handling logic) ...
 
             console.log("Google AI Response:", completion);
             const content = completion.choices[0].message.content;
@@ -286,7 +302,7 @@ Focus on details that require understanding, not just recall.
             return NextResponse.json({
                 ...quiz,
                 model: "gemini-2.5-flash",
-                sectionTitle: sectionTitle  // Include which section was tested
+                sectionTitle: selectedSection.title  // Include which section was tested
             });
 
         } catch (aiError) {

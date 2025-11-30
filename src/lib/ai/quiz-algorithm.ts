@@ -1,4 +1,6 @@
 
+import { generateHeadingId } from '../utils';
+
 export interface Section {
     id: string;
     title: string;
@@ -9,19 +11,6 @@ export interface Section {
 export interface ScoredSection extends Section {
     score: number;
     reasons: string[];
-}
-
-// Deterministic slugify (no random suffix)
-function generateId(text: string): string {
-    return text
-        .toString()
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')        // Replace spaces with -
-        .replace(/[^\w\-]+/g, '')    // Remove all non-word chars
-        .replace(/\-\-+/g, '-')      // Replace multiple - with single -
-        .replace(/^-+/, '')          // Trim - from start of text
-        .replace(/-+$/, '');         // Trim - from end of text
 }
 
 /**
@@ -57,7 +46,7 @@ export function parseSections(markdown: string): Section[] {
 
             // Start new section
             const title = headerMatch[2].trim();
-            const id = generateId(title);
+            const id = generateHeadingId(title);
 
             currentSection = {
                 id: id,
@@ -100,20 +89,20 @@ export function scopeSections(sections: Section[], currentHeadingId: string | nu
         return sections;
     }
 
-    // Find the index of the section that matches the currentHeadingId
-    // Since currentHeadingId might have a random suffix (from frontend slugify),
-    // and our section.id is deterministic (no suffix), we check if currentHeadingId STARTS WITH section.id
+    // Normalize IDs for comparison (simple lowercase + alphanumeric only)
+    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const targetId = normalize(currentHeadingId);
+
     const foundIndex = sections.findIndex(s => {
-        // Exact match (unlikely if suffix exists) OR Prefix match
-        // We add a hyphen to ensure we don't match "intro" with "introduction"
-        // e.g. "introduction-abc" starts with "introduction" -> Match
-        // "intro-abc" starts with "intro" -> Match
-        return s.id === currentHeadingId || currentHeadingId.startsWith(s.id + '-');
+        const sId = normalize(s.id);
+        // Exact match or Prefix match (to handle potential suffixes)
+        return sId === targetId || targetId.startsWith(sId);
     });
 
     if (foundIndex === -1) {
-        console.warn(`[Scoper] Warning: Current heading ID "${currentHeadingId}" not found in sections. Returning ALL sections.`);
-        return sections;
+        console.warn(`[Scoper] Warning: Current heading ID "${currentHeadingId}" not found in sections. Defaulting to FIRST SECTION to prevent spoilers.`);
+        // CRITICAL FAIL-SAFE: Return only the first section
+        return sections.slice(0, 1);
     }
 
     // Slice from 0 to foundIndex + 1 (to include the current section)

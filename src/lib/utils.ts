@@ -18,6 +18,15 @@ export function slugify(text: string): string {
         + '-' + Math.random().toString(36).substring(2, 7); // Add random suffix for uniqueness
 }
 
+export function generateHeadingId(title: string): string {
+    return title
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')     // Replace spaces with -
+        .replace(/[^\w\u4e00-\u9fa5-]/g, '') // Remove special chars (keep Chinese)
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
+}
+
 export function calculateReadingTime(content: string): string {
     const wordsPerMinute = 225; // Standard for English
     const charsPerMinute = 300; // Rough estimate for CJK characters

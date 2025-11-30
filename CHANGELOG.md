@@ -1,5 +1,15 @@
 # Project Changelog
 
+## v4.3.5 - Quiz Logic Fixes & Cleanup (2025-11-30)
+- **AI Quiz**:
+    - **Spoiler Fix**: Implemented "Fail-Safe Slicing" to prevent questions about unread sections. If the user's location is unknown, it defaults to the first section.
+    - **Standardized IDs**: Unified section ID generation between frontend and backend to ensure accurate progress tracking.
+    - **Dynamic UI**: Quiz Tab now clearly indicates "Progress-Aware Quiz" (for active lessons) vs. "Full Lesson Review" (for completed lessons).
+    - **Auto-Scroll Fix**: Resolved issue where generating a new quiz caused the page to scroll to the bottom.
+    - **Layout Fix**: Fixed math symbol alignment in quiz options.
+- **Project Cleanup**:
+    - Removed redundant files (`LessonQuiz.tsx`, `Quiz.tsx`, `markdown-utils.ts`) and the unused `/assignments` route.
+
 ## v4.3.4 - AI Quiz & UI Stability (2025-11-30)
 - **AI Quiz**:
     - **Prompt Fix**: Updated system prompt to strictly enforce LaTeX formatting rules, preventing plain text artifacts in math formulas.

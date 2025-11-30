@@ -319,6 +319,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                             activeHeadingId={lessonStatus === 'IN_PROGRESS' ? activeHeadingId : undefined}
                             courseSlug={courseSlug}
                             lessonSlug={lessonSlug}
+                            lessonStatus={lessonStatus}
                         />
                     )}
                 </div>

@@ -34,8 +34,12 @@ export default function AIQuizGenerator({ courseId, lessonId, topic }: AIQuizGen
         }
     };
 
-    // Scroll to top removed to prevent page jumping
-
+    // Scroll to question when quiz is generated
+    useEffect(() => {
+        if (quiz && containerRef.current) {
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [quiz]);
 
     const handleVerify = (explanation: string) => {
         // Placeholder for future verification logic
