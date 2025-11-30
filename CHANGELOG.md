@@ -1,5 +1,11 @@
 # Project Changelog
 
+## v4.4.3 - Database Cleanup & Critical Fixes (2025-11-30)
+- **Database**:
+    - **Schema Cleanup**: Removed the deprecated `completed` boolean column from the `UserProgress` table in favor of the `status` enum.
+- **Bug Fixes**:
+    - **Time Tracking**: Resolved the root cause of the `timeSpent` issue. `ResumeLearningTracker` was incorrectly receiving the Course UUID instead of the Slug, causing API calls to fail with 404. It now correctly uses the slug, ensuring progress and time are saved.
+
 ## v4.4.2 - Time Tracking Stability (2025-11-30)
 - **Time Tracking**:
     - **UserId Fallback**: Fixed a bug where `ResumeLearningTracker` failed to initialize if `userId` wasn't passed as a prop. Implemented a fallback to retrieve `userId` directly from the user session, ensuring time tracking works reliably in all contexts.

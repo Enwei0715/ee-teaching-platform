@@ -267,7 +267,7 @@ export default function LessonContent({
 
             {/* Resume Learning Tracker */}
             <ResumeLearningTracker
-                courseId={course.id}
+                courseId={course.slug}
                 lessonId={lesson.id}
                 lessonTitle={lesson.title}
 

@@ -127,7 +127,6 @@ export async function POST(
                 data: {
                     lastElementId: lastElementId || undefined,
                     timeSpent: timeSpent ? { increment: timeSpent } : undefined,
-                    completed: completed || undefined, // Keep legacy boolean for now
                     status: newStatus
                 }
             });
@@ -139,7 +138,6 @@ export async function POST(
                     lessonId: lesson.id,
                     lastElementId: lastElementId || null,
                     timeSpent: timeSpent || 0,
-                    completed: completed || false,
                     status: newStatus
                 }
             });
