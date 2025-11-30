@@ -42,7 +42,7 @@ export default function ResumeCard({ courseTitle, lessonTitle, resumeLink, statu
     };
 
     return (
-        <div className="glass-panel rounded-2xl p-6 flex items-center gap-4 hover:shadow-lg hover:shadow-indigo-600/10 transition-all group relative">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col items-start gap-6 hover:shadow-lg hover:shadow-indigo-600/10 transition-all group relative">
             {/* Dismiss Button (Top Right) */}
             {status === 'REVIEWING' && (
                 <button
@@ -54,43 +54,46 @@ export default function ResumeCard({ courseTitle, lessonTitle, resumeLink, statu
                 </button>
             )}
 
-            {/* Icon */}
-            <div className="p-3 bg-indigo-600/20 backdrop-blur-sm rounded-xl text-indigo-400 flex-shrink-0">
-                <BookOpen size={28} />
-            </div>
+            {/* Top Section: Icon & Text */}
+            <div className="flex items-start gap-4 w-full">
+                {/* Icon */}
+                <div className="p-3 bg-indigo-600/20 backdrop-blur-sm rounded-xl text-indigo-400 flex-shrink-0 mt-1">
+                    <BookOpen size={28} />
+                </div>
 
-            {/* Text Content */}
-            <div className="flex-1 min-w-0 pr-8">
-                <div className="flex items-center gap-2 mb-1">
-                    <p className="text-xs text-indigo-300 font-medium uppercase tracking-wider">
-                        Continue Learning
+                {/* Text Content */}
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <p className="text-xs text-indigo-300 font-medium uppercase tracking-wider">
+                            Continue Learning
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 mb-1">
+                        <h3 className="text-white font-bold text-lg leading-tight">
+                            {courseTitle}
+                        </h3>
+                        {/* Status Badge */}
+                        {status === 'REVIEWING' ? (
+                            <span className="text-[10px] px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 font-bold uppercase tracking-wide whitespace-nowrap flex-shrink-0">
+                                Reviewing
+                            </span>
+                        ) : (
+                            <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 font-bold uppercase tracking-wide whitespace-nowrap flex-shrink-0">
+                                In Progress
+                            </span>
+                        )}
+                    </div>
+                    <p className="text-sm text-gray-400 line-clamp-2">
+                        {lessonTitle}
                     </p>
                 </div>
-                <div className="flex items-center gap-3 mb-0.5">
-                    <h3 className="text-white font-bold text-lg truncate">
-                        {courseTitle}
-                    </h3>
-                    {/* Status Badge */}
-                    {status === 'REVIEWING' ? (
-                        <span className="text-[10px] px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 font-bold uppercase tracking-wide whitespace-nowrap">
-                            Reviewing
-                        </span>
-                    ) : (
-                        <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 font-bold uppercase tracking-wide whitespace-nowrap">
-                            In Progress
-                        </span>
-                    )}
-                </div>
-                <p className="text-sm text-gray-400 truncate">
-                    {lessonTitle}
-                </p>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
+            {/* Bottom Section: Actions */}
+            <div className="w-full flex justify-end pt-2 border-t border-white/5">
                 <Link
                     href={resumeLink}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 flex-shrink-0"
+                    className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 w-full sm:w-auto"
                 >
                     Resume
                     <ArrowRight size={18} />

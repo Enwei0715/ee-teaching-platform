@@ -1,5 +1,9 @@
 # Project Changelog
 
+## v4.4.9 - Dashboard Layout Polish (2025-11-30)
+- **UI Enhancements**:
+    - **Resume Card**: Refactored the "Continue Learning" card layout in the Dashboard. Moved the "Resume" button to the bottom to allow course and lesson titles to expand horizontally, improving readability for long titles.
+
 ## v4.4.8 - Fine-tuning (2025-11-30)
 - **UI Enhancements**:
     - **Particle Background**: Adjusted particle density to 200 (limit 300) for the optimal balance of visual richness and performance.
