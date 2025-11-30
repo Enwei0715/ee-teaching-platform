@@ -1,5 +1,11 @@
 # Project Changelog
 
+## v4.4.1 - Time Tracking Fix (2025-11-30)
+- **Time Tracking**:
+    - **Frontend**: Updated `ResumeLearningTracker` to calculate and send precise time deltas (in seconds) to the API, ensuring accurate tracking of time spent on each lesson.
+    - **Backend**: Modified the progress API to `increment` the `timeSpent` value in the database instead of overwriting it, preventing data loss during concurrent or frequent updates.
+    - **Periodic Sync**: Implemented a 30-second heartbeat to save time spent even when the user is not scrolling.
+
 ## v4.4.0 - Perfected Lesson State & Real-Time Sync (2025-11-30)
 - **Real-Time State Logic**:
     - **Instant Feedback**: Refactored `LessonProgressContext` to use optimistic state initialization, ensuring lesson status icons (Play/Check) update *instantly* on entry without waiting for API responses.

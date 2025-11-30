@@ -126,7 +126,7 @@ export async function POST(
                 where: { id: existingProgress.id },
                 data: {
                     lastElementId: lastElementId || undefined,
-                    timeSpent: timeSpent || undefined,
+                    timeSpent: timeSpent ? { increment: timeSpent } : undefined,
                     completed: completed || undefined, // Keep legacy boolean for now
                     status: newStatus
                 }

@@ -96,9 +96,39 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
         }
     }, [userId, courseId, lessonId]);
 
-    // Save scroll position on scroll
+    const startTimeRef = useRef(Date.now());
+
+    // Save scroll position and time on scroll
     useEffect(() => {
         if (!userId) return;
+
+        const saveProgress = async (elementId: string | null) => {
+            if (!courseId || !lessonId) return;
+
+            const now = Date.now();
+            const timeSpentDelta = Math.floor((now - startTimeRef.current) / 1000);
+
+            // Reset start time if we are sending data
+            if (timeSpentDelta > 0) {
+                startTimeRef.current = now;
+            }
+
+            try {
+                await fetch(`/api/courses/${courseId}/progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lessonId,
+                        lastElementId: elementId,
+                        timeSpent: timeSpentDelta > 0 ? timeSpentDelta : undefined
+                    }),
+                });
+            } catch (error) {
+                console.error("Failed to save progress to DB", error);
+            }
+        };
 
         const handleScroll = () => {
             if (saveTimeoutRef.current) {
@@ -132,31 +162,32 @@ export default function ResumeLearningTracker({ userId, lessonTitle, courseId, l
                 localStorage.setItem(`resume_learning_${userId}`, JSON.stringify(data));
 
                 // Save to Database (Sync across devices)
-                if (courseId && lessonId && activeElementId) {
-                    try {
-                        await fetch(`/api/courses/${courseId}/progress`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                lessonId,
-                                lastElementId: activeElementId,
-                                // We don't mark as completed here, just tracking position
-                            }),
-                        });
-                    } catch (error) {
-                        console.error("Failed to save progress to DB", error);
-                    }
+                if (activeElementId) {
+                    saveProgress(activeElementId);
                 }
 
             }, 2000); // Debounce 2s (less frequent for DB calls)
         };
 
+        // Periodic save for time tracking (every 30 seconds) even if not scrolling
+        const intervalId = setInterval(() => {
+            // We don't update elementId here, just time
+            // But we need to know the current elementId? 
+            // Actually, we can just send timeSpent without lastElementId if we want, 
+            // but the API might expect lastElementId to update it?
+            // The API update uses `lastElementId || undefined`. So if we send undefined, it won't overwrite it.
+            saveProgress(null);
+        }, 30000);
+
         window.addEventListener('scroll', handleScroll);
         return () => {
             window.removeEventListener('scroll', handleScroll);
             if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+            clearInterval(intervalId);
+
+            // Save on unmount (optional, but good for accuracy)
+            // Note: async in unmount might not always fire reliably, but worth a try with beacon or fetch keepalive
+            // For now, we rely on the periodic updates.
         };
     }, [userId, pathname, lessonTitle, courseId, lessonId]);
 
