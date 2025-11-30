@@ -102,6 +102,10 @@ Output Format (Strict JSON):
    - **MDX MATH COMPATIBILITY:**
      - Use ONLY single \`$\` for inline math and double \`$$\` for block math.
      - **FORBIDDEN:** \`\\(\`, \`\\)\`, \`\\[\`, \`\\]\`.
+   - **NO TEXT INSIDE MATH (CRITICAL):**
+     - **NEVER** put plain text inside \`$ $\`. Math mode is ONLY for formulas.
+     - **BAD:** \`$10^{10} text{cm}^{-3}$\` or \`$10^{10} \\text{cm}^{-3}$\` (Avoid \`\\text\` if possible)
+     - **GOOD:** \`$10^{10} \\mathrm{cm}^{-3}$\` (Use \`\\mathrm\` for units) or \`$10^{10}$ cm$^{-3}$\` (Text outside)
 
 4. **LANGUAGE:**
    - **Questions/Options:** Traditional Chinese (繁體中文).
@@ -226,6 +230,10 @@ Output Format (Strict JSON):
    - **MDX MATH COMPATIBILITY:**
      - Use ONLY single \`$\` for inline math and double \`$$\` for block math.
      - **FORBIDDEN:** \`\\(\`, \`\\)\`, \`\\[\`, \`\\]\`.
+   - **NO TEXT INSIDE MATH (CRITICAL):**
+     - **NEVER** put plain text inside \`$ $\`. Math mode is ONLY for formulas.
+     - **BAD:** \`$10^{10} text{cm}^{-3}$\` or \`$10^{10} \\text{cm}^{-3}$\` (Avoid \`\\text\` if possible)
+     - **GOOD:** \`$10^{10} \\mathrm{cm}^{-3}$\` (Use \`\\mathrm\` for units) or \`$10^{10}$ cm$^{-3}$\` (Text outside)
 
 4. **LANGUAGE:**
    - **Questions/Options:** Traditional Chinese (繁體中文).

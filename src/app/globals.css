@@ -66,11 +66,12 @@
 /* Math formulas - 讓公式自然顯示,不限制寬度 */
 @layer utilities {
   /* KaTeX 區塊公式 - CRITICAL: Force scrolling while keeping parent locked */
+  /* KaTeX 區塊公式 - CRITICAL: Force scrolling while keeping parent locked */
   .katex-display {
     /* Container constraints - prevent layout blowout */
     max-width: 100% !important;
     width: 100% !important;
-    display: block !important;
+    display: block !important; /* Keep block for scrolling, but ensure it doesn't break layout */
     box-sizing: border-box !important;
     
     /* FORCE horizontal scrolling to work despite parent overflow:hidden */
@@ -87,6 +88,9 @@
     
     /* Prevent text wrapping in formulas */
     white-space: nowrap !important;
+    
+    /* Fix vertical alignment with text */
+    vertical-align: middle !important;
   }
 
   /* 自訂 KaTeX 滾動條樣式 (Webkit) */
@@ -119,6 +123,7 @@
   /* 行內公式 - 恢復基本樣式，按文字順序顯示 */
   .katex {
     display: inline;
+    vertical-align: middle !important; /* Fix alignment with Chinese text */
   }
 
   /* Prose 內容 - 防止水平溢出但允許子元素滾動 */
@@ -172,6 +177,19 @@
     display: block;
     overflow-x: auto;
     max-width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+
+  .prose table th,
+  .prose table td {
+    border: 1px solid #475569; /* Slate-600 */
+    padding: 0.5em 1em;
+  }
+
+  .prose table th {
+    background-color: rgba(30, 41, 59, 0.5); /* Slate-800/50 */
+    font-weight: 600;
   }
 
   /* Mobile-specific fixes for squashed text (below 640px) */
@@ -238,5 +256,23 @@
   input[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
+  }
+  /* Global Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #777;
   }
 }

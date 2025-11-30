@@ -16,10 +16,12 @@ export default function QuizChat({ context }: QuizChatProps) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
     };
 
     useEffect(() => {
@@ -69,7 +71,10 @@ export default function QuizChat({ context }: QuizChatProps) {
                 Ask a follow-up question
             </h4>
 
-            <div className="bg-slate-950/50 rounded-lg border border-indigo-500/20 p-4 mb-4 max-h-60 overflow-y-auto custom-scrollbar">
+            <div
+                ref={chatContainerRef}
+                className="bg-slate-950/50 rounded-lg border border-indigo-500/20 p-4 mb-4 max-h-60 overflow-y-auto custom-scrollbar"
+            >
                 {messages.length === 0 ? (
                     <p className="text-sm text-gray-400 text-center italic">
                         Have doubts? Ask the AI tutor about this problem.
@@ -109,7 +114,6 @@ export default function QuizChat({ context }: QuizChatProps) {
                                 </div>
                             </div>
                         )}
-                        <div ref={messagesEndRef} />
                     </div>
                 )}
             </div>

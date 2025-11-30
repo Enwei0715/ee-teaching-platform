@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { MessageSquare, X, Send, Bot, Maximize2, Minimize2 } from 'lucide-react';
 import { askQuestion } from '@/lib/llm-service';
 import { useSession } from 'next-auth/react';
@@ -40,6 +41,11 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { data: session } = useSession();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -148,8 +154,10 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
         }
     };
 
+    if (!mounted) return null;
+
     if (!session) {
-        return (
+        return createPortal(
             <div className="fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => window.location.href = '/auth/signin'}
@@ -158,12 +166,21 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                 >
                     <Bot size={24} />
                 </button>
-            </div>
+            </div>,
+            document.body
         );
     }
 
-    return (
+    return createPortal(
         <div className="fixed bottom-6 right-6 z-[200]">
+            {/* Backdrop Overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[-1] transition-opacity duration-300"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
             {/* Chat Window */}
             {isOpen && (
                 <div className={`ai-tutor-window bg-slate-950/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-300 origin-bottom-right touch-none 
@@ -317,6 +334,7 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
             >
                 {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
             </button>
-        </div>
+        </div>,
+        document.body
     );
 }
