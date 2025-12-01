@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Clock, Calendar, Edit, Zap, Trophy, CheckCircle } from 'lucide-react';
@@ -104,11 +104,24 @@ export default function LessonContent({
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Time tracking for anti-cheating
+    const startTimeRef = useRef(Date.now());
+
     // Intersection Observer for Completion (AI Quiz Section)
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
+                    const timeSpent = (Date.now() - startTimeRef.current) / 1000;
+                    const MIN_TIME_SECONDS = 10; // Set to 10s for testing (should be 10 mins in prod)
+
+                    if (timeSpent < MIN_TIME_SECONDS && !isCompleted) {
+                        toast.error("Don't be lazy! Read for at least 10 seconds before completing.", {
+                            icon: <Clock size={18} className="text-red-500" />
+                        });
+                        return;
+                    }
+
                     console.log("🎯 [LessonContent] Reached AI Quiz section! Triggering completion...");
                     markAsComplete().then((result: any) => {
                         // Check if XP was awarded
@@ -320,11 +333,7 @@ export default function LessonContent({
                                     <div className="text-right">
                                         <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
                                         <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
-                                        {!isCompleted && (
-                                            <div className="text-xs text-yellow-300 font-medium mt-1">
-                                                +100 XP Bonus
-                                            </div>
-                                        )}
+                                        {/* Bonus XP text removed as per request since it triggers automatically */}
                                     </div>
                                     <CheckCircle size={20} />
                                 </Link>

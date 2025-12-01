@@ -187,7 +187,7 @@ export default function QuizTab({
                                         <h3 className="text-white font-bold text-lg mb-1 flex flex-col gap-2">
                                             {lessonStatus === 'IN_PROGRESS' ? 'Progress-Aware Quiz' : 'Full Lesson Review'}
                                         </h3>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center justify-center gap-2">
                                             <span className="text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 w-fit">
                                                 <Zap size={12} className="fill-yellow-400" />
                                                 Win 10 XP

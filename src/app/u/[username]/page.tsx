@@ -15,10 +15,14 @@ export default async function ProfilePage({ params }: { params: { username: stri
     const session = await getServerSession(authOptions);
     const decodedUsername = decodeURIComponent(params.username);
 
-    // Try to find user by name first (as per route param), fallback to ID if needed or handle logic
-    // The previous code used `where: { name: decodedUsername }`
+    // Try to find user by ID first (since Navbar links to ID), then by Name
     const user = await prisma.user.findFirst({
-        where: { name: decodedUsername },
+        where: {
+            OR: [
+                { id: decodedUsername },
+                { name: decodedUsername }
+            ]
+        },
         include: {
             badges: {
                 include: {
