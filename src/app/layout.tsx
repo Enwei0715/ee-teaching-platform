@@ -8,6 +8,7 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import AITutor from "@/components/ai/AITutor";
 import HotkeysProvider from "@/context/HotkeysProvider";
 import ShortcutsModal from '@/components/layout/ShortcutsModal';
+import OnboardingModal from '@/components/auth/OnboardingModal';
 import { EditModeProvider } from "@/context/EditModeContext";
 import BackgroundGrid from "@/components/layout/BackgroundGrid";
 import FeedbackWidget from "@/components/feedback/FeedbackWidget";
@@ -51,6 +52,7 @@ export default async function RootLayout({
                                 </div>
                             </main>
                             <ShortcutsModal />
+                            <OnboardingModal />
                             <FloatingActionGroup />
                             <FeedbackWidget hideTrigger={true} />
                             <Toaster richColors position="top-center" />
