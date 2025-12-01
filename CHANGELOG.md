@@ -222,3 +222,5 @@
 - **Review XP Enforced**: Restored Review XP (1/10th base XP) but enforced the same dynamic time check for reviews to ensure genuine engagement.
 - **Certificate Fix**: Resolved a bug where lessons in `REVIEWING` status were ignored, now correctly counting them towards course completion and certificate generation.
 - **Badge Seeding**: Added automatic seeding to ensure all badge definitions exist in the database, fixing the issue where badges weren't being awarded.
+- **Streak Badge Fix**: Updated logic to check for streak badges whenever the streak is sufficient (>= 7), not just when it increments, ensuring missed badges are awarded.
+- **Badge Debugging**: Added detailed server-side logging for badge events to help diagnose triggering issues.

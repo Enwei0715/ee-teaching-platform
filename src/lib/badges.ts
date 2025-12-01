@@ -50,12 +50,18 @@ export async function checkBadges(userId: string, event: { type: 'LESSON_COMPLET
 
     // Helper to award badge
     const awardBadge = async (slug: string) => {
-        // Check if already earned
-        if (user.badges.some(ub => ub.badgeId === slug)) return; // Note: badgeId in UserBadge is actually the ID, not slug. We need to handle this.
+        console.log(`🏅 [Badges] Attempting to award badge: ${slug}`);
 
-        // Actually, we need to look up the badge by slug first
+        // Check if already earned (FIXED: Check against loaded badges properly if possible, but for now rely on DB)
+        // The previous check `user.badges.some(ub => ub.badgeId === slug)` was wrong (UUID vs Slug).
+        // We will rely on the DB check below for correctness.
+
+        // Lookup badge by slug
         const badge = await prisma.badge.findUnique({ where: { slug } });
-        if (!badge) return; // Badge definition doesn't exist in DB yet
+        if (!badge) {
+            console.error(`❌ [Badges] Badge definition not found for slug: ${slug}`);
+            return;
+        }
 
         // Check if user has it
         const hasBadge = await prisma.userBadge.findUnique({
@@ -68,6 +74,7 @@ export async function checkBadges(userId: string, event: { type: 'LESSON_COMPLET
         });
 
         if (!hasBadge) {
+            console.log(`🎉 [Badges] Awarding new badge: ${slug} to user ${userId}`);
             await prisma.userBadge.create({
                 data: {
                     userId,
@@ -75,20 +82,27 @@ export async function checkBadges(userId: string, event: { type: 'LESSON_COMPLET
                 }
             });
             earnedBadges.push(badge.name);
+        } else {
+            console.log(`ℹ️ [Badges] User already has badge: ${slug}`);
         }
     };
+
+    console.log(`🔍 [Badges] Checking badges for event: ${event.type} (User Level: ${user.level}, Streak: ${user.streak})`);
 
     // Check conditions based on event
     if (event.type === 'LESSON_COMPLETE') {
         const completedCount = user.progress.filter(p => p.status === 'COMPLETED').length;
+        console.log(`📊 [Badges] Completed lessons count: ${completedCount}`);
         if (completedCount >= 1) await awardBadge('first-step');
     }
 
     if (event.type === 'STREAK_UPDATE') {
+        console.log(`🔥 [Badges] Checking streak: ${user.streak}`);
         if (user.streak >= 7) await awardBadge('streak-week');
     }
 
     if (event.type === 'LEVEL_UP') {
+        console.log(`📈 [Badges] Checking level: ${user.level}`);
         if (user.level >= 5) await awardBadge('scholar');
     }
 

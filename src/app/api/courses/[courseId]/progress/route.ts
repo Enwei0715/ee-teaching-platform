@@ -211,7 +211,8 @@ export async function POST(
             }
         }
 
-        if (streakResult?.updated) {
+        // Always check streak badges if streak is sufficient, to catch missed badges
+        if ((streakResult?.streak || 0) >= 7) {
             const streakBadges = await checkBadges(session.user.id, { type: 'STREAK_UPDATE' });
             earnedBadges.push(...streakBadges);
         }
