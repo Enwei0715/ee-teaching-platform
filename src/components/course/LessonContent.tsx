@@ -113,12 +113,19 @@ export default function LessonContent({
             (entries) => {
                 if (entries[0].isIntersecting) {
                     const timeSpent = (Date.now() - startTimeRef.current) / 1000;
-                    const MIN_TIME_SECONDS = 10; // Set to 10s for testing (should be 10 mins in prod)
+                    // Dynamic time check: 50% of reading time, minimum 30 seconds
+                    const requiredTime = Math.max(30, (readingTime * 60) / 2);
 
-                    if (timeSpent < MIN_TIME_SECONDS && !isCompleted) {
-                        toast.error("Don't be lazy! Read for at least 10 seconds before completing.", {
-                            icon: <Clock size={18} className="text-red-500" />
-                        });
+                    if (timeSpent < requiredTime) {
+                        const remaining = Math.ceil(requiredTime - timeSpent);
+                        toast.error(
+                            isCompleted
+                                ? `Review too short! Read for ${remaining}s more to earn Review XP.`
+                                : `Don't rush! Read for ${remaining}s more to complete the lesson.`,
+                            {
+                                icon: <Clock size={18} className="text-red-500" />
+                            }
+                        );
                         return;
                     }
 

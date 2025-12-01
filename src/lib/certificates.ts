@@ -24,7 +24,7 @@ export async function generateCertificate(userId: string, courseId: string) {
         where: {
             userId,
             courseId,
-            status: 'COMPLETED' // Only count completed lessons
+            status: { in: ['COMPLETED', 'REVIEWING'] } // Count both completed and reviewing lessons
         }
     });
 

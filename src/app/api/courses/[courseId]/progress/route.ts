@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { addXP, updateStreak, calculateLessonXP, calculateQuizXP, checkBadges } from "@/lib/gamification";
+import { addXP, updateStreak, calculateLessonXP, calculateQuizXP, checkBadges, seedBadges } from "@/lib/gamification";
 import { generateCertificate } from "@/lib/certificates";
 
 export async function GET(
@@ -184,6 +184,9 @@ export async function POST(
         let isNewCertificate = false;
 
         if (completed) {
+            // Ensure badges exist
+            await seedBadges();
+
             // Check Lesson Badges
             const lessonBadges = await checkBadges(session.user.id, { type: 'LESSON_COMPLETE' });
             earnedBadges.push(...lessonBadges);

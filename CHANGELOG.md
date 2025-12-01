@@ -214,3 +214,11 @@
 - **Quiz XP**:
   - Unified Quiz XP to a flat **10 XP** per question.
   - Centered the "Win 10 XP" badge in the QuizTab header.
+
+## v5.2.7 - 2025-12-01
+
+### 🧠 Smart Gamification & Logic Fixes
+- **Dynamic Lesson Timer**: Replaced the fixed 10s timer with a smart check requiring **50% of the estimated reading time** (min 30s) to prevent XP farming.
+- **Review XP Enforced**: Restored Review XP (1/10th base XP) but enforced the same dynamic time check for reviews to ensure genuine engagement.
+- **Certificate Fix**: Resolved a bug where lessons in `REVIEWING` status were ignored, now correctly counting them towards course completion and certificate generation.
+- **Badge Seeding**: Added automatic seeding to ensure all badge definitions exist in the database, fixing the issue where badges weren't being awarded.

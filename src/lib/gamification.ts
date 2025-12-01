@@ -102,10 +102,14 @@ export async function updateStreak(userId: string) {
     return { streak: newStreak, updated: shouldUpdate };
 }
 
-import { checkBadges as checkBadgesLib } from './badges';
+import { checkBadges as checkBadgesLib, seedBadges as seedBadgesLib } from './badges';
 
 export async function checkBadges(userId: string, event: any) {
     return await checkBadgesLib(userId, event);
+}
+
+export async function seedBadges() {
+    return await seedBadgesLib();
 }
 
 import { calculatePotentialXP, calculateQuizXP as calcQuizXP, Difficulty } from './xp';
