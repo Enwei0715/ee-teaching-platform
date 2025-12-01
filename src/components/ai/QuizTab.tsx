@@ -100,9 +100,23 @@ export default function QuizTab({
         setSelectedAnswer(index);
     };
 
-    const handleSubmit = () => {
-        if (selectedAnswer === null) return;
+    const handleSubmit = async () => {
+        if (selectedAnswer === null || !quiz) return;
         setShowResult(true);
+
+        if (selectedAnswer === quiz.correctAnswer) {
+            try {
+                const res = await fetch('/api/gamification/quiz-xp', { method: 'POST' });
+                if (res.ok) {
+                    const data = await res.json();
+                    // Optional: Show toast or confetti
+                    // For now, just log it or rely on the global XP update if we had one
+                    // But we should probably show a toast here since it's a separate component
+                }
+            } catch (error) {
+                console.error("Failed to award XP:", error);
+            }
+        }
     };
 
     const handleRetry = () => {

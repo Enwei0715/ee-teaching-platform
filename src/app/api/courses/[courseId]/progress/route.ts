@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { addXP, updateStreak, calculateLessonXP, calculateQuizXP } from "@/lib/gamification";
+import { addXP, updateStreak, calculateLessonXP, calculateQuizXP, checkBadges } from "@/lib/gamification";
+import { generateCertificate } from "@/lib/certificates";
 
 export async function GET(
     request: Request,
@@ -120,6 +121,7 @@ export async function POST(
 
         // Gamification: Award XP
         if (completed) {
+            newStatus = 'COMPLETED'; // Ensure status is updated
             const wasAlreadyCompleted = existingProgress?.status === 'COMPLETED' || existingProgress?.status === 'REVIEWING';
 
             // Calculate Base XP
@@ -176,6 +178,29 @@ export async function POST(
             });
         }
 
+        // Check Badges & Certificates
+        const earnedBadges: string[] = [];
+        let certificate = null;
+
+        if (completed) {
+            // Check Lesson Badges
+            const lessonBadges = await checkBadges(session.user.id, { type: 'LESSON_COMPLETE' });
+            earnedBadges.push(...lessonBadges);
+
+            // Check Certificate
+            certificate = await generateCertificate(session.user.id, course.id);
+        }
+
+        if (streakResult?.updated) {
+            const streakBadges = await checkBadges(session.user.id, { type: 'STREAK_UPDATE' });
+            earnedBadges.push(...streakBadges);
+        }
+
+        if (xpResult?.levelUp) {
+            const levelBadges = await checkBadges(session.user.id, { type: 'LEVEL_UP' });
+            earnedBadges.push(...levelBadges);
+        }
+
         return NextResponse.json({
             ...progress,
             gamification: {
@@ -183,7 +208,9 @@ export async function POST(
                 streakUpdated: streakResult?.updated || false,
                 xpGained,
                 isPractice,
-                xp: xpResult
+                xp: xpResult,
+                earnedBadges,
+                certificate
             }
         });
     } catch (error) {

@@ -102,8 +102,10 @@ export async function updateStreak(userId: string) {
     return { streak: newStreak, updated: shouldUpdate };
 }
 
-export async function checkBadges(userId: string) {
-    // This would be called after specific events
+import { checkBadges as checkBadgesLib } from './badges';
+
+export async function checkBadges(userId: string, event: any) {
+    return await checkBadgesLib(userId, event);
 }
 
 import { calculatePotentialXP, calculateQuizXP as calcQuizXP, Difficulty } from './xp';

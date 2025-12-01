@@ -21,10 +21,12 @@ export default function AIQuizGenerator({ courseId, lessonId, topic, context }: 
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { markAsComplete } = useLessonProgress();
+    const { markAsComplete, status: lessonStatus } = useLessonProgress();
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const potentialXP = calculateQuizXP();
+    const isCompleted = lessonStatus === 'COMPLETED' || lessonStatus === 'REVIEWING';
+    const baseXP = calculateQuizXP();
+    const potentialXP = isCompleted ? Math.max(1, Math.round(baseXP / 10)) : baseXP;
 
     const handleGenerate = async () => {
         setLoading(true);
