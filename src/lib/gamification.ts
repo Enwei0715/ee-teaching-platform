@@ -128,3 +128,23 @@ export function calculateProjectXP(difficulty: Difficulty = 'Intermediate'): num
     const multiplier = multipliers[difficulty] || 1.5;
     return Math.round(baseXP * multiplier);
 }
+export function getLevelProgress(totalXP: number) {
+    const currentLevel = Math.floor(Math.sqrt(totalXP / 100)) + 1;
+    const nextLevel = currentLevel + 1;
+
+    const xpForCurrentLevel = 100 * Math.pow(currentLevel - 1, 2);
+    const xpForNextLevel = 100 * Math.pow(nextLevel - 1, 2);
+
+    const xpInCurrentLevel = totalXP - xpForCurrentLevel;
+    const xpRequiredForNextLevel = xpForNextLevel - xpForCurrentLevel;
+    const progressPercent = Math.min(100, Math.max(0, (xpInCurrentLevel / xpRequiredForNextLevel) * 100));
+
+    return {
+        currentLevel,
+        nextLevel,
+        xpInCurrentLevel,
+        xpRequiredForNextLevel,
+        progressPercent,
+        totalXP
+    };
+}

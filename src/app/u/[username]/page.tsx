@@ -13,6 +13,8 @@ interface Props {
     };
 }
 
+import ProfileHeader from '@/components/profile/ProfileHeader';
+
 export default async function ProfilePage({ params }: Props) {
     const userId = params.username; // Using ID as username for now
 
@@ -42,78 +44,7 @@ export default async function ProfilePage({ params }: Props) {
 
             <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
                 {/* Header Section */}
-                <div className="glass-panel p-8 rounded-2xl shadow-xl mb-8 flex flex-col md:flex-row items-center md:items-start gap-8 border border-white/10">
-                    <div className="relative">
-                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-indigo-500/30 shadow-lg">
-                            {user.image ? (
-                                <Image
-                                    src={user.image}
-                                    alt={user.name || 'User'}
-                                    width={128}
-                                    height={128}
-                                    className="object-cover w-full h-full"
-                                />
-                            ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-4xl font-bold">
-                                    {(user.name || 'U').charAt(0).toUpperCase()}
-                                </div>
-                            )}
-                        </div>
-                        <div className="absolute -bottom-2 -right-2 bg-gray-900 rounded-full p-1 border border-white/10">
-                            <div className="bg-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                                Lvl {user.level || 1}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 text-center md:text-left w-full">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
-                            <h1 className="text-3xl font-bold">{user.name || 'Anonymous User'}</h1>
-                            {/* Level Progress Bar */}
-                            <div className="w-full md:w-48 mt-2 md:mt-0">
-                                <div className="flex justify-between text-xs text-gray-400 mb-1">
-                                    <span>Lvl {user.level || 1}</span>
-                                    <span>{user.xp || 0} / {((user.level || 1) + 1) * 100} XP</span>
-                                </div>
-                                <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-white/5">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
-                                        style={{ width: `${Math.min(100, ((user.xp || 0) % 100))}%` }} // Simplified logic for now
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-400 mb-4">
-                            {user.occupation && (
-                                <div className="flex items-center gap-1">
-                                    <Briefcase size={14} />
-                                    {user.occupation}
-                                </div>
-                            )}
-                            {user.major && (
-                                <div className="flex items-center gap-1">
-                                    <GraduationCap size={14} />
-                                    {user.major}
-                                </div>
-                            )}
-                            <div className="flex items-center gap-1">
-                                <MapPin size={14} />
-                                Earth
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                            <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                                <Flame size={16} className="text-orange-500" />
-                                <span className="font-medium">{user.streak || 0} Day Streak</span>
-                            </div>
-                            <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                                <Award size={16} className="text-yellow-500" />
-                                <span className="font-medium">{user.xp || 0} XP</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ProfileHeader user={user} />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Left Column: Badges & Stats */}
