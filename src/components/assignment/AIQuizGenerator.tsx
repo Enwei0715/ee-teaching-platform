@@ -72,15 +72,27 @@ export default function AIQuizGenerator({ courseId, lessonId, topic, context }: 
                 colors: ['#EAB308', '#A855F7', '#3B82F6']
             });
 
-            toast.success(
-                <div className="flex flex-col gap-1">
-                    <span className="font-bold">Quiz Completed!</span>
-                    <span className="flex items-center gap-1 text-sm">
-                        <Zap size={14} className="text-yellow-500 fill-yellow-500" />
-                        You earned {result.gamification.xpGained} XP
-                    </span>
-                </div>
-            );
+            // Check for Level Up
+            if (result.gamification.xp?.levelUp) {
+                toast.success(
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold text-lg">🎉 Level Up!</span>
+                        <span className="text-sm">You reached Level {result.gamification.xp.newLevel}!</span>
+                        <span className="text-xs opacity-80">+{result.gamification.xpGained} XP</span>
+                    </div>,
+                    { duration: 5000 }
+                );
+            } else {
+                toast.success(
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold">Quiz Completed!</span>
+                        <span className="flex items-center gap-1 text-sm">
+                            <Zap size={14} className="text-yellow-500 fill-yellow-500" />
+                            You earned {result.gamification.xpGained} XP
+                        </span>
+                    </div>
+                );
+            }
         } else {
             toast.success('Quiz Completed!', {
                 icon: <Trophy size={18} className="text-yellow-500" />,

@@ -56,71 +56,50 @@ export async function updateStreak(userId: string) {
     const lastLogin = user.lastLoginDate ? new Date(user.lastLoginDate) : null;
 
     let newStreak = user.streak;
+    let shouldUpdate = false;
 
     if (lastLogin) {
-        const diffTime = Math.abs(now.getTime() - lastLogin.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // Normalize dates to midnight (UTC) to compare "days"
+        // We use UTC to avoid timezone complexity on the server side for now
+        // Ideally, we'd use the user's local timezone, but that requires storing it.
+        const today = new Date(now);
+        today.setUTCHours(0, 0, 0, 0);
 
-        // Check if same day (ignoring time)
-        const isSameDay = now.toDateString() === lastLogin.toDateString();
+        const last = new Date(lastLogin);
+        last.setUTCHours(0, 0, 0, 0);
 
-        if (isSameDay) {
-            // Already logged in today, do nothing to streak
-            return { streak: newStreak, updated: false };
-        } else if (diffDays <= 2) {
-            // Consecutive day (allow some buffer for timezone/late night)
-            // Ideally check if yesterday. 
-            // Simple check: if not same day and diff is small.
-            // Better: Check if yesterday.
-            const yesterday = new Date(now);
-            yesterday.setDate(yesterday.getDate() - 1);
-            if (lastLogin.toDateString() === yesterday.toDateString()) {
-                newStreak += 1;
-            } else {
-                // Missed a day? 
-                // If diffDays is 1 (meaning strictly yesterday), streak++.
-                // If diffDays > 1, reset.
-                // Actually diffDays calculation above is rough.
-                // Let's stick to date string comparison.
-                newStreak = 1;
-            }
+        const diffTime = today.getTime() - last.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            // Already logged in today (UTC), keep streak
+            shouldUpdate = true; // Update lastLoginDate time
+        } else if (diffDays === 1) {
+            // Logged in yesterday (UTC), increment streak
+            newStreak += 1;
+            shouldUpdate = true;
         } else {
+            // Missed a day or more, reset streak
             newStreak = 1;
+            shouldUpdate = true;
         }
     } else {
+        // First login ever
         newStreak = 1;
+        shouldUpdate = true;
     }
 
-    // Refined logic for "Yesterday"
-    if (lastLogin) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const last = new Date(lastLogin);
-        last.setHours(0, 0, 0, 0);
-
-        const diff = (today.getTime() - last.getTime()) / (1000 * 3600 * 24);
-
-        if (diff === 0) {
-            // Same day
-            newStreak = user.streak;
-        } else if (diff === 1) {
-            // Yesterday
-            newStreak = user.streak + 1;
-        } else {
-            // Missed days
-            newStreak = 1;
-        }
+    if (shouldUpdate) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                lastLoginDate: now,
+                streak: newStreak
+            }
+        });
     }
 
-    await prisma.user.update({
-        where: { id: userId },
-        data: {
-            lastLoginDate: now,
-            streak: newStreak
-        }
-    });
-
-    return { streak: newStreak, updated: true };
+    return { streak: newStreak, updated: shouldUpdate };
 }
 
 export async function checkBadges(userId: string) {

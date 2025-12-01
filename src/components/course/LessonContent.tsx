@@ -58,7 +58,9 @@ export default function LessonContent({
     const router = useRouter();
     const { isEditMode } = useEditMode();
 
-    const potentialXP = calculatePotentialXP(lesson.content.length);
+    const isCompleted = lessonStatus === 'COMPLETED' || lessonStatus === 'REVIEWING';
+    const baseXP = calculatePotentialXP(lesson.content.length);
+    const potentialXP = isCompleted ? Math.max(1, Math.round(baseXP / 10)) : baseXP;
 
     // State for progress-aware quiz
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
@@ -119,15 +121,27 @@ export default function LessonContent({
                                 colors: ['#EAB308', '#A855F7', '#3B82F6'] // Yellow, Purple, Blue
                             });
 
-                            toast.success(
-                                <div className="flex flex-col gap-1">
-                                    <span className="font-bold">Lesson Completed!</span>
-                                    <span className="flex items-center gap-1 text-sm">
-                                        <Zap size={14} className="text-yellow-500 fill-yellow-500" />
-                                        You earned {result.gamification.xpGained} XP
-                                    </span>
-                                </div>
-                            );
+                            // Check for Level Up
+                            if (result.gamification.xp?.levelUp) {
+                                toast.success(
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-bold text-lg">🎉 Level Up!</span>
+                                        <span className="text-sm">You reached Level {result.gamification.xp.newLevel}!</span>
+                                        <span className="text-xs opacity-80">+{result.gamification.xpGained} XP</span>
+                                    </div>,
+                                    { duration: 5000 }
+                                );
+                            } else {
+                                toast.success(
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-bold">Lesson Completed!</span>
+                                        <span className="flex items-center gap-1 text-sm">
+                                            <Zap size={14} className="text-yellow-500 fill-yellow-500" />
+                                            You earned {result.gamification.xpGained} XP
+                                        </span>
+                                    </div>
+                                );
+                            }
                         } else if (result?.status === 'COMPLETED') {
                             toast.success('Lesson Completed!', {
                                 icon: <Trophy size={18} className="text-yellow-500" />,
@@ -197,9 +211,12 @@ export default function LessonContent({
                                         <Calendar size={16} className="text-accent-primary" />
                                         <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-500/20">
-                                        <Zap size={16} className="text-yellow-500" />
-                                        <span className="text-yellow-500 font-medium">+{potentialXP} XP</span>
+                                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isCompleted
+                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                                            : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                                        }`}>
+                                        <Zap size={16} className={isCompleted ? "text-blue-400" : "text-yellow-500"} />
+                                        <span className="font-medium">+{potentialXP} XP</span>
                                     </div>
                                     {isEditMode && (
                                         <Link href={`/admin/courses/${course.slug}?file=${lesson.slug}.mdx`}>

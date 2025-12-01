@@ -90,8 +90,15 @@ export default function CourseProgress({ courseId, lessons }: CourseProgressProp
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-medium text-yellow-500/80 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20 whitespace-nowrap">
-                                +{calculatePotentialXP(lesson.content.length)} XP
+                            <span className={`text-xs font-medium px-2 py-1 rounded border whitespace-nowrap ${(progressMap[lesson.id] === 'COMPLETED' || progressMap[lesson.id] === 'REVIEWING')
+                                    ? 'text-blue-400/80 bg-blue-500/10 border-blue-500/20'
+                                    : 'text-yellow-500/80 bg-yellow-500/10 border-yellow-500/20'
+                                }`}>
+                                +{
+                                    (progressMap[lesson.id] === 'COMPLETED' || progressMap[lesson.id] === 'REVIEWING')
+                                        ? Math.max(1, Math.round(calculatePotentialXP(lesson.content.length) / 10))
+                                        : calculatePotentialXP(lesson.content.length)
+                                } XP
                             </span>
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity text-accent-primary">
                                 <PlayCircle size={20} />
