@@ -76,7 +76,7 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
     useEffect(() => {
         if (isOpen && allData.length === 0) {
             setLoading(true);
-            fetch('/api/search/index')
+            fetch('/api/search') // Fixed API endpoint
                 .then(res => res.json())
                 .then(data => {
                     setAllData(data);
@@ -93,10 +93,16 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
     const fuse = useMemo(() => {
         const combinedData = [...systemActions, ...allData];
         return new Fuse(combinedData, {
-            keys: ['title', 'description', 'tags', 'url'], // Added URL to keys
+            keys: [
+                { name: 'title', weight: 0.7 },
+                { name: 'description', weight: 0.3 },
+                { name: 'url', weight: 0.5 },
+                { name: 'tags', weight: 0.4 }
+            ],
             threshold: 0.4,
             distance: 100,
             includeScore: true,
+            ignoreLocation: true, // Search anywhere in the string
         });
     }, [allData, systemActions]);
 
@@ -107,82 +113,95 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
             return;
         }
 
-        // Path-based Navigation Logic
+        const lowerQuery = query.toLowerCase();
+
+        // 1. Path Navigation Mode (Scoped Search)
         if (query.startsWith('/')) {
-            const currentPath = query.toLowerCase();
+            // Determine the "parent" path to scope the search
+            // e.g. "/courses/basic" -> Parent: "/courses/" -> Search: "basic"
+            // e.g. "/courses/" -> Parent: "/" -> Search: "courses" (or show all roots)
 
-            // 1. Define Root Navigation Paths
-            const rootPaths: SearchResult[] = [
-                { id: 'nav-courses', title: '/courses', description: 'Browse all courses', type: 'navigation', url: '/courses', tags: ['courses'] },
-                { id: 'nav-dashboard', title: '/dashboard', description: 'Go to Dashboard', type: 'navigation', url: '/dashboard', tags: ['dashboard'] },
-                { id: 'nav-projects', title: '/projects', description: 'View Projects', type: 'navigation', url: '/projects', tags: ['projects'] },
-                { id: 'nav-blog', title: '/blog', description: 'Read Blog Posts', type: 'navigation', url: '/blog', tags: ['blog'] },
-            ];
+            const lastSlashIndex = query.lastIndexOf('/');
+            const parentPath = query.substring(0, lastSlashIndex + 1); // e.g. "/courses/"
+            const searchTerm = query.substring(lastSlashIndex + 1); // e.g. "basic"
 
-            if (session?.user?.id) {
-                rootPaths.push({
-                    id: 'nav-profile',
-                    title: `/u/${session.user.id}`,
-                    description: 'My Profile',
-                    type: 'navigation',
-                    url: `/u/${session.user.id}`,
-                    tags: ['profile']
-                });
-            }
+            // Find items that are direct children of the parentPath
+            // OR items that are deeper but match the search term well?
+            // Let's stick to hierarchy: Show children of parentPath that match searchTerm.
 
-            // 2. Find matching Root Paths (e.g. "/c" matches "/courses")
-            // We only show these if they strictly start with the query, but aren't exact duplicates of what we already typed (unless we are just typing partial)
-            const matchingRoots = rootPaths.filter(r =>
-                r.url.toLowerCase().startsWith(currentPath) &&
-                r.url.toLowerCase() !== currentPath // Don't show "/courses" if I already typed "/courses" (optional, but keeps it clean)
-            );
+            let scopedItems = allData.filter(item => {
+                // Check if item belongs to this parent path
+                // item.url must start with parentPath
+                if (!item.url.startsWith(parentPath)) return false;
 
-            // 3. Find matching Content from allData
-            // Filter by depth to show hierarchy
-            const queryParts = currentPath.split('/').filter(Boolean);
-            const queryDepth = queryParts.length;
-            const isDirectory = currentPath.endsWith('/');
+                // Calculate relative depth
+                // parentPath: /courses/ (depth 2 parts: "", "courses") - wait, split('/') gives ['', 'courses', '']
+                // item.url: /courses/react (depth 3 parts: ['', 'courses', 'react'])
 
-            const matchingContent = allData.filter(item => {
-                if (!item.url.toLowerCase().startsWith(currentPath)) return false;
+                const parentDepth = parentPath.split('/').filter(Boolean).length;
+                const itemDepth = item.url.split('/').filter(Boolean).length;
 
-                const itemParts = item.url.split('/').filter(Boolean);
-                const itemDepth = itemParts.length;
+                // We want direct children (depth + 1)
+                // Exception: Sections (#) are treated as children of the lesson
+                const isSection = item.type === 'section';
 
-                // If query ends with '/', we want immediate children (depth + 1)
-                // If query doesn't end with '/', we want current level siblings (depth)
-                // Exception: Sections have '#' and are considered deeper or same level as lesson?
-                // Let's treat sections as children of lessons.
-
-                // Logic:
-                // /courses/ -> depth 1. Want courses (depth 2: /courses/react).
-                // /courses/react -> depth 2. Want courses (sibling) or maybe lesson (child)?
-                // Usually autocomplete shows completions for current segment.
-
-                if (isDirectory) {
-                    // Looking for children
-                    // e.g. /courses/ (1) -> /courses/react (2)
-                    return itemDepth === queryDepth + 1;
-                } else {
-                    // Looking for completion of current segment
-                    // e.g. /courses/re (2) -> /courses/react (2)
-                    return itemDepth === queryDepth;
+                if (isSection) {
+                    // If we are in a lesson path, show sections
+                    // Lesson URL: /courses/slug/lesson-slug
+                    // Section URL: /courses/slug/lesson-slug#section
+                    return item.url.startsWith(parentPath) && item.url !== parentPath;
                 }
+
+                return itemDepth === parentDepth + 1;
             });
 
-            // 4. Combine and Sort
-            let combined = [...matchingRoots, ...matchingContent];
+            // If we are at root "/", show root navigation items
+            if (parentPath === '/') {
+                const rootPaths: SearchResult[] = [
+                    { id: 'nav-courses', title: 'Courses', description: 'Browse all courses', type: 'navigation', url: '/courses', tags: ['courses'] },
+                    { id: 'nav-dashboard', title: 'Dashboard', description: 'Go to Dashboard', type: 'navigation', url: '/dashboard', tags: ['dashboard'] },
+                    { id: 'nav-projects', title: 'Projects', description: 'View Projects', type: 'navigation', url: '/projects', tags: ['projects'] },
+                    { id: 'nav-blog', title: 'Blog', description: 'Read Blog Posts', type: 'navigation', url: '/blog', tags: ['blog'] },
+                ];
+                if (session?.user?.id) {
+                    rootPaths.push({
+                        id: 'nav-profile',
+                        title: 'My Profile',
+                        description: 'View Profile',
+                        type: 'navigation',
+                        url: `/u/${session.user.id}`,
+                        tags: ['profile']
+                    });
+                }
+                scopedItems = [...rootPaths, ...scopedItems];
+            }
 
-            // Sort by URL length to keep it clean
-            combined.sort((a, b) => a.url.length - b.url.length);
+            // Fuzzy search within the scoped items using the searchTerm
+            if (searchTerm) {
+                const scopedFuse = new Fuse(scopedItems, {
+                    keys: ['title', 'url', 'tags'],
+                    threshold: 0.4
+                });
+                const fuzzyResults = scopedFuse.search(searchTerm).map(r => r.item);
 
-            setResults(combined.slice(0, 20));
+                // Also include items that strictly start with the query URL (for exact path typing)
+                const exactPrefixMatches = scopedItems.filter(item =>
+                    item.url.toLowerCase().startsWith(lowerQuery) &&
+                    !fuzzyResults.includes(item)
+                );
+
+                setResults([...fuzzyResults, ...exactPrefixMatches]);
+            } else {
+                // If no search term (just typed "/courses/"), show all children
+                setResults(scopedItems);
+            }
             return;
         }
 
-        // Default Fuzzy Search
+        // 2. Global Search (Default)
+        // If not starting with '/', search everything
         const searchResults = fuse.search(query);
-        setResults(searchResults.map(result => result.item).slice(0, 10));
+        setResults(searchResults.map(result => result.item).slice(0, 20));
 
     }, [query, fuse, allData, session]);
 
