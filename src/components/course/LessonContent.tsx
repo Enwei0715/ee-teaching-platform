@@ -212,8 +212,8 @@ export default function LessonContent({
                                         <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                     </div>
                                     <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isCompleted
-                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                                            : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                                        : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
                                         }`}>
                                         <Zap size={16} className={isCompleted ? "text-blue-400" : "text-yellow-500"} />
                                         <span className="font-medium">+{potentialXP} XP</span>
@@ -288,11 +288,13 @@ export default function LessonContent({
                                     className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
                                 >
                                     <div className="text-right">
-                                        <div className="text-xs text-white/80 uppercase tracking-wider">Finish</div>
-                                        <div className="font-bold">Complete Course</div>
-                                        <div className="text-xs text-yellow-300 font-medium mt-1">
-                                            +100 XP Bonus
-                                        </div>
+                                        <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
+                                        <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
+                                        {!isCompleted && (
+                                            <div className="text-xs text-yellow-300 font-medium mt-1">
+                                                +100 XP Bonus
+                                            </div>
+                                        )}
                                     </div>
                                     <CheckCircle size={20} />
                                 </Link>
