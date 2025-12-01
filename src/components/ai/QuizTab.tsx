@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Sparkles, AlertCircle, RotateCw } from 'lucide-react';
+import { Sparkles, AlertCircle, RotateCw, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -109,9 +110,22 @@ export default function QuizTab({
                 const res = await fetch('/api/gamification/quiz-xp', { method: 'POST' });
                 if (res.ok) {
                     const data = await res.json();
-                    // Optional: Show toast or confetti
-                    // For now, just log it or rely on the global XP update if we had one
-                    // But we should probably show a toast here since it's a separate component
+
+                    if (data.xpGained > 0) {
+                        toast.success(
+                            <div className="flex flex-col gap-1">
+                                <span className="font-bold flex items-center gap-2">
+                                    <Zap size={16} className="text-yellow-500 fill-yellow-500" />
+                                    Correct! +{data.xpGained} XP
+                                </span>
+                                {data.levelUp && (
+                                    <span className="text-xs text-indigo-300 font-bold">
+                                        🎉 Level Up! You are now Level {data.newLevel}
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    }
                 }
             } catch (error) {
                 console.error("Failed to award XP:", error);
@@ -160,8 +174,12 @@ export default function QuizTab({
                             <>
                                 <Sparkles size={48} className="text-indigo-400" />
                                 <div>
-                                    <h3 className="text-white font-bold text-lg mb-2">
+                                    <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-3">
                                         {lessonStatus === 'IN_PROGRESS' ? 'Progress-Aware Quiz' : 'Full Lesson Review'}
+                                        <span className="text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                            <Zap size={12} className="fill-yellow-400" />
+                                            Win 15 XP
+                                        </span>
                                     </h3>
                                     <p className="text-gray-400 text-sm max-w-md">
                                         {lessonStatus === 'IN_PROGRESS'
