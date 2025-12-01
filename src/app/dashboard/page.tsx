@@ -8,6 +8,8 @@ import { getAllCourses, getCourseStructure } from "@/lib/mdx";
 import OscilloscopeBackground from "@/components/ui/OscilloscopeBackground";
 import ResumeLearningPrompt from "@/components/dashboard/ResumeLearningPrompt";
 import ResumeCard from "@/components/dashboard/ResumeCard";
+import BadgeSyncer from "@/components/gamification/BadgeSyncer";
+import { getLevelProgress } from "@/lib/gamification";
 
 export const dynamic = 'force-dynamic';
 
@@ -143,6 +145,7 @@ export default async function DashboardPage() {
     const timeFormatted = formatDuration(totalSeconds);
 
     const streak = user?.streak || 0;
+    const levelProgress = getLevelProgress(user?.xp || 0);
 
     // Filter and Sort Active Courses
     const activeCourses = allCourses
@@ -167,6 +170,7 @@ export default async function DashboardPage() {
     return (
         <div className="flex-1 w-full flex flex-col relative overflow-hidden bg-transparent py-8">
             <OscilloscopeBackground />
+            <BadgeSyncer />
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-white">Welcome back, {session.user.name}!</h1>
@@ -205,7 +209,7 @@ export default async function DashboardPage() {
                             <div>
                                 <p className="text-sm text-gray-400">Current Level</p>
                                 <div className="flex items-baseline gap-2">
-                                    <h3 className="text-2xl font-bold text-white">{user?.level || 1}</h3>
+                                    <h3 className="text-2xl font-bold text-white">{levelProgress.currentLevel}</h3>
                                     <span className="text-xs text-gray-500">({user?.xp || 0} XP)</span>
                                 </div>
                             </div>
@@ -214,14 +218,14 @@ export default async function DashboardPage() {
                         <div className="w-full bg-gray-800 rounded-full h-2 mb-1">
                             <div
                                 className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out"
-                                style={{ width: `${Math.min(100, ((user?.xp || 0) % 100))}%` }} // Simplified progress logic: 100 XP per level for now
+                                style={{ width: `${levelProgress.progressPercent}%` }}
                             ></div>
                         </div>
                         <p className="text-xs text-gray-500 text-right">
-                            {100 - ((user?.xp || 0) % 100)} XP to next level
+                            {Math.round(levelProgress.xpRequiredForNextLevel - levelProgress.xpInCurrentLevel)} XP to next level
                         </p>
                     </div>
-                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default">
+                    <div className="glass-panel p-6 rounded-xl shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-2xl hover:bg-gray-800/80 cursor-default flex flex-col justify-center">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-purple-900/30 text-purple-400 rounded-lg">
                                 <Activity size={24} />

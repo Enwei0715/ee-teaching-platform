@@ -10,7 +10,7 @@ export async function generateCertificate(userId: string, courseId: string) {
         }
     });
 
-    if (existing) return existing;
+    if (existing) return { certificate: existing, isNew: false };
 
     // Verify course completion
     const course = await prisma.course.findUnique({
@@ -43,5 +43,5 @@ export async function generateCertificate(userId: string, courseId: string) {
         }
     });
 
-    return certificate;
+    return { certificate, isNew: true };
 }

@@ -181,6 +181,7 @@ export async function POST(
         // Check Badges & Certificates
         const earnedBadges: string[] = [];
         let certificate = null;
+        let isNewCertificate = false;
 
         if (completed) {
             // Check Lesson Badges
@@ -188,7 +189,23 @@ export async function POST(
             earnedBadges.push(...lessonBadges);
 
             // Check Certificate
-            certificate = await generateCertificate(session.user.id, course.id);
+            const certResult = await generateCertificate(session.user.id, course.id);
+            if (certResult) {
+                certificate = certResult.certificate;
+                isNewCertificate = certResult.isNew;
+
+                if (certResult.isNew) {
+                    // Award Course Completion Bonus
+                    const bonusXP = 100;
+                    const bonusResult = await addXP(session.user.id, bonusXP);
+                    xpGained += bonusXP;
+
+                    // Merge bonus result if level up happened
+                    if (bonusResult?.levelUp) {
+                        xpResult = bonusResult; // Keep the latest state
+                    }
+                }
+            }
         }
 
         if (streakResult?.updated) {
@@ -210,7 +227,8 @@ export async function POST(
                 isPractice,
                 xp: xpResult,
                 earnedBadges,
-                certificate
+                certificate,
+                courseCompleted: !!certificate && isNewCertificate
             }
         });
     } catch (error) {

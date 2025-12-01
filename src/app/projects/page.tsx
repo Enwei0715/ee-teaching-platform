@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Wrench, ArrowRight, Edit2 } from 'lucide-react';
+import { Wrench, ArrowRight, Edit2, CheckCircle } from 'lucide-react';
 import EditableText from '@/components/ui/EditableText';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
@@ -100,13 +100,18 @@ export default function ProjectsPage() {
                                         <Wrench size={64} className="text-gray-700 group-hover:text-indigo-500/50 group-hover:scale-110 transition-all duration-500 relative z-0" />
                                     )}
 
-                                    <div className="absolute top-4 right-4 z-20">
+                                    <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 items-end">
                                         <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-white/5 ${project.level === 'Beginner' ? 'bg-green-600 text-white' :
                                             project.level === 'Intermediate' ? 'bg-amber-600 text-white' :
                                                 'bg-red-600 text-white'
                                             }`}>
                                             {project.level || 'All Levels'}
                                         </span>
+                                        {project.isCompleted && (
+                                            <span className="px-3 py-1 text-xs font-bold rounded-full shadow-sm border border-green-400/30 bg-green-500/20 text-green-400 flex items-center gap-1 backdrop-blur-md">
+                                                <CheckCircle size={12} /> Completed
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="p-6 flex-1 flex flex-col">

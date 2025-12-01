@@ -26,7 +26,7 @@ export default function AIQuizGenerator({ courseId, lessonId, topic, context }: 
 
     const isCompleted = lessonStatus === 'COMPLETED' || lessonStatus === 'REVIEWING';
     const baseXP = calculateQuizXP();
-    const potentialXP = isCompleted ? Math.max(1, Math.round(baseXP / 10)) : baseXP;
+    const potentialXP = isCompleted ? Math.max(1, Math.round(baseXP / 2)) : baseXP;
 
     const handleGenerate = async () => {
         setLoading(true);

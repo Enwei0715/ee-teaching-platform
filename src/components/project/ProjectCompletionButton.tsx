@@ -56,13 +56,18 @@ export default function ProjectCompletionButton({ projectSlug, initialCompleted 
 
     if (completed) {
         return (
-            <button
-                disabled
-                className="w-full flex items-center justify-center gap-2 bg-green-500/20 text-green-400 border border-green-500/30 py-3 rounded-lg font-semibold cursor-default"
-            >
-                <CheckCircle size={20} />
-                Completed
-            </button>
+            <div className="w-full flex flex-col gap-2">
+                <button
+                    disabled
+                    className="w-full flex items-center justify-center gap-2 bg-green-500/20 text-green-400 border border-green-500/30 py-3 rounded-lg font-semibold cursor-default"
+                >
+                    <CheckCircle size={20} />
+                    Completed
+                </button>
+                <p className="text-center text-xs text-green-500/70 flex items-center justify-center gap-1">
+                    <Zap size={12} /> You earned XP for this project
+                </p>
+            </div>
         );
     }
 

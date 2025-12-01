@@ -37,7 +37,7 @@ export function calculatePotentialXP(contentLength: number, difficulty: Difficul
 
 export function calculateQuizXP(difficulty: Difficulty = 'Intermediate'): number {
     // Fixed base XP for quizzes, independent of lesson length
-    const baseQuizXP = 15;
+    const baseQuizXP = 10;
     const multiplier = difficultyMultipliers[difficulty];
     return Math.round(baseQuizXP * multiplier);
 }

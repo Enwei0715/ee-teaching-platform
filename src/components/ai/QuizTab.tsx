@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, AlertCircle, RotateCw, Zap } from 'lucide-react';
+import { Sparkles, AlertCircle, RotateCw, Zap, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -107,7 +107,11 @@ export default function QuizTab({
 
         if (selectedAnswer === quiz.correctAnswer) {
             try {
-                const res = await fetch('/api/gamification/quiz-xp', { method: 'POST' });
+                const res = await fetch('/api/gamification/quiz-xp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPerfect: true })
+                });
                 if (res.ok) {
                     const data = await res.json();
 
@@ -123,6 +127,11 @@ export default function QuizTab({
                                         🎉 Level Up! You are now Level {data.newLevel}
                                     </span>
                                 )}
+                                {data.earnedBadges && data.earnedBadges.map((badge: string) => (
+                                    <span key={badge} className="text-xs text-yellow-300 font-bold flex items-center gap-1">
+                                        <Trophy size={12} /> Badge Unlocked: {badge}
+                                    </span>
+                                ))}
                             </div>
                         );
                     }
@@ -174,14 +183,23 @@ export default function QuizTab({
                             <>
                                 <Sparkles size={48} className="text-indigo-400" />
                                 <div>
-                                    <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-3">
-                                        {lessonStatus === 'IN_PROGRESS' ? 'Progress-Aware Quiz' : 'Full Lesson Review'}
-                                        <span className="text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                            <Zap size={12} className="fill-yellow-400" />
-                                            Win 15 XP
-                                        </span>
-                                    </h3>
-                                    <p className="text-gray-400 text-sm max-w-md">
+                                    <div className="mb-4">
+                                        <h3 className="text-white font-bold text-lg mb-1 flex flex-col gap-2">
+                                            {lessonStatus === 'IN_PROGRESS' ? 'Progress-Aware Quiz' : 'Full Lesson Review'}
+                                        </h3>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 w-fit">
+                                                <Zap size={12} className="fill-yellow-400" />
+                                                Win 10 XP
+                                            </span>
+                                            {lessonStatus !== 'IN_PROGRESS' && (
+                                                <span className="text-xs text-gray-500">
+                                                    (Review Mode)
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-400 text-sm max-w-md mb-4">
                                         {lessonStatus === 'IN_PROGRESS'
                                             ? "Test your understanding! We'll only ask about sections you've already read."
                                             : "Challenge yourself! Questions will be drawn from the entire lesson content."

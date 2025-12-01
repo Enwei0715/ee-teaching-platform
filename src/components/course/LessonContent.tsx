@@ -121,8 +121,38 @@ export default function LessonContent({
                                 colors: ['#EAB308', '#A855F7', '#3B82F6'] // Yellow, Purple, Blue
                             });
 
-                            // Check for Level Up
-                            if (result.gamification.xp?.levelUp) {
+                            // Check for Course Completion
+                            if (result.gamification.courseCompleted) {
+                                // Big Confetti for Course Completion
+                                var duration = 3 * 1000;
+                                var animationEnd = Date.now() + duration;
+                                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+                                var random = function (min: number, max: number) {
+                                    return Math.random() * (max - min) + min;
+                                };
+
+                                var interval: any = setInterval(function () {
+                                    var timeLeft = animationEnd - Date.now();
+
+                                    if (timeLeft <= 0) {
+                                        return clearInterval(interval);
+                                    }
+
+                                    var particleCount = 50 * (timeLeft / duration);
+                                    confetti({ ...defaults, particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } });
+                                    confetti({ ...defaults, particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } });
+                                }, 250);
+
+                                toast.success(
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-bold text-lg">🏆 Course Completed!</span>
+                                        <span className="text-sm">You've mastered {course.title}!</span>
+                                        <span className="text-xs opacity-80 font-bold text-yellow-300">+100 Bonus XP & Certificate Earned</span>
+                                    </div>,
+                                    { duration: 8000 }
+                                );
+                            } else if (result.gamification.xp?.levelUp) {
                                 toast.success(
                                     <div className="flex flex-col gap-1">
                                         <span className="font-bold text-lg">🎉 Level Up!</span>

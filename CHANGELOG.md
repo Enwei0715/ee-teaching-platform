@@ -158,11 +158,39 @@
   * 優化 Command Palette (`Ctrl + K`) 的導航體驗，新增了層級過濾功能，現在輸入路徑時會依序推薦下一層級的內容 (課程 -> 單元 -> 章節)，並支援搜尋課程內的章節標題 (Sections)。
   * 新增「完善個人資料」流程 (`OnboardingModal`)，針對使用 Google/GitHub 登入的新用戶，自動跳出視窗引導填寫「職業」與「主修」資訊，確保所有用戶資料完整，以便提供更個人化的學習體驗。
   * 修正課程完成按鈕的顯示邏輯，當課程已完成或處於複習狀態時，不再顯示「+100 XP Bonus」字樣，並將按鈕文字改為「Return to Course」，避免誤導用戶。
-  * 優化個人頁面 (`/u/[username]`) 的 XP 進度條顯示，現在會正確計算並顯示「當前等級進度」而非總經驗值，讓升級目標更明確 (例如：80/500 XP)。同時新增「編輯個人資料」功能，允許用戶修改職業與主修資訊。
+
+## v5.2.2 - Gamification Polish & Profile Features (2025-12-01)
+
+* **feat**:
+
+  * 這一版針對遊戲化與個人頁面進行深度打磨。優化個人頁面 (`/u/[username]`) 的 XP 進度條顯示，現在會正確計算並顯示「當前等級進度」而非總經驗值，讓升級目標更明確 (例如：80/500 XP)。同時新增「編輯個人資料」功能，允許用戶修改職業與主修資訊。
   * 實作完整的徽章 (Badges) 與證書 (Certificates) 系統。現在完成課程會自動頒發證書，達成特定條件 (如首堂課、7日連勝、等級5) 會自動解鎖徽章。
   * 修正 `QuizTab` (AI Tutor) 的 XP 獎勵機制，現在答對問題會給予經驗值回饋。
   * 修正 `QuizCard` (AI Quiz Generator) 的 XP 顯示差異，現在會根據課程是否已完成，正確顯示預估獲得的 XP (已完成課程為 1/10)。
-  * 大幅增強 Command Palette (`Ctrl + K`) 功能：
+
+## v5.2.4 - 2025-12-01
+
+### 🎨 UX & Design
+- **Profile Background**: Added a unique "Circuit Board" particle effect to the user profile page for a more immersive experience.
+- **Quiz Tab Layout**: Improved the header layout to prevent the "Win XP" badge from overlapping with the title.
+
+### ⚖️ Gamification Balance
+- **XP Balancing**: Unified Quiz XP to **10 XP** per question for both Lesson Quizzes and AI Tutor Quizzes.
+- **Review Penalty**: Adjusted the XP penalty for reviewing completed lessons to 50% (was 90%), making practice more rewarding (5 XP).
+- **Badge Logic**: Implemented "Quiz Whiz" badge triggering for perfect quiz scores.
+
+## v5.2.5 - 2025-12-01
+
+### 🏆 Gamification & Certificates
+- **Course Certificates**: Implemented automatic certificate generation upon course completion, awarding a **+100 XP Bonus** with a celebratory confetti effect.
+- **Projects UI**: Added a "Completed" badge to project cards and a persistent "XP Earned" message to the completion button.
+- **Dashboard XP**: Fixed the "XP to next level" calculation and the progress bar layout to accurately reflect user progression.
+
+## v5.2.3 - Command Palette & Badge UX (2025-12-01)
+
+* **feat**:
+
+  * 這一版大幅增強 Command Palette (`Ctrl + K`) 功能：
     * 修正導航層級邏輯，現在支援模糊搜尋與自動層級切換，解決了輸入完整名稱後推薦消失的問題。
     * 實作「無限層級」導航，可順暢地從課程 -> 單元 -> 章節進行深入檢索。
     * 整合全域搜尋功能，即使在導航模式下也能快速找到目標內容。

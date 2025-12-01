@@ -15,13 +15,34 @@ export async function POST(req: Request) {
             );
         }
 
+        // Parse body to check for perfect score
+        // Default to not perfect if body is empty or invalid
+        let isPerfect = false;
+        try {
+            const body = await req.json();
+            if (body.isPerfect) isPerfect = true;
+        } catch (e) {
+            // Body might be empty if just calling for XP
+        }
+
         // We could accept difficulty here if we want to vary XP
         const xpAmount = calculateQuizXP();
 
-        // For practice quizzes, we might want to cap it or give less
-        // For now, let's give the standard quiz XP (e.g. 15)
-
         const result = await addXP(session.user.id, xpAmount);
+
+        // Check for Quiz Whiz badge
+        if (isPerfect) {
+            const { checkBadges } = await import("@/lib/badges");
+            const earnedBadges = await checkBadges(session.user.id, {
+                type: 'QUIZ_COMPLETE',
+                data: { isCorrect: true }
+            });
+
+            // Add earned badges to result
+            if (earnedBadges.length > 0) {
+                (result as any).earnedBadges = earnedBadges;
+            }
+        }
 
         return NextResponse.json(result, { status: 200 });
     } catch (error) {
