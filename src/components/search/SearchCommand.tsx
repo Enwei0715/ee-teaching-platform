@@ -137,17 +137,44 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                 r.url.toLowerCase() !== currentPath // Don't show "/courses" if I already typed "/courses" (optional, but keeps it clean)
             );
 
-            // 3. Find matching Content from allData (e.g. "/courses/react" matches course URL)
-            const matchingContent = allData.filter(item =>
-                item.url.toLowerCase().startsWith(currentPath)
-            );
+            // 3. Find matching Content from allData
+            // Filter by depth to show hierarchy
+            const queryParts = currentPath.split('/').filter(Boolean);
+            const queryDepth = queryParts.length;
+            const isDirectory = currentPath.endsWith('/');
+
+            const matchingContent = allData.filter(item => {
+                if (!item.url.toLowerCase().startsWith(currentPath)) return false;
+
+                const itemParts = item.url.split('/').filter(Boolean);
+                const itemDepth = itemParts.length;
+
+                // If query ends with '/', we want immediate children (depth + 1)
+                // If query doesn't end with '/', we want current level siblings (depth)
+                // Exception: Sections have '#' and are considered deeper or same level as lesson?
+                // Let's treat sections as children of lessons.
+
+                // Logic:
+                // /courses/ -> depth 1. Want courses (depth 2: /courses/react).
+                // /courses/react -> depth 2. Want courses (sibling) or maybe lesson (child)?
+                // Usually autocomplete shows completions for current segment.
+
+                if (isDirectory) {
+                    // Looking for children
+                    // e.g. /courses/ (1) -> /courses/react (2)
+                    return itemDepth === queryDepth + 1;
+                } else {
+                    // Looking for completion of current segment
+                    // e.g. /courses/re (2) -> /courses/react (2)
+                    return itemDepth === queryDepth;
+                }
+            });
 
             // 4. Combine and Sort
-            // Prioritize: Exact Root Matches -> Content -> Other
             let combined = [...matchingRoots, ...matchingContent];
 
-            // If we have no results but the query looks like a path, maybe fuzzy search the remaining part?
-            // For now, strict path matching is what was requested ("infinite extension").
+            // Sort by URL length to keep it clean
+            combined.sort((a, b) => a.url.length - b.url.length);
 
             setResults(combined.slice(0, 20));
             return;
@@ -179,12 +206,12 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
                 const topResult = results[0];
                 // If it's a path navigation item, fill the query with its URL
                 if (query.startsWith('/')) {
-                    // Add trailing slash if it's a root path to trigger next level
-                    const newQuery = topResult.url.startsWith(query) ? topResult.url : topResult.url;
-                    setQuery(newQuery + (newQuery.split('/').length === 2 ? '/' : ''));
+                    // If it's a container (Course), add slash to help user go deeper
+                    const isContainer = topResult.type === 'course' && !topResult.url.includes('#');
+                    const newQuery = topResult.url;
+                    setQuery(newQuery + (isContainer ? '/' : ''));
                 } else {
                     // For normal search, maybe just fill the title? Or do nothing.
-                    // Let's stick to path autocomplete for now.
                 }
             }
         }
@@ -209,7 +236,8 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
 
     const getTypeLabel = (type: string) => {
         switch (type) {
-            case 'course': return 'Courses';
+            case 'course': return 'Courses & Lessons';
+            case 'section': return 'Sections';
             case 'blog': return 'Blog Posts';
             case 'project': return 'Projects';
             case 'system': return 'System';
@@ -221,6 +249,7 @@ export default function SearchCommand({ isOpen, onClose }: Props) {
     const getTypeIcon = (type: string) => {
         switch (type) {
             case 'course': return <BookOpen size={18} />;
+            case 'section': return <FolderKanban size={18} />;
             case 'blog': return <FileText size={18} />;
             case 'project': return <Wrench size={18} />;
             case 'system': return <Wrench size={18} />;

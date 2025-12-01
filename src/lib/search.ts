@@ -2,7 +2,7 @@ import { getAllBlogPosts, getAllProjects, getAllCourses, getCourseStructure } fr
 
 export type SearchResult = {
     id?: string;
-    type: 'blog' | 'course' | 'project' | 'system' | 'navigation';
+    type: 'blog' | 'course' | 'project' | 'system' | 'navigation' | 'section';
     title: string;
     description: string;
     url: string;
@@ -56,16 +56,38 @@ export const getSearchIndex = async (): Promise<SearchResult[]> => {
         // Index Lessons
         // Note: getCourseStructure might take ID or Slug depending on implementation. 
         // Based on previous usage in LessonContent, it likely takes ID to fetch, but we need slugs for URL.
+        // Index Lessons
         const lessons = await getCourseStructure(course.id);
         lessons.forEach(lesson => {
+            // Add Lesson
             results.push({
                 id: `lesson-${lesson.id}`,
                 type: 'course',
                 title: lesson.title,
                 description: `Lesson ${lesson.order} of ${course.title}`,
-                url: `/courses/${course.slug}/${lesson.slug}`, // Use slugs
+                url: `/courses/${course.slug}/${lesson.slug}`,
                 tags: ['Lesson', course.title],
             });
+
+            // Add Sections (Headings)
+            const headingRegex = /^#{2,3}\s+(.+)$/gm;
+            let match;
+            while ((match = headingRegex.exec(lesson.content)) !== null) {
+                const headingTitle = match[1];
+                const headingSlug = headingTitle
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+
+                results.push({
+                    id: `section-${lesson.id}-${headingSlug}`,
+                    type: 'section' as any, // Cast to any to avoid type error if type definition isn't updated yet
+                    title: headingTitle,
+                    description: `Section in ${lesson.title}`,
+                    url: `/courses/${course.slug}/${lesson.slug}#${headingSlug}`,
+                    tags: ['Section', lesson.title],
+                });
+            }
         });
     }
 
