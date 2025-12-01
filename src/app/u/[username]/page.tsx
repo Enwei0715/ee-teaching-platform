@@ -14,6 +14,7 @@ interface Props {
 }
 
 import ProfileHeader from '@/components/profile/ProfileHeader';
+import BadgeList from '@/components/profile/BadgeList';
 
 export default async function ProfilePage({ params }: Props) {
     const userId = params.username; // Using ID as username for now
@@ -54,21 +55,7 @@ export default async function ProfilePage({ params }: Props) {
                                 <Trophy size={20} className="text-yellow-500" />
                                 Badges
                             </h2>
-                            {user.badges.length > 0 ? (
-                                <div className="grid grid-cols-3 gap-4">
-                                    {user.badges.map((ub) => (
-                                        <div key={ub.id} className="flex flex-col items-center text-center group">
-                                            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2 group-hover:bg-white/10 transition-colors border border-white/10">
-                                                {/* Placeholder for dynamic icon */}
-                                                <Award size={24} className="text-indigo-400" />
-                                            </div>
-                                            <span className="text-xs text-gray-400 group-hover:text-white transition-colors">{ub.badge.name}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500 text-center py-4">No badges earned yet.</p>
-                            )}
+                            <BadgeList earnedBadges={user.badges} />
                         </section>
                     </div>
 

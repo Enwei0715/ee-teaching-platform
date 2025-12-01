@@ -93,10 +93,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                                 {user.major}
                             </div>
                         )}
-                        <div className="flex items-center gap-1">
-                            <MapPin size={14} />
-                            Earth
-                        </div>
+
                     </div>
 
                     <div className="flex flex-wrap justify-center md:justify-start gap-3">

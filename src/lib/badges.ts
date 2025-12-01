@@ -6,28 +6,32 @@ export const BADGE_DEFINITIONS = [
         name: 'First Step',
         description: 'Completed your first lesson',
         icon: 'Footprints',
-        condition: 'Complete 1 lesson'
+        condition: 'Complete 1 lesson',
+        tier: 'Bronze'
     },
     {
         slug: 'quiz-whiz',
         name: 'Quiz Whiz',
         description: 'Scored perfectly on a quiz',
         icon: 'Zap',
-        condition: 'Get a perfect score on a quiz'
+        condition: 'Get a perfect score on a quiz',
+        tier: 'Silver'
     },
     {
         slug: 'streak-week',
         name: 'Streak Week',
         description: 'Maintained a 7-day streak',
         icon: 'Flame',
-        condition: 'Reach a 7-day streak'
+        condition: 'Reach a 7-day streak',
+        tier: 'Gold'
     },
     {
         slug: 'scholar',
         name: 'Scholar',
         description: 'Reached Level 5',
         icon: 'GraduationCap',
-        condition: 'Reach Level 5'
+        condition: 'Reach Level 5',
+        tier: 'Silver'
     }
 ];
 
