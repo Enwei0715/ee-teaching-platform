@@ -81,7 +81,8 @@ export async function GET(
                 slug: course.slug,
                 description: course.description,
                 level: course.level,
-                image: course.image
+                image: course.image,
+                published: course.published
             }
         });
 

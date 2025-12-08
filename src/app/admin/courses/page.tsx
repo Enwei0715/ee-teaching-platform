@@ -1,10 +1,30 @@
+import prisma from "@/lib/prisma";
 import CourseListTable from "./CourseListTable";
-import { getAllCourses } from "@/lib/mdx";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCoursesPage() {
-    const courses = await getAllCourses();
+    const courses = await prisma.course.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+            _count: {
+                select: { lessons: true }
+            }
+        }
+    });
+
+    const formattedCourses = courses.map(course => ({
+        slug: course.slug,
+        meta: {
+            title: course.title,
+            description: course.description,
+            level: course.level,
+            published: course.published,
+            modules: course._count.lessons
+        }
+    }));
 
     return (
         <div>
@@ -19,7 +39,7 @@ export default async function AdminCoursesPage() {
                 </Link>
             </div>
 
-            <CourseListTable initialCourses={courses} />
+            <CourseListTable initialCourses={formattedCourses} />
         </div>
     );
 }
