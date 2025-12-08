@@ -223,4 +223,11 @@
 - **Certificate Fix**: Resolved a bug where lessons in `REVIEWING` status were ignored, now correctly counting them towards course completion and certificate generation.
 - **Badge Seeding**: Added automatic seeding to ensure all badge definitions exist in the database, fixing the issue where badges weren't being awarded.
 - **Streak Badge Fix**: Updated logic to check for streak badges whenever the streak is sufficient (>= 7), not just when it increments, ensuring missed badges are awarded.
-- **Badge Debugging**: Added detailed server-side logging for badge events to help diagnose triggering issues.
+- Badge Debugging: Added detailed server-side logging for badge events to help diagnose triggering issues.
+
+## v5.3.0 - Admin Improvements: Visibility & Manual Quiz (2025-12-09)
+
+* **feat**:
+
+  * 這一版針對「課程管理靈活性與測驗可靠度」進行強化。新增課程隱藏/公開功能 (Visibility Toggle)，讓管理員能隨時控制課程的上下架狀態。
+  * 實作完整的 Admin Lesson Q&A 系統，在課程編輯器中新增 Quiz 分頁，允許手動建立與編輯測驗題庫。這些題目會作為 AI 生成失敗時的 Fallback 機制，確保學生永遠有題目可練習，大幅提升系統穩定性。

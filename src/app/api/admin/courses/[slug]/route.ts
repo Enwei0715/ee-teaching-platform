@@ -40,6 +40,11 @@ export async function GET(
                 where: {
                     courseId: course.id,
                     slug: lessonSlug
+                },
+                include: {
+                    questions: {
+                        orderBy: { order: 'asc' }
+                    }
                 }
             });
 
@@ -49,6 +54,7 @@ export async function GET(
                     description: lesson.description,
                     order: lesson.order,
                     slug: lesson.slug,
+                    questions: lesson.questions,
                 };
                 return NextResponse.json({ content: lesson.content, meta });
             }
@@ -160,6 +166,35 @@ export async function POST(
             });
         }
 
+        // Handle questions update if provided
+        if (meta.questions && Array.isArray(meta.questions)) {
+            // Find the lesson ID (either existing or newly created)
+            const targetLesson = existingLesson || await prisma.lesson.findFirst({
+                where: { courseId: course.id, slug: lessonSlug }
+            });
+
+            if (targetLesson) {
+                // Delete existing questions
+                await prisma.quizQuestion.deleteMany({
+                    where: { lessonId: targetLesson.id }
+                });
+
+                // Create new questions
+                if (meta.questions.length > 0) {
+                    await prisma.quizQuestion.createMany({
+                        data: meta.questions.map((q: any, index: number) => ({
+                            lessonId: targetLesson.id,
+                            question: q.question,
+                            options: q.options,
+                            correctAnswer: parseInt(q.correctAnswer),
+                            explanation: q.explanation,
+                            order: index
+                        }))
+                    });
+                }
+            }
+        }
+
         revalidatePath('/admin/courses');
         revalidatePath('/courses');
 
@@ -212,6 +247,7 @@ export async function PATCH(
                 level: updates.level,
                 slug: updates.slug, // Allow slug update
                 image: updates.image,
+                published: updates.published,
             }
         });
 
