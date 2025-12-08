@@ -243,3 +243,9 @@
 * **feat**:
 
   * 在「課程編輯器」(Edit Course Details Modal) 中新增 Published/Hidden 狀態切換功能。現在管理員不需跳回列表，也能在編輯課程詳細資料時直接控制課程的可見狀態，並確保設定會立即儲存生效。
+
+## v5.3.3 - Admin List Refresh Fix (2025-12-09)
+
+* **fix**:
+
+  * 修正 Admin Panel 課程列表在切換狀態後，頁面未自動刷新的問題。加入 `router.refresh()` 確保在 API 回應成功後，會強制更新伺服器端資料緩存，讓切換頁面或重新整理時能顯示正確的最新狀態。

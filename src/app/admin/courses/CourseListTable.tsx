@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BookOpen, Edit, ExternalLink } from "lucide-react";
 import DeleteButton from "../components/DeleteButton";
 
@@ -16,6 +17,7 @@ interface Course {
 }
 
 export default function CourseListTable({ initialCourses }: { initialCourses: Course[] }) {
+    const router = useRouter();
     const [courses, setCourses] = useState<Course[]>(initialCourses);
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export default function CourseListTable({ initialCourses }: { initialCourses: Co
             if (!res.ok) {
                 throw new Error("Failed to update level");
             }
+            router.refresh(); // Refresh server data
         } catch (error) {
             console.error(error);
             alert("Failed to update level");
@@ -61,6 +64,7 @@ export default function CourseListTable({ initialCourses }: { initialCourses: Co
             if (!res.ok) {
                 throw new Error("Failed to update published status");
             }
+            router.refresh(); // Refresh server data
         } catch (error) {
             console.error(error);
             alert("Failed to update published status");
@@ -105,8 +109,8 @@ export default function CourseListTable({ initialCourses }: { initialCourses: Co
                                         <button
                                             onClick={() => handlePublishToggle(course.slug, course.meta.published)}
                                             className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${course.meta.published
-                                                    ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50'
-                                                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                                ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50'
+                                                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                                                 }`}
                                         >
                                             {course.meta.published ? "Published" : "Hidden"}
