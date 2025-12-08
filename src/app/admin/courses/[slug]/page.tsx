@@ -179,7 +179,8 @@ export default function EditCoursePage() {
         slug: '',
         description: '',
         level: 'Beginner',
-        image: ''
+        image: '',
+        published: false
     });
 
     useEffect(() => {
@@ -194,7 +195,8 @@ export default function EditCoursePage() {
                             slug: data.course.slug,
                             description: data.course.description,
                             level: data.course.level,
-                            image: data.course.image || ''
+                            image: data.course.image || '',
+                            published: data.course.published || false
                         });
                     }
                 })
@@ -635,6 +637,23 @@ export default function EditCoursePage() {
                                     className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
                                 />
                             </div>
+
+                            <div className="flex items-center gap-3 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                                <label className="text-sm font-medium text-gray-300">Visibility Status</label>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={courseDetails.published}
+                                        onChange={(e) => setCourseDetails({ ...courseDetails, published: e.target.checked })}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span className="ml-3 text-sm font-medium text-gray-300">
+                                        {courseDetails.published ? 'Published (Visible)' : 'Hidden (Draft)'}
+                                    </span>
+                                </label>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-2">Slug (URL)</label>
                                 <input

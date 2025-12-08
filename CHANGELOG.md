@@ -237,3 +237,9 @@
 * **fix**:
 
   * 修正 Admin Panel 課程列表無法正確顯示 Hidden 課程的問題。將資料讀取邏輯從公開 API 改為直接讀取資料庫，確保管理員能看到所有狀態的課程，並正確同步 `Published/Hidden` 狀態。
+
+## v5.3.2 - Course Editor Visibility Toggle (2025-12-09)
+
+* **feat**:
+
+  * 在「課程編輯器」(Edit Course Details Modal) 中新增 Published/Hidden 狀態切換功能。現在管理員不需跳回列表，也能在編輯課程詳細資料時直接控制課程的可見狀態，並確保設定會立即儲存生效。
