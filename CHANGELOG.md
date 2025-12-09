@@ -5,8 +5,10 @@
   * **UI Optimization**: 
     * **Global FAB Integration**: 將外觀設定按鈕整合至全域 **FloatingActionGroup** (扳手選單)，移除重複的懸浮按鈕，僅在課程頁面顯示 "Appearance" 選項。
     * **Desktop**: 面板介面更簡潔，移除字體選項。
-    * **Mobile**: 在底部 Lesson Bar 新增快速字體切換按鈕 (Type Icon)，提升閱讀調整效率。
-  * **System**: 強化主題遷移邏輯，確保舊版主題使用者自動切換至預設深色模式，避免視覺突兀。
+    * **Mobile**: 將底部的 **字體設定 (Type)** 替換為 **主題設定 (Theme 🎨)**，與桌面版統一，點擊後開啟完整外觀面板。
+  * **System**: 
+    * **Universal Effects**: 解除背景特效 (Grid/Particles) 的主題限制，現在 `Midnight`, `Forest`, `Amethyst` 皆可顯示特效。
+    * 強化主題遷移邏輯，確保舊版主題使用者自動切換至預設深色模式，避免視覺突兀。
 
 ## v5.4.4 - Reader Mode Overhaul (2025-12-09)
 

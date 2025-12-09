@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Menu, List, Bot, MessageSquarePlus, Type } from 'lucide-react';
+import { Menu, List, Bot, MessageSquarePlus, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LessonFontSize } from '@/hooks/useLessonAppearance';
 
@@ -25,15 +25,8 @@ export default function MobileLessonBar({ onUpdateAppearance, currentFontSize = 
             case 'feedback':
                 window.dispatchEvent(new CustomEvent('open-feedback'));
                 break;
-            case 'font-size':
-                if (onUpdateAppearance) {
-                    const nextSize: Record<LessonFontSize, LessonFontSize> = {
-                        'small': 'medium',
-                        'medium': 'large',
-                        'large': 'small'
-                    };
-                    onUpdateAppearance({ fontSize: nextSize[currentFontSize] });
-                }
+            case 'appearance':
+                window.dispatchEvent(new CustomEvent('open-appearance-settings'));
                 break;
         }
     };
@@ -107,15 +100,13 @@ export default function MobileLessonBar({ onUpdateAppearance, currentFontSize = 
                         <span className="text-[10px] font-medium">Feedback</span>
                     </button>
 
-                    {/* Font Size Toggle */}
+                    {/* Appearance Settings */}
                     <button
-                        onClick={() => handleAction('font-size')}
+                        onClick={() => handleAction('appearance')}
                         className="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors"
                     >
-                        <Type size={20} className={currentFontSize === 'large' ? 'text-white' : ''} />
-                        <span className="text-[10px] font-medium">
-                            {currentFontSize === 'small' ? 'Sm' : currentFontSize === 'medium' ? 'Md' : 'Lg'}
-                        </span>
+                        <Palette size={20} />
+                        <span className="text-[10px] font-medium">Theme</span>
                     </button>
                 </div>
             </div>

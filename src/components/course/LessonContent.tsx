@@ -89,8 +89,8 @@ export default function LessonContent({
 
     return (
         <div className={`min-h-screen pb-20 relative transition-colors duration-500 ease-out ${currentTheme.wrapper} ${currentTheme.text}`}>
-            {/* Show grid only if showEffects is TRUE AND we are in a theme that supports it (e.g. default/navy) */}
-            {(appearance.showEffects && (appearance.theme === 'default' || appearance.theme === 'navy')) && (
+            {/* Show grid if showEffects is TRUE (works on all dark themes now) */}
+            {appearance.showEffects && (
                 <InteractiveGridPattern />
             )}
 
