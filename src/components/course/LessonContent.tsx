@@ -128,157 +128,159 @@ export default function LessonContent({
 
                         {/* HEADER with Appearance Control */}
                         <div className={`mb-8 border-b pb-8 ${currentTheme.border}`}>
-                            <div className="flex justify-between items-start gap-4">
-                                <h1 className={`text-3xl lg:text-4xl font-bold mb-4 tracking-tight ${currentTheme.text}`}>
-                                    {lesson.title}
-                                </h1>
-                                <div className="flex-shrink-0 pt-1">
-                                    <LessonAppearanceControl
-                                        appearance={appearance}
-                                        onUpdate={updateAppearance}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-4 text-sm opacity-80">
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
-                                    <Clock size={16} className="text-accent-primary" />
-                                    <span>{readingTime} min read</span>
-                                </div>
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
-                                    <Calendar size={16} className="text-accent-primary" />
-                                    <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
-                                </div>
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isCompleted
-                                    ? 'bg-blue-500/10 border-blue-500/20 text-blue-500'
-                                    : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-600'
-                                    }`}>
-                                    <Zap size={16} className={isCompleted ? "text-blue-500" : "text-yellow-500"} />
-                                    <span className="font-medium">+{potentialXP} XP</span>
-                                </div>
-                                {isEditMode && (
-                                    <Link href={`/admin/courses/${course.slug}?file=${lesson.slug}.mdx`}>
-                                        <button className="glass-ghost px-3 py-1 rounded-lg border border-white/20 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
-                                            <Edit size={14} /> Edit Lesson
-                                        </button>
-                                    </Link>
-                                )}
-                            </div>
+                            <h1 className={`text-3xl lg:text-4xl font-bold mb-4 tracking-tight ${currentTheme.text}`}>
+                                {lesson.title}
+                            </h1>
                         </div>
 
-                        {/* MDX Content - Wrapped in dynamic prose classes */}
-                        {/* We use explicit inline style for font-size to ensure it works regardless of Tailwind conflicts */}
-                        <article
-                            className={`prose max-w-none ${currentTheme.prose} ${currentFontSize.class}`}
-                            style={{ fontSize: currentFontSize.cssValue }}
-                        >
-                            <div id="lesson-content" className="relative">
-                                {/* MDXContent might need to know about theme if it has custom internal styles, 
-                                    but usually prose handles markdown well. */}
-                                <MDXContent
-                                    source={mdxSource}
-                                    courseId={course.slug}
-                                    lessonId={lesson.slug}
-                                />
-                                <TextSelectionToolbar />
+                        <div className="flex flex-wrap items-center gap-4 text-sm opacity-80">
+                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
+                                <Clock size={16} className="text-accent-primary" />
+                                <span>{readingTime} min read</span>
                             </div>
-                        </article>
-
-                        <hr className={`my-12 ${currentTheme.border}`} />
-
-                        {/* Quiz Section */}
-                        <section id="ai-quiz" className="mb-20">
-                            <AIQuizGenerator
-                                courseId={course.slug}
-                                lessonId={lesson.slug}
-                                topic={lesson.title}
-                                context={lesson.content}
-                            />
-                        </section>
-
-                        {/* Navigation Buttons */}
-                        <div className={`mt-12 flex justify-between items-center pt-8 border-t ${currentTheme.border}`}>
-                            {prevLesson ? (
-                                <Link
-                                    href={`/courses/${course.slug}/${prevLesson.id}`}
-                                    className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
-                                >
-                                    <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                                    <div>
-                                        <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Previous</div>
-                                        <div className="font-medium">{prevLesson.title}</div>
-                                    </div>
-                                </Link>
-                            ) : (
-                                <div />
-                            )}
-
-                            {nextLesson ? (
-                                <Link
-                                    href={`/courses/${course.slug}/${nextLesson.id}`}
-                                    className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
-                                >
-                                    <div className="text-right">
-                                        <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Next</div>
-                                        <div className="font-medium">{nextLesson.title}</div>
-                                        <div className="text-xs text-yellow-500 font-medium mt-1">
-                                            +{calculatePotentialXP(nextLesson.content?.length || 0)} XP
-                                        </div>
-                                    </div>
-                                    <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            ) : (
-                                <Link
-                                    href={`/courses/${course.slug}`}
-                                    className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
-                                >
-                                    <div className="text-right">
-                                        <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
-                                        <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
-                                        {/* Bonus XP text removed as per request since it triggers automatically */}
-                                    </div>
-                                    <CheckCircle size={20} />
+                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
+                                <Calendar size={16} className="text-accent-primary" />
+                                <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
+                            </div>
+                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isCompleted
+                                ? 'bg-blue-500/10 border-blue-500/20 text-blue-500'
+                                : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-600'
+                                }`}>
+                                <Zap size={16} className={isCompleted ? "text-blue-500" : "text-yellow-500"} />
+                                <span className="font-medium">+{potentialXP} XP</span>
+                            </div>
+                            {isEditMode && (
+                                <Link href={`/admin/courses/${course.slug}?file=${lesson.slug}.mdx`}>
+                                    <button className="glass-ghost px-3 py-1 rounded-lg border border-white/20 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
+                                        <Edit size={14} /> Edit Lesson
+                                    </button>
                                 </Link>
                             )}
                         </div>
-                    </main>
-
-                    {/* Table of Contents */}
-                    <TableOfContents
-                        courseId={course.slug}
-                        lessonId={lesson.id}
-                        initialLastElementId={initialLastElementId}
-                        onActiveHeadingChange={setActiveHeadingId}
-                        hideMobileTrigger={true}
-                        theme={appearance.theme}
-                    />
                 </div>
-            </div>
 
-            {/* AI Tutor */}
-            <AITutor
-                lessonTitle={lesson.title}
-                lessonContent={lesson.content}
-                lessonContext={{
-                    courseTitle: course.title,
-                    lessonTitle: lesson.title,
-                    content: lesson.content
-                }}
-                activeHeadingId={activeHeadingId}
-                courseSlug={course.slug}
-                lessonSlug={lesson.slug}
-                hideTrigger={true}
-            />
+                {/* MDX Content - Wrapped in dynamic prose classes */}
+                {/* We use explicit inline style for font-size to ensure it works regardless of Tailwind conflicts */}
+                <article
+                    className={`prose max-w-none ${currentTheme.prose} ${currentFontSize.class}`}
+                    style={{ fontSize: currentFontSize.cssValue }}
+                >
+                    <div id="lesson-content" className="relative">
+                        {/* MDXContent might need to know about theme if it has custom internal styles, 
+                                    but usually prose handles markdown well. */}
+                        <MDXContent
+                            source={mdxSource}
+                            courseId={course.slug}
+                            lessonId={lesson.slug}
+                        />
+                        <TextSelectionToolbar />
+                    </div>
+                </article>
 
-            {/* Resume Learning Tracker */}
-            <ResumeLearningTracker
+                <hr className={`my-12 ${currentTheme.border}`} />
+
+                {/* Quiz Section */}
+                <section id="ai-quiz" className="mb-20">
+                    <AIQuizGenerator
+                        courseId={course.slug}
+                        lessonId={lesson.slug}
+                        topic={lesson.title}
+                        context={lesson.content}
+                    />
+                </section>
+
+                {/* Navigation Buttons */}
+                <div className={`mt-12 flex justify-between items-center pt-8 border-t ${currentTheme.border}`}>
+                    {prevLesson ? (
+                        <Link
+                            href={`/courses/${course.slug}/${prevLesson.id}`}
+                            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
+                        >
+                            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                            <div>
+                                <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Previous</div>
+                                <div className="font-medium">{prevLesson.title}</div>
+                            </div>
+                        </Link>
+                    ) : (
+                        <div />
+                    )}
+
+                    {nextLesson ? (
+                        <Link
+                            href={`/courses/${course.slug}/${nextLesson.id}`}
+                            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
+                        >
+                            <div className="text-right">
+                                <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Next</div>
+                                <div className="font-medium">{nextLesson.title}</div>
+                                <div className="text-xs text-yellow-500 font-medium mt-1">
+                                    +{calculatePotentialXP(nextLesson.content?.length || 0)} XP
+                                </div>
+                            </div>
+                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    ) : (
+                        <Link
+                            href={`/courses/${course.slug}`}
+                            className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
+                        >
+                            <div className="text-right">
+                                <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
+                                <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
+                                {/* Bonus XP text removed as per request since it triggers automatically */}
+                            </div>
+                            <CheckCircle size={20} />
+                        </Link>
+                    )}
+                </div>
+            </main>
+
+            {/* Table of Contents */}
+            <TableOfContents
                 courseId={course.slug}
                 lessonId={lesson.id}
-                lessonTitle={lesson.title}
+                initialLastElementId={initialLastElementId}
+                onActiveHeadingChange={setActiveHeadingId}
+                hideMobileTrigger={true}
+                theme={appearance.theme}
             />
-
-            {/* Mobile Bottom Action Bar */}
-            <MobileLessonBar />
         </div>
+            </div >
+
+        {/* AI Tutor */ }
+        < AITutor
+    lessonTitle = { lesson.title }
+    lessonContent = { lesson.content }
+    lessonContext = {{
+        courseTitle: course.title,
+            lessonTitle: lesson.title,
+                content: lesson.content
+    }
+}
+activeHeadingId = { activeHeadingId }
+courseSlug = { course.slug }
+lessonSlug = { lesson.slug }
+hideTrigger = { true}
+    />
+
+    {/* Resume Learning Tracker */ }
+    < ResumeLearningTracker
+courseId = { course.slug }
+lessonId = { lesson.id }
+lessonTitle = { lesson.title }
+    />
+
+    {/* Appearance Settings FAB - Fixed Bottom Right */ }
+    < div className = "fixed bottom-6 right-6 z-[60]" >
+        <LessonAppearanceControl
+            appearance={appearance}
+            onUpdate={updateAppearance}
+        />
+            </div >
+
+    {/* Mobile Bottom Action Bar */ }
+    < MobileLessonBar />
+        </div >
     );
 }

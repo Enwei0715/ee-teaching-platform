@@ -39,7 +39,7 @@ export default function CourseSidebar(props: Props) {
             case 'light':
                 return 'bg-white border-r border-gray-200 text-gray-800';
             case 'sepia':
-                return 'bg-[#f4ecd8] border-r border-[#e6decf] text-[#433422]';
+                return 'bg-[#e6decf] border-r border-[#d3cbb7] text-[#433422]'; // Darker beige for sidebar to distinguish from content
             // Navy is handled by default mostly, or separate. If 'navy' theme, usually dark bg.
             case 'navy':
                 return 'bg-[#111b27] border-r border-blue-900/30 text-blue-100';
@@ -164,7 +164,7 @@ export default function CourseSidebar(props: Props) {
     const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
         <>
             {/* Progress Bar Section */}
-            <div className={`p-6 border-b ${theme === 'default' ? 'border-border-primary glass-ghost' : 'border-current/10'}`}>
+            <div className={`p-6 border-b relative ${theme === 'default' ? 'border-border-primary glass-ghost' : 'border-current/10'}`}>
                 <div className="flex justify-between items-center">
                     <h2 className={`font-bold text-lg tracking-tight ${theme === 'light' || theme === 'sepia' ? 'text-current' : 'text-text-primary'}`}>Course Content</h2>
 

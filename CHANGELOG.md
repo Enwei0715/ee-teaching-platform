@@ -1,3 +1,11 @@
+## v5.4.6 - Reader Mode UX & Settings FAB (2025-12-09)
+
+* **feat**:
+
+  * **Settings FAB**: 將「閱讀設定」(Aa) 按鈕從文章標題區移至畫面右下角的懸浮按鈕 (FAB)，確保在閱讀長文時能隨時調整字體與主題，大幅提升操作便利性 (尤其是手機版)。
+  * **Sepia Polish**: 針對 Sepia 主題進行深度優化。修正側邊欄背景色 (Darker Beige) 以區隔內容區，並強制複寫所有標題與粗體的顏色，徹底消除 Dark Mode 造成的白色文字殘留。
+  * **Sidebar Visibility**: 修復側邊欄收折按鈕在特定主題下的層級與定位問題，確保功能隨時可用。
+
 ## v5.4.5 - Visual Polish & Accessibility (2025-12-09)
 
 * **fix**:
