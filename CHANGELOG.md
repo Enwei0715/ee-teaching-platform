@@ -6,6 +6,14 @@
   * **Robust Font Size**: Fixed font size scaling by using explicit inline styles to override Tailwind defaults, ensuring 'Medium' and 'Large' choices have a significant visual impact.
   * **Code Cleanup**: Consolidated theme logic and fixed various lint warnings.
 
+## v5.4.1 - Reader Mode Polish & Contrast Fixes (2025-12-09)
+
+* **fix**:
+
+  * **Focus Mode Logic Inversion**: 將「專注模式」(Focus Mode) 改名為「背景特效」(Background Effects) 並預設為關閉。現在預設介面更加乾淨，需要時才手動開啟。
+  * **Contrast Improvements**: 修正 Light 與 Sepia 主題下的文字對比度問題，針對標題、段落與程式碼區塊強制設定深色文字，解決因全域 dark mode 造成的文字看不清問題。
+  * **Font Size Scaling**: 調整文字大小縮放比例，讓 Medium (預設) 與 Large 的差異更顯著，真正達到輔助閱讀的效果。
+
 ## v5.4.0 - Reader Mode & Lesson Customization (2025-12-09)
 
 * **feat**:
