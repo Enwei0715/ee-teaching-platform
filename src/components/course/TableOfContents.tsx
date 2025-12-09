@@ -223,7 +223,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                             <h3 className={`text-lg font-bold ${currentTheme.text}`}>Table of Contents</h3>
                             <button
                                 onClick={() => setIsMobileOpen(false)}
-                                className={`p-2 rounded-lg transition-colors ${theme === 'sepia' ? 'hover:bg-black/10' : 'hover:bg-white/10'}`}
+                                className={`p-2 rounded-lg transition-colors hover:bg-white/10`}
                             >
                                 <X size={20} className={currentTheme.text} />
                             </button>

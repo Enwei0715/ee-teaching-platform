@@ -11,15 +11,7 @@ export const themeStyles = {
         skeletonPanel: 'glass-panel',
     },
     // Light theme removed as requested
-    sepia: {
-        wrapper: 'bg-[#f4ecd8]',
-        text: 'text-[#433422]', // Darker brown for better contrast
-        // Warm tones with high contrast
-        prose: 'prose-stone prose-headings:text-[#433422] prose-p:text-[#5b4636] prose-strong:text-[#433422] prose-code:text-[#433422] prose-li:text-[#5b4636]',
-        border: 'border-[#d3cbb7]',
-        skeletonBase: 'bg-[#e2d8b8]',
-        skeletonPanel: 'bg-[#f4ecd8] border border-[#d3cbb7]',
-    },
+
     navy: {
         wrapper: 'bg-[#0f172a]',
         text: 'text-slate-200',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type LessonTheme = 'default' | 'sepia' | 'navy' | 'midnight' | 'forest' | 'amethyst';
+export type LessonTheme = 'default' | 'navy' | 'midnight' | 'forest' | 'amethyst';
 export type LessonFontSize = 'small' | 'medium' | 'large';
 
 export interface LessonAppearance {
@@ -39,8 +39,8 @@ export function useLessonAppearance() {
                     delete parsed.focusMode;
                 }
 
-                // Migration: Remove 'light' theme (deprecated)
-                if (parsed.theme === 'light') {
+                // Migration: Remove 'light' and 'sepia' themes (deprecated)
+                if (parsed.theme === 'light' || parsed.theme === 'sepia') {
                     parsed.theme = 'default';
                 }
 

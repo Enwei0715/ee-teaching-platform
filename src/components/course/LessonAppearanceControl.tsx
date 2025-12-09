@@ -1,7 +1,7 @@
 'use client';
 
 
-import { Settings, Check, Type, EyeOff, Eye, Palette, X } from 'lucide-react';
+import { Check, EyeOff, Eye, X, Wrench } from 'lucide-react';
 import { LessonAppearance, LessonTheme, LessonFontSize } from '@/hooks/useLessonAppearance';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -38,14 +38,9 @@ export default function LessonAppearanceControl({ appearance, onUpdate }: Lesson
         { id: 'forest', label: 'Forest', bg: 'bg-[#051a15]', text: 'text-emerald-200' },
         { id: 'amethyst', label: 'Amethyst', bg: 'bg-[#150f25]', text: 'text-purple-200' },
         { id: 'navy', label: 'Navy', bg: 'bg-[#1e293b]', text: 'text-slate-200' },
-        { id: 'sepia', label: 'Sepia', bg: 'bg-[#f4ecd8]', text: 'text-[#5b4636]' },
     ];
 
-    const fontSizes: { id: LessonFontSize; label: string; iconSize: number }[] = [
-        { id: 'small', label: 'Small', iconSize: 14 },
-        { id: 'medium', label: 'Medium', iconSize: 18 },
-        { id: 'large', label: 'Large', iconSize: 24 },
-    ];
+
 
     if (!mounted) return null;
 
@@ -119,26 +114,7 @@ export default function LessonAppearanceControl({ appearance, onUpdate }: Lesson
                             </div>
                         </div>
 
-                        {/* Font Size (Desktop mainly, but kept for completeness) */}
-                        <div className="space-y-3 hidden md:block">
-                            <label className="text-xs text-text-secondary font-medium uppercase tracking-wider">
-                                Font Size
-                            </label>
-                            <div className="flex bg-slate-900/50 rounded-lg p-1 border border-white/5">
-                                {fontSizes.map((size) => (
-                                    <button
-                                        key={size.id}
-                                        onClick={() => onUpdate({ fontSize: size.id })}
-                                        className={`flex-1 flex items-center justify-center p-2 rounded-md transition-all ${appearance.fontSize === size.id
-                                            ? 'bg-accent-primary text-white shadow-lg'
-                                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
-                                            }`}
-                                    >
-                                        <Type size={size.iconSize} />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+
 
                     </div>
                 </div>
@@ -153,7 +129,7 @@ export default function LessonAppearanceControl({ appearance, onUpdate }: Lesson
                     }`}
                 title="Appearance Settings"
             >
-                {isOpen ? <X size={24} /> : <Palette size={24} />}
+                {isOpen ? <X size={24} /> : <Wrench size={24} />}
             </button>
         </div>,
         document.body
