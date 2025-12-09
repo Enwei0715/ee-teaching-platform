@@ -1,3 +1,11 @@
+## v5.4.2 - Reader Mode Polish: Themed Skeletons & Font Scaling (2025-12-09)
+
+* **fix**:
+
+  * **Themed Loading State**: Loading skeletons now intelligently detect and match the user's selected theme (Light/Sepia/Navy) instantly, preventing dark-mode flash during navigation.
+  * **Robust Font Size**: Fixed font size scaling by using explicit inline styles to override Tailwind defaults, ensuring 'Medium' and 'Large' choices have a significant visual impact.
+  * **Code Cleanup**: Consolidated theme logic and fixed various lint warnings.
+
 ## v5.4.0 - Reader Mode & Lesson Customization (2025-12-09)
 
 * **feat**:
