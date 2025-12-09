@@ -77,7 +77,33 @@ export default function LessonContent({
     const [scrollProgress, setScrollProgress] = useState(0);
 
     // Navigation Hotkeys Listener
-    // ... (skip unchanged)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            if (e.key === 'ArrowLeft' && prevLesson) {
+                router.push(`/courses/${course.slug}/${prevLesson.id}`);
+            } else if (e.key === 'ArrowRight' && nextLesson) {
+                router.push(`/courses/${course.slug}/${nextLesson.id}`);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [prevLesson, nextLesson, course.slug, router]);
+
+    // Scroll Progress Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalScroll = document.documentElement.scrollTop;
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scroll = `${totalScroll / windowHeight}`;
+            setScrollProgress(Number(scroll) * 100);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // If not mounted yet (SSR), render a safe default or loading state to prevent mismatch
     // But for a lesson page, we want SEO to be good, so we should default to 'default' theme which matches server render usually.
@@ -157,130 +183,128 @@ export default function LessonContent({
                                 </Link>
                             )}
                         </div>
-                </div>
+                    </main>
 
-                {/* MDX Content - Wrapped in dynamic prose classes */}
-                {/* We use explicit inline style for font-size to ensure it works regardless of Tailwind conflicts */}
-                <article
-                    className={`prose max-w-none ${currentTheme.prose} ${currentFontSize.class}`}
-                    style={{ fontSize: currentFontSize.cssValue }}
-                >
-                    <div id="lesson-content" className="relative">
-                        {/* MDXContent might need to know about theme if it has custom internal styles, 
-                                    but usually prose handles markdown well. */}
-                        <MDXContent
-                            source={mdxSource}
+                    {/* MDX Content - Wrapped in dynamic prose classes */}
+                    {/* We use explicit inline style for font-size to ensure it works regardless of Tailwind conflicts */}
+                    <article
+                        className={`prose max-w-none ${currentTheme.prose} ${currentFontSize.class}`}
+                        style={{ fontSize: currentFontSize.cssValue }}
+                    >
+                        <div id="lesson-content" className="relative">
+                            {/* MDXContent might need to know about theme if it has custom internal styles, 
+                                        but usually prose handles markdown well. */}
+                            <MDXContent
+                                source={mdxSource}
+                                courseId={course.slug}
+                                lessonId={lesson.slug}
+                            />
+                            <TextSelectionToolbar />
+                        </div>
+                    </article>
+
+                    <hr className={`my-12 ${currentTheme.border}`} />
+
+                    {/* Quiz Section */}
+                    <section id="ai-quiz" className="mb-20">
+                        <AIQuizGenerator
                             courseId={course.slug}
                             lessonId={lesson.slug}
+                            topic={lesson.title}
+                            context={lesson.content}
                         />
-                        <TextSelectionToolbar />
-                    </div>
-                </article>
+                    </section>
 
-                <hr className={`my-12 ${currentTheme.border}`} />
-
-                {/* Quiz Section */}
-                <section id="ai-quiz" className="mb-20">
-                    <AIQuizGenerator
-                        courseId={course.slug}
-                        lessonId={lesson.slug}
-                        topic={lesson.title}
-                        context={lesson.content}
-                    />
-                </section>
-
-                {/* Navigation Buttons */}
-                <div className={`mt-12 flex justify-between items-center pt-8 border-t ${currentTheme.border}`}>
-                    {prevLesson ? (
-                        <Link
-                            href={`/courses/${course.slug}/${prevLesson.id}`}
-                            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
-                        >
-                            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                            <div>
-                                <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Previous</div>
-                                <div className="font-medium">{prevLesson.title}</div>
-                            </div>
-                        </Link>
-                    ) : (
-                        <div />
-                    )}
-
-                    {nextLesson ? (
-                        <Link
-                            href={`/courses/${course.slug}/${nextLesson.id}`}
-                            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
-                        >
-                            <div className="text-right">
-                                <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Next</div>
-                                <div className="font-medium">{nextLesson.title}</div>
-                                <div className="text-xs text-yellow-500 font-medium mt-1">
-                                    +{calculatePotentialXP(nextLesson.content?.length || 0)} XP
+                    {/* Navigation Buttons */}
+                    <div className={`mt-12 flex justify-between items-center pt-8 border-t ${currentTheme.border}`}>
+                        {prevLesson ? (
+                            <Link
+                                href={`/courses/${course.slug}/${prevLesson.id}`}
+                                className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
+                            >
+                                <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                                <div>
+                                    <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Previous</div>
+                                    <div className="font-medium">{prevLesson.title}</div>
                                 </div>
-                            </div>
-                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    ) : (
-                        <Link
-                            href={`/courses/${course.slug}`}
-                            className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
-                        >
-                            <div className="text-right">
-                                <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
-                                <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
-                                {/* Bonus XP text removed as per request since it triggers automatically */}
-                            </div>
-                            <CheckCircle size={20} />
-                        </Link>
-                    )}
-                </div>
-            </main>
+                            </Link>
+                        ) : (
+                            <div />
+                        )}
 
-            {/* Table of Contents */}
-            <TableOfContents
+                        {nextLesson ? (
+                            <Link
+                                href={`/courses/${course.slug}/${nextLesson.id}`}
+                                className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right group"
+                            >
+                                <div className="text-right">
+                                    <div className="text-xs text-text-secondary/60 uppercase tracking-wider">Next</div>
+                                    <div className="font-medium">{nextLesson.title}</div>
+                                    <div className="text-xs text-yellow-500 font-medium mt-1">
+                                        +{calculatePotentialXP(nextLesson.content?.length || 0)} XP
+                                    </div>
+                                </div>
+                                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        ) : (
+                            <Link
+                                href={`/courses/${course.slug}`}
+                                className="flex items-center gap-2 bg-accent-primary hover:bg-accent-primary/90 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-accent-primary/25 group"
+                            >
+                                <div className="text-right">
+                                    <div className="text-xs text-white/80 uppercase tracking-wider">{isCompleted ? 'Done' : 'Finish'}</div>
+                                    <div className="font-bold">{isCompleted ? 'Return to Course' : 'Complete Course'}</div>
+                                    {/* Bonus XP text removed as per request since it triggers automatically */}
+                                </div>
+                                <CheckCircle size={20} />
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
+                {/* Table of Contents */}
+                <TableOfContents
+                    courseId={course.slug}
+                    lessonId={lesson.id}
+                    initialLastElementId={initialLastElementId}
+                    onActiveHeadingChange={setActiveHeadingId}
+                    hideMobileTrigger={true}
+                    theme={appearance.theme}
+                />
+            </div>
+
+            {/* AI Tutor */}
+            <AITutor
+                lessonTitle={lesson.title}
+                lessonContent={lesson.content}
+                lessonContext={{
+                    courseTitle: course.title,
+                    lessonTitle: lesson.title,
+                    content: lesson.content
+                }}
+                activeHeadingId={activeHeadingId}
+                courseSlug={course.slug}
+                lessonSlug={lesson.slug}
+                hideTrigger={true}
+            />
+
+            {/* Resume Learning Tracker */}
+            <ResumeLearningTracker
                 courseId={course.slug}
                 lessonId={lesson.id}
-                initialLastElementId={initialLastElementId}
-                onActiveHeadingChange={setActiveHeadingId}
-                hideMobileTrigger={true}
-                theme={appearance.theme}
+                lessonTitle={lesson.title}
             />
+
+            {/* Appearance Settings FAB - Fixed Bottom Right */}
+            <div className="fixed bottom-6 right-6 z-[60]">
+                <LessonAppearanceControl
+                    appearance={appearance}
+                    onUpdate={updateAppearance}
+                />
+            </div>
+
+            {/* Mobile Bottom Action Bar */}
+            <MobileLessonBar />
         </div>
-            </div >
-
-        {/* AI Tutor */ }
-        < AITutor
-    lessonTitle = { lesson.title }
-    lessonContent = { lesson.content }
-    lessonContext = {{
-        courseTitle: course.title,
-            lessonTitle: lesson.title,
-                content: lesson.content
-    }
-}
-activeHeadingId = { activeHeadingId }
-courseSlug = { course.slug }
-lessonSlug = { lesson.slug }
-hideTrigger = { true}
-    />
-
-    {/* Resume Learning Tracker */ }
-    < ResumeLearningTracker
-courseId = { course.slug }
-lessonId = { lesson.id }
-lessonTitle = { lesson.title }
-    />
-
-    {/* Appearance Settings FAB - Fixed Bottom Right */ }
-    < div className = "fixed bottom-6 right-6 z-[60]" >
-        <LessonAppearanceControl
-            appearance={appearance}
-            onUpdate={updateAppearance}
-        />
-            </div >
-
-    {/* Mobile Bottom Action Bar */ }
-    < MobileLessonBar />
-        </div >
     );
 }
