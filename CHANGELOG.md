@@ -3,7 +3,8 @@
 * **refactor(ui)**: 
   * **Themes 2.0 Refined**: 移除所有淺色系主題 (Light/Sepia)，專注打造極致深色模式體驗。新增 `Midnight` (純黑), `Forest` (深綠), `Amethyst` (暗紫)，保留 `Navy` 與 `Default`。
   * **UI Optimization**: 
-    * **Desktop**: 將外觀設定按鈕改為右下角懸浮的**扳手圖示 (Wrench)**，並移除面板中的字體大小選項，介面更簡潔。
+    * **Global FAB Integration**: 將外觀設定按鈕整合至全域 **FloatingActionGroup** (扳手選單)，移除重複的懸浮按鈕，僅在課程頁面顯示 "Appearance" 選項。
+    * **Desktop**: 面板介面更簡潔，移除字體選項。
     * **Mobile**: 在底部 Lesson Bar 新增快速字體切換按鈕 (Type Icon)，提升閱讀調整效率。
   * **System**: 強化主題遷移邏輯，確保舊版主題使用者自動切換至預設深色模式，避免視覺突兀。
 

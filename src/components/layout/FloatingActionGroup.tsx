@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wrench, MessageSquarePlus, Bot, Keyboard, ArrowUp, X } from 'lucide-react';
+import { Wrench, MessageSquarePlus, Bot, Keyboard, ArrowUp, X, Palette } from 'lucide-react';
 
 export default function FloatingActionGroup() {
     const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +25,9 @@ export default function FloatingActionGroup() {
             case 'scroll-top':
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 break;
+            case 'appearance':
+                window.dispatchEvent(new CustomEvent('open-appearance-settings'));
+                break;
         }
     };
 
@@ -32,7 +35,10 @@ export default function FloatingActionGroup() {
     const isLessonPage = pathname?.startsWith('/courses/') && pathname?.split('/').length > 3;
 
     const menuItems = [
-        ...(isLessonPage ? [{ id: 'ai-tutor', icon: Bot, label: 'AI Tutor', color: 'bg-indigo-600' }] : []),
+        ...(isLessonPage ? [
+            { id: 'ai-tutor', icon: Bot, label: 'AI Tutor', color: 'bg-indigo-600' },
+            { id: 'appearance', icon: Palette, label: 'Appearance', color: 'bg-purple-600' }
+        ] : []),
         { id: 'feedback', icon: MessageSquarePlus, label: 'Feedback', color: 'bg-blue-600' },
         { id: 'shortcuts', icon: Keyboard, label: 'Shortcuts', color: 'bg-gray-700' },
         { id: 'scroll-top', icon: ArrowUp, label: 'Top', color: 'bg-emerald-600' },
