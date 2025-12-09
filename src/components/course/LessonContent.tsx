@@ -20,6 +20,7 @@ import { useLessonAppearance } from '@/hooks/useLessonAppearance';
 import LessonAppearanceControl from '@/components/course/LessonAppearanceControl';
 import { useLessonProgress } from '@/context/LessonProgressContext';
 import { calculatePotentialXP } from '@/lib/xp';
+import { themeStyles, fontSizes } from '@/lib/theme-config';
 
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern';
 
@@ -65,45 +66,11 @@ export default function LessonContent({
     const baseXP = calculatePotentialXP(lesson.content.length);
     const potentialXP = isCompleted ? Math.max(1, Math.round(baseXP / 10)) : baseXP;
 
-    // Theme Styles Configuration
-    const themeStyles = {
-        default: {
-            wrapper: 'bg-bg-primary',
-            text: 'text-text-primary',
-            prose: 'prose-invert', // Dark mode defaults
-            border: 'border-border-primary'
-        },
-        light: {
-            wrapper: 'bg-white',
-            text: 'text-slate-900',
-            // Force specific colors to override any global dark mode defaults
-            prose: 'prose-slate prose-headings:text-slate-900 prose-p:text-slate-800 prose-strong:text-slate-900 prose-code:text-slate-900 prose-li:text-slate-800',
-            border: 'border-slate-200'
-        },
-        sepia: {
-            wrapper: 'bg-[#f4ecd8]',
-            text: 'text-[#433422]', // Darker brown for better contrast
-            // Warm tones with high contrast
-            prose: 'prose-stone prose-headings:text-[#433422] prose-p:text-[#5b4636] prose-strong:text-[#433422] prose-code:text-[#433422] prose-li:text-[#5b4636]',
-            border: 'border-[#d3cbb7]'
-        },
-        navy: {
-            wrapper: 'bg-[#0f172a]',
-            text: 'text-slate-200',
-            prose: 'prose-invert prose-blue',
-            border: 'border-blue-900/30'
-        }
-    };
-
-    // Font Size Configuration - Scaled up for better visibility
-    const fontSizes = {
-        small: 'prose-sm',
-        medium: 'prose-lg', // Bumped up default
-        large: 'prose-xl'   // Much larger
-    };
-
+    // Use shared config from imports
     const currentTheme = themeStyles[appearance.theme];
     const currentFontSize = fontSizes[appearance.fontSize];
+
+
 
     // State for progress-aware quiz
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
@@ -200,7 +167,11 @@ export default function LessonContent({
                         </div>
 
                         {/* MDX Content - Wrapped in dynamic prose classes */}
-                        <article className={`prose max-w-none ${currentTheme.prose} ${currentFontSize}`}>
+                        {/* We use explicit inline style for font-size to ensure it works regardless of Tailwind conflicts */}
+                        <article
+                            className={`prose max-w-none ${currentTheme.prose} ${currentFontSize.class}`}
+                            style={{ fontSize: currentFontSize.cssValue }}
+                        >
                             <div id="lesson-content" className="relative">
                                 {/* MDXContent might need to know about theme if it has custom internal styles, 
                                     but usually prose handles markdown well. */}
