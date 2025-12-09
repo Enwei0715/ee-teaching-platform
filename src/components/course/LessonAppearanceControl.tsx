@@ -53,18 +53,18 @@ export default function LessonAppearanceControl({ appearance, onUpdate }: Lesson
                 <div className="absolute right-0 mt-2 w-72 p-4 rounded-xl border border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="space-y-6">
 
-                        {/* Focus Mode */}
+                        {/* Background Effects */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 text-text-primary">
-                                {appearance.focusMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                                <span className="font-medium">Focus Mode</span>
+                                {appearance.showEffects ? <Eye size={18} /> : <EyeOff size={18} />}
+                                <span className="font-medium">Background Effects</span>
                             </div>
                             <button
-                                onClick={() => onUpdate({ focusMode: !appearance.focusMode })}
-                                className={`w-12 h-6 rounded-full transition-colors relative ${appearance.focusMode ? 'bg-accent-primary' : 'bg-slate-700'
+                                onClick={() => onUpdate({ showEffects: !appearance.showEffects })}
+                                className={`w-12 h-6 rounded-full transition-colors relative ${appearance.showEffects ? 'bg-accent-primary' : 'bg-slate-700'
                                     }`}
                             >
-                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${appearance.focusMode ? 'translate-x-6' : 'translate-x-0'
+                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${appearance.showEffects ? 'translate-x-6' : 'translate-x-0'
                                     }`} />
                             </button>
                         </div>
@@ -112,8 +112,8 @@ export default function LessonAppearanceControl({ appearance, onUpdate }: Lesson
                                         key={size.id}
                                         onClick={() => onUpdate({ fontSize: size.id })}
                                         className={`flex-1 flex items-center justify-center p-2 rounded-md transition-all ${appearance.fontSize === size.id
-                                                ? 'bg-accent-primary text-white shadow-lg'
-                                                : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                            ? 'bg-accent-primary text-white shadow-lg'
+                                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
                                             }`}
                                     >
                                         <Type size={size.iconSize} />
