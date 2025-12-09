@@ -16,6 +16,7 @@ const DEFAULT_APPEARANCE: LessonAppearance = {
 };
 
 const STORAGE_KEY = 'ee-master-lesson-appearance';
+const EVENT_KEY = 'ee-master-appearance-changed';
 
 export function useLessonAppearance() {
     // Initialize with default, then hydrate from localStorage
@@ -24,34 +25,49 @@ export function useLessonAppearance() {
 
     useEffect(() => {
         setMounted(true);
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                // Migration: If 'focusMode' exists from previous version, map it?
-                // Old: focusMode=true (hidden) -> New: showEffects=false
-                // Old: focusMode=false (shown) -> New: showEffects=true
-                // But since we just deployed, maybe just reset or handle gracefully.
-                const parsed = JSON.parse(stored);
-
-                // Handle breaking change from 'focusMode' to 'showEffects' if needed, or just overwrite
-                if ('focusMode' in parsed) {
-                    // If user had focusMode: true (hidden), we want showEffects: false
-                    // If user had focusMode: false (shown), we want showEffects: true
-                    parsed.showEffects = !parsed.focusMode;
-                    delete parsed.focusMode;
+        const loadFromStorage = () => {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    // Migration logic
+                    if ('focusMode' in parsed) {
+                        parsed.showEffects = !parsed.focusMode;
+                        delete parsed.focusMode;
+                    }
+                    setAppearance({ ...DEFAULT_APPEARANCE, ...parsed });
+                } catch (e) {
+                    console.error('Failed to parse lesson appearance settings', e);
                 }
-
-                setAppearance({ ...DEFAULT_APPEARANCE, ...parsed });
-            } catch (e) {
-                console.error('Failed to parse lesson appearance settings', e);
             }
-        }
+        };
+
+        // Initial load
+        loadFromStorage();
+
+        // Listen for changes from other components (e.g. Navbar <-> LessonContent)
+        const handleStorageChange = () => {
+            loadFromStorage();
+        };
+
+        window.addEventListener(EVENT_KEY, handleStorageChange);
+        // Also listen to 'storage' event for cross-tab sync if needed (optional but good)
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener(EVENT_KEY, handleStorageChange);
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
     const updateAppearance = (updates: Partial<LessonAppearance>) => {
         setAppearance(prev => {
             const newSettings = { ...prev, ...updates };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
+            // Dispatch event to notify other hooks
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event(EVENT_KEY));
+            }
             return newSettings;
         });
     };

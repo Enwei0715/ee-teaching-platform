@@ -87,8 +87,8 @@ export default function LessonContent({
 
     return (
         <div className={`min-h-screen pb-20 relative transition-colors duration-500 ease-out ${currentTheme.wrapper} ${currentTheme.text}`}>
-            {/* Show grid only if showEffects is TRUE AND we are in a theme that supports it (e.g. default/navy) */}
-            {(appearance.showEffects && (appearance.theme === 'default' || appearance.theme === 'navy')) && (
+            {/* Show grid only if showEffects is TRUE. */}
+            {(appearance.showEffects) && (
                 <InteractiveGridPattern />
             )}
 
@@ -102,13 +102,13 @@ export default function LessonContent({
 
             <div className="flex flex-col lg:flex-row min-h-screen relative">
                 {/* Sidebar - Flush Left */}
-                {/* Hide sidebar in specific focus modes? Maybe just leave it closing-able. */}
                 <CourseSidebar
                     courseId={course.slug}
                     lessons={course.lessons}
                     category="Electronics"
                     courseTitle={course.title}
                     hideMobileTrigger={true}
+                    theme={appearance.theme}
                 />
 
                 {/* Main Content Wrapper */}
@@ -141,11 +141,11 @@ export default function LessonContent({
                             </div>
 
                             <div className="flex flex-wrap items-center gap-4 text-sm opacity-80">
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-bg-tertiary' : 'bg-black/5'}`}>
+                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
                                     <Clock size={16} className="text-accent-primary" />
                                     <span>{readingTime} min read</span>
                                 </div>
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-bg-tertiary' : 'bg-black/5'}`}>
+                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${appearance.theme === 'default' ? 'bg-black/20' : 'bg-black/5'}`}>
                                     <Calendar size={16} className="text-accent-primary" />
                                     <span>{lesson.updatedAt ? new Date(lesson.updatedAt).toLocaleDateString() : 'Recently updated'}</span>
                                 </div>
@@ -250,6 +250,7 @@ export default function LessonContent({
                         initialLastElementId={initialLastElementId}
                         onActiveHeadingChange={setActiveHeadingId}
                         hideMobileTrigger={true}
+                        theme={appearance.theme}
                     />
                 </div>
             </div>

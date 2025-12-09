@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import EditableImage from '@/components/ui/EditableImage';
 import EditableText from '@/components/ui/EditableText';
@@ -10,6 +11,8 @@ import SearchCommand from '@/components/search/SearchCommand';
 import { useSession, signOut } from 'next-auth/react';
 import { useEditMode } from '@/context/EditModeContext';
 
+import { useLessonAppearance } from '@/hooks/useLessonAppearance';
+
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -17,6 +20,36 @@ export default function Navbar() {
     const { data: session } = useSession();
     const { isEditMode, toggleEditMode } = useEditMode();
     const userMenuRef = useRef<HTMLDivElement>(null);
+
+    // Reader Mode Integration
+    const pathname = usePathname();
+    const { appearance } = useLessonAppearance();
+
+    // Check if we are on a lesson page: /courses/[slug]/[lessonId]
+    const isLessonPage = pathname?.match(/\/courses\/[^\/]+\/[^\/]+/);
+    const activeTheme = isLessonPage ? appearance.theme : 'default';
+
+    // Dynamic Styles for Navbar
+    const getNavbarStyles = () => {
+        switch (activeTheme) {
+            case 'light':
+                return 'bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-800';
+            case 'sepia':
+                return 'bg-[#f4ecd8]/95 backdrop-blur-md border-b border-[#e6decf] text-[#433422]';
+            case 'navy':
+                return 'bg-[#111b27]/95 backdrop-blur-md border-b border-blue-900/30 text-blue-100';
+            default: // default dark
+                return 'glass-heavy border-b border-border-primary';
+        }
+    };
+
+    const linkBaseClass = activeTheme === 'light' || activeTheme === 'sepia'
+        ? 'text-current hover:opacity-70 font-medium'
+        : 'text-text-secondary hover:text-text-primary transition-colors';
+
+    // Helper to override internal text colors if needed
+    // We wrap the nav and assume 'text-current' works for simple text, but links usually have specific classes.
+    // We will update the links below to use `linkBaseClass`.
 
     // Keyboard shortcut to open search
     // Listen for global hotkey events
@@ -85,7 +118,7 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className="glass-heavy border-b border-border-primary sticky top-0 z-40 w-full">
+            <nav className={`${getNavbarStyles()} sticky top-0 z-40 w-full transition-colors duration-300`}>
                 <div className="w-full px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
@@ -103,23 +136,23 @@ export default function Navbar() {
                                         priority
                                     />
                                 </div>
-                                <span className="text-text-primary font-bold text-xl tracking-tight whitespace-nowrap">EE Master</span>
+                                <span className={`font-bold text-xl tracking-tight whitespace-nowrap ${activeTheme === 'light' || activeTheme === 'sepia' ? 'text-current' : 'text-text-primary'}`}>EE Master</span>
                             </Link>
                         </div>
 
                         {/* Desktop Navigation - Absolute Center */}
                         <div className="hidden xl:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                             <div className="flex items-center space-x-8">
-                                <Link href="/courses" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                <Link href="/courses" className={`${linkBaseClass} px-3 py-2 rounded-md text-sm transition-colors`}>
                                     <EditableText mode="static" contentKey="navbar.link.courses" defaultText="Courses" tag="span" />
                                 </Link>
-                                <Link href="/projects" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                <Link href="/projects" className={`${linkBaseClass} px-3 py-2 rounded-md text-sm transition-colors`}>
                                     <EditableText mode="static" contentKey="navbar.link.projects" defaultText="Projects" tag="span" />
                                 </Link>
-                                <Link href="/blog" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                <Link href="/blog" className={`${linkBaseClass} px-3 py-2 rounded-md text-sm transition-colors`}>
                                     <EditableText mode="static" contentKey="navbar.link.blog" defaultText="Blog" tag="span" />
                                 </Link>
-                                <Link href="/forum" className="text-text-secondary hover:text-text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                <Link href="/forum" className={`${linkBaseClass} px-3 py-2 rounded-md text-sm transition-colors`}>
                                     <EditableText mode="static" contentKey="navbar.link.forum" defaultText="Forum" tag="span" />
                                 </Link>
                                 {session && (

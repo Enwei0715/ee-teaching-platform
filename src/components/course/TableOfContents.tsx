@@ -16,15 +16,18 @@ interface TableOfContentsProps {
     initialLastElementId?: string | null;
     onActiveHeadingChange?: (id: string) => void;
     hideMobileTrigger?: boolean;
+    theme?: string;
 }
 
-export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange, hideMobileTrigger = false }: TableOfContentsProps) {
+export default function TableOfContents({ courseId, lessonId, initialLastElementId, onActiveHeadingChange, hideMobileTrigger = false, theme = 'default' }: TableOfContentsProps) {
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const lastSavedIdRef = useRef<string | null>(null); // Track last saved position
     const isRestoredRef = useRef(false); // Prevent saving during initial load
+
+    // ... (logic for observer/extraction remains same, just styling changes below)
 
     // Extract headings from DOM
     useEffect(() => {
@@ -186,6 +189,30 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         return null;
     }
 
+    const getPanelStyles = () => {
+        switch (theme) {
+            case 'light':
+                return 'bg-white shadow-xl border-l border-gray-200 text-gray-800';
+            case 'sepia':
+                return 'bg-[#f4ecd8] shadow-xl border-l border-[#e6decf] text-[#433422]';
+            case 'navy':
+                return 'bg-[#111b27] shadow-xl border-l border-blue-900/30 text-blue-100';
+            default:
+                return 'glass-panel rounded-l-xl border-r-0 shadow-2xl';
+        }
+    };
+
+    const getLinkStyles = (isActive: boolean) => {
+        if (theme === 'light' || theme === 'sepia') {
+            return isActive
+                ? 'text-blue-600 border-l-2 border-blue-500 bg-blue-500/10 font-medium'
+                : 'text-current opacity-60 hover:opacity-100 hover:bg-black/5 border-l-2 border-transparent';
+        }
+        return isActive
+            ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
+            : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border-l-2 border-transparent';
+    };
+
     return (
         <>
             {/* Mobile Trigger Button - Only show if not hidden */}
@@ -209,14 +236,14 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                     />
 
                     {/* Drawer Panel */}
-                    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[95] glass-heavy rounded-t-2xl max-h-[70vh] overflow-y-auto p-6 border-t border-white/10 animate-in slide-in-from-bottom-10">
+                    <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-[95] rounded-t-2xl max-h-[70vh] overflow-y-auto p-6 border-t animate-in slide-in-from-bottom-10 ${getPanelStyles()}`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold text-white">Table of Contents</h3>
+                            <h3 className={`text-lg font-bold ${theme === 'light' || theme === 'sepia' ? 'text-current' : 'text-white'}`}>Table of Contents</h3>
                             <button
                                 onClick={() => setIsMobileOpen(false)}
                                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                             >
-                                <X size={20} className="text-white" />
+                                <X size={20} className={theme === 'light' || theme === 'sepia' ? 'text-current' : 'text-white'} />
                             </button>
                         </div>
 
@@ -234,10 +261,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                                             w-full text-left text-sm py-2.5 px-4 rounded-lg
                                             transition-all duration-200
                                             ${item.level === 3 ? 'pl-8' : 'pl-4'}
-                                            ${isActive
-                                                ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
-                                                : 'text-gray-300 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
-                                            }
+                                            ${getLinkStyles(isActive)}
                                         `}
                                     >
                                         {item.text}
@@ -258,15 +282,15 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                 group transition-all duration-300
             ">
                 {/* TOC Panel - Hidden by default, slides in on hover */}
-                <div className="
+                <div className={`
                     w-64 max-h-[70vh] overflow-y-auto custom-scrollbar
-                    glass-panel rounded-l-xl border-r-0 shadow-2xl
                     transform translate-x-full opacity-0
                     group-hover:translate-x-0 group-hover:opacity-100
                     transition-all duration-300 ease-out
                     p-4
-                ">
-                    <h3 className="text-sm font-bold text-white/90 mb-3 uppercase tracking-wide">
+                    ${getPanelStyles()}
+                `}>
+                    <h3 className={`text-sm font-bold mb-3 uppercase tracking-wide ${theme === 'light' || theme === 'sepia' ? 'text-current opacity-70' : 'text-white/90'}`}>
                         On this page
                     </h3>
                     <nav className="space-y-1">
@@ -280,10 +304,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
                                         w-full text-left text-sm py-1.5 px-3 rounded-lg
                                         transition-all duration-200
                                         ${item.level === 3 ? 'pl-6' : 'pl-3'}
-                                        ${isActive
-                                            ? 'text-blue-400 border-l-2 border-blue-400 bg-blue-500/10 font-medium'
-                                            : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border-l-2 border-transparent'
-                                        }
+                                        ${getLinkStyles(isActive)}
                                     `}
                                     title={item.text}
                                 >

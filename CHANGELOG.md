@@ -1,3 +1,17 @@
+## v5.4.4 - Global Lesson Interface Theming (2025-12-09)
+
+* **feat**:
+
+  * **Global Reader Mode**: 這是「沉浸式閱讀體驗」的最終樣式修正。將 Reader Mode 的主題樣式 (Light, Sepia, etc.) 擴展至全域介面，包含導覽列 (Navbar)、側邊欄 (CourseSidebar)、目錄 (TableOfContents) 與載入骨架 (SkeletonPlayer)，確保整個視窗的色調一致，不再出現「只有中間變色、旁邊還是黑底」的突兀感。
+  * **Event-Driven Theming**: 重構 `useLessonAppearance` hook，加入跨元件事件同步機制，讓位於 Layout 層級的 Navbar 能即時響應下層 Lesson 頁面的主題切換，無需重新整理頁面。
+
+## v5.4.3 - Reader Mode Visual Scoping (2025-12-09)
+
+* **fix**:
+
+  * **Visual Hierarchy**: Refined the application of Reader Mode themes. Now, only the central "Lesson Card" adopts the selected theme (e.g., Sepia paper), while the global interface (Navbar, Sidebar, TOC) remains in the default Dark/Blue theme. This creates a focused, book-like reading experience without breaking the overall app consistency.
+  * **Skeleton Scoping**: Updated the loading state to mirror this behavior—sidebar skeleton remains dark, while the content skeleton matches the user's theme preference.
+
 ## v5.4.2 - Reader Mode Polish: Themed Skeletons & Font Scaling (2025-12-09)
 
 * **fix**:
