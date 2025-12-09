@@ -7,6 +7,30 @@
     * **Mobile**: 在底部 Lesson Bar 新增快速字體切換按鈕 (Type Icon)，提升閱讀調整效率。
   * **System**: 強化主題遷移邏輯，確保舊版主題使用者自動切換至預設深色模式，避免視覺突兀。
 
+## v5.4.4 - Reader Mode Overhaul (2025-12-09)
+
+* **feat**:
+  * **Theme Upgrade**: 移除 `Light` 主題，新增 `Midnight`, `Forest`, `Amethyst` 深色主題。
+  * **UI Relocation**: 將外觀設定從 Header 移至右下角 FAB。
+  * **Mobile UX**: 新增底部 Lesson Bar 字體大小切換功能。
+
+## v5.4.3 - Table of Contents Theme Support (2025-12-09)
+
+* **fix**:
+  * **TOC Styling**: 修正 Table of Contents 在不同主題下的顯示問題，確保文字對比度與 Focus 狀態正確。
+  * **Layout**: 優化側邊欄在行動裝置上的顯示邏輯。
+
+## v5.4.2 - Skeleton Loading & Visual Consistency (2025-12-09)
+
+* **refactor**:
+  * **Seamless Loading**: 將 Skeleton Loading 狀態與使用者目前選擇的主題同步 (例如在 Midnight 主題下顯示深灰骨架)，消除載入時的視覺閃爍。
+
+## v5.4.1 - Reader Mode Foundation & Contrast Fixes (2025-12-09)
+
+* **fix**:
+  * **Contrast**: 修正 Sepia 與舊版 Light 主題在特定元件上的對比度問題。
+  * **Focus Mode**: 調整 Focus Mode 邏輯，預設為關閉狀態，並修正切換時的 Grid 背景行為。
+
 ## v5.4.0 - Reader Mode & Lesson Customization (2025-12-09)
 
 * **feat**:
