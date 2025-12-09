@@ -14,7 +14,7 @@ export const themeStyles = {
         wrapper: 'bg-white',
         text: 'text-slate-900',
         // Force specific colors to override any global dark mode defaults
-        prose: 'prose-slate prose-headings:text-slate-900! prose-p:text-slate-800! prose-strong:text-slate-900! prose-code:text-slate-900! prose-li:text-slate-800! [&_h1]:text-slate-900! [&_h2]:text-slate-900! [&_h3]:text-slate-900! [&_strong]:text-slate-900! [&_code]:text-slate-900!',
+        prose: 'prose-slate prose-headings:text-slate-900 prose-p:text-slate-800 prose-strong:text-slate-900 prose-code:text-slate-900 prose-li:text-slate-800',
         border: 'border-slate-200',
         skeletonBase: 'bg-slate-200',
         skeletonPanel: 'bg-white border border-slate-200',
@@ -22,9 +22,8 @@ export const themeStyles = {
     sepia: {
         wrapper: 'bg-[#f4ecd8]',
         text: 'text-[#433422]', // Darker brown for better contrast
-        // Warm tones with high contrast - explicit overrides for specific elements
-        // Using !important via tailwind (!) to force override any inherited dark mode styles
-        prose: 'prose-stone prose-headings:text-[#433422]! prose-p:text-[#433422]! prose-strong:text-[#2d2317]! prose-code:text-[#433422]! prose-li:text-[#433422]! [&_h1]:text-[#2d2317]! [&_h2]:text-[#2d2317]! [&_h3]:text-[#2d2317]! [&_strong]:text-[#2d2317]! [&_code]:text-[#433422]!',
+        // Warm tones with high contrast
+        prose: 'prose-stone prose-headings:text-[#433422] prose-p:text-[#5b4636] prose-strong:text-[#433422] prose-code:text-[#433422] prose-li:text-[#5b4636]',
         border: 'border-[#d3cbb7]',
         skeletonBase: 'bg-[#e2d8b8]',
         skeletonPanel: 'bg-[#f4ecd8] border border-[#d3cbb7]',
@@ -43,15 +42,15 @@ export const themeStyles = {
 // We provide both Tailwind class AND explicit CSS value for robust scaling
 export const fontSizes = {
     small: {
-        class: 'prose-sm',
-        cssValue: '0.875rem'
+        class: 'prose-base', // Was prose-sm (0.875rem), now base (1rem) for better readability as minimum
+        cssValue: '1rem'
     },
     medium: {
-        class: 'prose-lg', // Bumped up default
-        cssValue: '1.125rem'
+        class: 'prose-xl', // Was prose-lg (1.125rem), now xl (1.25rem)
+        cssValue: '1.25rem'
     },
     large: {
-        class: 'prose-xl',   // Much larger
-        cssValue: '1.4rem'
+        class: 'prose-2xl',   // Was prose-xl (1.4rem), now 2xl (1.5rem)
+        cssValue: '1.5rem'
     }
 };

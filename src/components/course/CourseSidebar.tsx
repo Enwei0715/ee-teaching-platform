@@ -21,62 +21,16 @@ interface Props {
     category?: string;
     courseTitle?: string;
     hideMobileTrigger?: boolean;
-    theme?: string;
 }
 
 export default function CourseSidebar(props: Props) {
-    const { courseId, lessons, category = "Courses", courseTitle = "Course", hideMobileTrigger = false, theme = 'default' } = props;
+    const { courseId, lessons, category = "Courses", courseTitle = "Course", hideMobileTrigger = false } = props;
     const pathname = usePathname();
     const { data: session } = useSession();
     const [progressMap, setProgressMap] = useState<Record<string, string>>({});
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-    // Dynamic Styles
-    const getSidebarStyles = () => {
-        switch (theme) {
-            case 'light':
-                return 'bg-white border-r border-gray-200 text-gray-800';
-            case 'sepia':
-                return 'bg-[#e6decf] border-r border-[#d3cbb7] text-[#433422]'; // Darker beige for sidebar to distinguish from content
-            // Navy is handled by default mostly, or separate. If 'navy' theme, usually dark bg.
-            case 'navy':
-                return 'bg-[#111b27] border-r border-blue-900/30 text-blue-100';
-            default:
-                return 'glass-heavy border-r border-gray-800/80';
-        }
-    };
-
-    const headerStyles = () => {
-        switch (theme) {
-            case 'light':
-                return 'border-gray-200 bg-white/90 text-gray-900';
-            case 'sepia':
-                return 'border-[#e6decf] bg-[#f4ecd8]/90 text-[#433422]';
-            case 'navy':
-                return 'border-blue-900/30 bg-[#111b27]/90 text-blue-100';
-            default:
-                return 'border-white/10 bg-slate-950/50 text-white';
-        }
-    };
-
-    const getFloatingButtonStyles = () => {
-        switch (theme) {
-            case 'light':
-                return 'bg-white text-gray-900 shadow-xl border border-gray-200 hover:bg-gray-50';
-            case 'sepia':
-                return 'bg-[#f4ecd8] text-[#433422] shadow-xl border border-[#d3cbb7] hover:bg-[#e6decf]';
-            case 'navy':
-                return 'bg-[#1e293b] text-blue-100 shadow-xl border border-blue-900/30 hover:bg-[#334155]';
-            default:
-                return 'glass-heavy text-white shadow-2xl hover:bg-blue-600'; // Keep original for dark mode
-        }
-    };
-
-    const inactiveLinkClass = theme === 'light' || theme === 'sepia'
-        ? 'text-current opacity-70 hover:opacity-100 hover:bg-black/5'
-        : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary';
 
     // Context for real-time updates
     const { currentLessonId, status: currentLessonStatus } = useLessonProgress();
@@ -146,15 +100,15 @@ export default function CourseSidebar(props: Props) {
 
     // Reusable Sidebar Header with Breadcrumbs
     const SidebarHeader = () => (
-        <div className={`p-4 border-b backdrop-blur-md sticky top-0 z-10 ${headerStyles()}`}>
-            <nav className="flex items-center text-xs opacity-70 space-x-1 mb-2">
-                <Link href="/courses" className="hover:opacity-100 transition-opacity">Courses</Link>
+        <div className="p-4 border-b border-white/10 bg-slate-950/50 backdrop-blur-md sticky top-0 z-10">
+            <nav className="flex items-center text-xs text-gray-400 space-x-1 mb-2">
+                <Link href="/courses" className="hover:text-white transition-colors">Courses</Link>
                 <span>/</span>
-                <Link href={`/courses/${courseId}`} className="hover:opacity-100 transition-opacity truncate max-w-[200px]">
+                <Link href={`/courses/${courseId}`} className="hover:text-white transition-colors truncate max-w-[200px]">
                     {courseTitle}
                 </Link>
             </nav>
-            <h2 className="text-base font-bold leading-tight">
+            <h2 className="text-base font-bold text-white leading-tight">
                 {courseTitle}
             </h2>
         </div>
@@ -164,22 +118,22 @@ export default function CourseSidebar(props: Props) {
     const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
         <>
             {/* Progress Bar Section */}
-            <div className={`p-6 border-b relative ${theme === 'default' ? 'border-border-primary glass-ghost' : 'border-current/10'}`}>
+            <div className="p-6 border-b border-border-primary glass-ghost">
                 <div className="flex justify-between items-center">
-                    <h2 className={`font-bold text-lg tracking-tight ${theme === 'light' || theme === 'sepia' ? 'text-current' : 'text-text-primary'}`}>Course Content</h2>
+                    <h2 className="font-bold text-text-primary text-lg tracking-tight">Course Content</h2>
 
                     {/* Close Button (Mobile) or Collapse Button (Desktop) */}
                     {isMobile ? (
                         <button
                             onClick={() => setIsMobileOpen(false)}
-                            className={`p-2 transition-colors rounded-lg ${inactiveLinkClass}`}
+                            className="p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
                         >
                             <X size={20} />
                         </button>
                     ) : (
                         <button
                             onClick={toggleSidebar}
-                            className={`absolute top-6 right-6 p-2 transition-colors rounded-lg ${inactiveLinkClass}`}
+                            className="absolute top-6 right-6 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
                             title="Hide sidebar (Focus Mode) • Ctrl+B"
                         >
                             <PanelLeftClose size={18} />
@@ -187,15 +141,15 @@ export default function CourseSidebar(props: Props) {
                     )}
                 </div>
 
-                <div className={`mt-4 w-full h-1.5 rounded-full overflow-hidden ${theme === 'default' ? 'bg-bg-tertiary' : 'bg-black/10'}`}>
+                <div className="mt-4 w-full bg-bg-tertiary h-1.5 rounded-full overflow-hidden">
                     <div
                         className="bg-accent-primary h-full rounded-full transition-all duration-500 ease-out"
                         style={{ width: `${progressPercentage}%` }}
                     ></div>
                 </div>
-                <div className="flex justify-between items-center mt-2 opacity-70">
-                    <p className="text-xs font-medium">{progressPercentage}% Completed</p>
-                    <p className="text-xs">{completedCount}/{totalLessons} Lessons</p>
+                <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-text-secondary font-medium">{progressPercentage}% Completed</p>
+                    <p className="text-xs text-text-secondary">{completedCount}/{totalLessons} Lessons</p>
                 </div>
             </div>
 
@@ -216,14 +170,14 @@ export default function CourseSidebar(props: Props) {
                                         "flex items-start gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-200 group relative",
                                         isActive
                                             ? "bg-accent-primary/10 text-accent-primary font-medium"
-                                            : inactiveLinkClass
+                                            : "text-text-secondary hover:bg-bg-tertiary hover:text-text-primary"
                                     )}
                                 >
                                     {isActive && (
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent-primary rounded-r-full" />
                                     )}
 
-                                    <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "opacity-50 group-hover:opacity-100")}>
+                                    <div className={cn("mt-0.5 shrink-0 transition-colors", isActive ? "text-accent-primary" : "text-text-secondary/30 group-hover:text-text-secondary/70")}>
                                         <StatusIcon
                                             status={displayStatus}
                                             index={index}
@@ -257,7 +211,7 @@ export default function CourseSidebar(props: Props) {
         <>
             {/* Desktop Sidebar */}
             <aside className={cn(
-                `hidden lg:flex flex-col h-[calc(100vh-5rem)] sticky top-20 self-start rounded-xl overflow-hidden transition-all duration-300 ease-in-out ${getSidebarStyles()}`,
+                "hidden lg:flex flex-col glass-heavy border-r border-gray-800/80 h-[calc(100vh-5rem)] sticky top-20 self-start rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
                 isCollapsed ? "w-0 opacity-0 pointer-events-none" : "w-72 opacity-100"
             )}>
                 <SidebarHeader />
@@ -269,7 +223,7 @@ export default function CourseSidebar(props: Props) {
             {/* Mobile Floating Button - Only show if not hidden */}
             {!isMobileOpen && !props.hideMobileTrigger && (
                 <button
-                    className={`lg:hidden fixed bottom-6 left-6 z-50 p-3 rounded-full transition-all ${getFloatingButtonStyles()}`}
+                    className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
                     onClick={() => setIsMobileOpen(true)}
                     aria-label="Open Menu"
                 >
@@ -287,7 +241,7 @@ export default function CourseSidebar(props: Props) {
                     />
 
                     {/* Drawer Panel */}
-                    <aside className={`fixed top-16 bottom-0 left-0 w-[85vw] max-w-xs overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[40] ${getSidebarStyles()}`}>
+                    <aside className="fixed top-16 bottom-0 left-0 w-[85vw] max-w-xs glass-heavy border-r border-white/10 overflow-y-auto animate-in slide-in-from-left duration-300 shadow-2xl z-[40]">
                         <SidebarHeader />
                         <SidebarContent isMobile={true} />
                     </aside>
@@ -298,7 +252,7 @@ export default function CourseSidebar(props: Props) {
             {isMounted && isCollapsed && (
                 <button
                     onClick={toggleSidebar}
-                    className={`fixed left-4 top-24 z-50 p-3 rounded-full transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300 hidden lg:block ${getFloatingButtonStyles()}`}
+                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300 hidden lg:block"
                     title="Show sidebar • Ctrl+B"
                 >
                     <PanelLeftOpen size={20} />
