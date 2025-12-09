@@ -61,6 +61,19 @@ export default function CourseSidebar(props: Props) {
         }
     };
 
+    const getFloatingButtonStyles = () => {
+        switch (theme) {
+            case 'light':
+                return 'bg-white text-gray-900 shadow-xl border border-gray-200 hover:bg-gray-50';
+            case 'sepia':
+                return 'bg-[#f4ecd8] text-[#433422] shadow-xl border border-[#d3cbb7] hover:bg-[#e6decf]';
+            case 'navy':
+                return 'bg-[#1e293b] text-blue-100 shadow-xl border border-blue-900/30 hover:bg-[#334155]';
+            default:
+                return 'glass-heavy text-white shadow-2xl hover:bg-blue-600'; // Keep original for dark mode
+        }
+    };
+
     const inactiveLinkClass = theme === 'light' || theme === 'sepia'
         ? 'text-current opacity-70 hover:opacity-100 hover:bg-black/5'
         : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary';
@@ -256,7 +269,7 @@ export default function CourseSidebar(props: Props) {
             {/* Mobile Floating Button - Only show if not hidden */}
             {!isMobileOpen && !props.hideMobileTrigger && (
                 <button
-                    className="lg:hidden fixed bottom-6 left-6 z-50 p-3 glass-heavy rounded-full text-white shadow-2xl hover:bg-blue-600 transition-all"
+                    className={`lg:hidden fixed bottom-6 left-6 z-50 p-3 rounded-full transition-all ${getFloatingButtonStyles()}`}
                     onClick={() => setIsMobileOpen(true)}
                     aria-label="Open Menu"
                 >
@@ -285,7 +298,7 @@ export default function CourseSidebar(props: Props) {
             {isMounted && isCollapsed && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed left-4 top-24 z-50 p-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-full shadow-lg hover:shadow-accent-primary/50 transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300 hidden lg:block"
+                    className={`fixed left-4 top-24 z-50 p-3 rounded-full transition-all transform hover:scale-110 animate-in slide-in-from-left duration-300 hidden lg:block ${getFloatingButtonStyles()}`}
                     title="Show sidebar • Ctrl+B"
                 >
                     <PanelLeftOpen size={20} />

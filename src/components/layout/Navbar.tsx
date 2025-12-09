@@ -136,7 +136,7 @@ export default function Navbar() {
                                         priority
                                     />
                                 </div>
-                                <span className={`font-bold text-xl tracking-tight whitespace-nowrap ${activeTheme === 'light' || activeTheme === 'sepia' ? 'text-current' : 'text-text-primary'}`}>EE Master</span>
+                                <span className={`font-bold text-xl tracking-tight whitespace-nowrap ${activeTheme === 'light' ? 'text-gray-900' : activeTheme === 'sepia' ? 'text-[#433422]' : 'text-text-primary'}`}>EE Master</span>
                             </Link>
                         </div>
 

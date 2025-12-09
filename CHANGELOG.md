@@ -1,3 +1,11 @@
+## v5.4.5 - Visual Polish & Accessibility (2025-12-09)
+
+* **fix**:
+
+  * **Visual Consistency**: 針對使用者回饋的細節進行修正。修復了 Sidebar 與 TOC 在行動版懸浮按鈕 (Floating Action Button) 的顏色，現在會正確跟隨 Reader Mode 主題變色 (如 Sepia 變為米色底深棕字)，不再是突兀的藍色。
+  * **Text Contrast**: 強化 `theme-config` 的權重，使用 CSS Selector (`[&_h1]`) 強制複寫全域 Dark Mode 樣式，解決在 Sepia/Light 主題下部分標題仍顯示為白色的對比度問題。
+  * **Navbar Title**: 明確指定 Navbar 標題顏色，確保在淺色主題下依然清晰可見。
+
 ## v5.4.4 - Global Lesson Interface Theming (2025-12-09)
 
 * **feat**:

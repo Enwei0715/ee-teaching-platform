@@ -202,6 +202,19 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
         }
     };
 
+    const getFloatingButtonStyles = () => {
+        switch (theme) {
+            case 'light':
+                return 'bg-white text-gray-900 shadow-xl border border-gray-200 hover:bg-gray-50';
+            case 'sepia':
+                return 'bg-[#f4ecd8] text-[#433422] shadow-xl border border-[#d3cbb7] hover:bg-[#e6decf]';
+            case 'navy':
+                return 'bg-[#1e293b] text-blue-100 shadow-xl border border-blue-900/30 hover:bg-[#334155]';
+            default:
+                return 'glass-heavy text-white shadow-lg hover:shadow-xl';
+        }
+    };
+
     const getLinkStyles = (isActive: boolean) => {
         if (theme === 'light' || theme === 'sepia') {
             return isActive
@@ -219,7 +232,7 @@ export default function TableOfContents({ courseId, lessonId, initialLastElement
             {!hideMobileTrigger && (
                 <button
                     onClick={() => setIsMobileOpen(true)}
-                    className="lg:hidden fixed bottom-32 right-4 z-50 p-3 glass-heavy rounded-full text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    className={`lg:hidden fixed bottom-32 right-4 z-50 p-3 rounded-full transition-all transform hover:scale-105 ${getFloatingButtonStyles()}`}
                     title="Table of Contents"
                 >
                     <List size={20} />
