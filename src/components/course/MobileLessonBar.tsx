@@ -1,10 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Menu, List, Bot, MessageSquarePlus, MoreHorizontal } from 'lucide-react';
+import { Menu, List, Bot, MessageSquarePlus, Type } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LessonFontSize } from '@/hooks/useLessonAppearance';
 
-export default function MobileLessonBar() {
+interface MobileLessonBarProps {
+    onUpdateAppearance?: (updates: { fontSize: LessonFontSize }) => void;
+    currentFontSize?: LessonFontSize;
+}
+
+export default function MobileLessonBar({ onUpdateAppearance, currentFontSize = 'medium' }: MobileLessonBarProps) {
     const handleAction = (action: string) => {
         switch (action) {
             case 'sidebar':
@@ -18,6 +24,16 @@ export default function MobileLessonBar() {
                 break;
             case 'feedback':
                 window.dispatchEvent(new CustomEvent('open-feedback'));
+                break;
+            case 'font-size':
+                if (onUpdateAppearance) {
+                    const nextSize: Record<LessonFontSize, LessonFontSize> = {
+                        'small': 'medium',
+                        'medium': 'large',
+                        'large': 'small'
+                    };
+                    onUpdateAppearance({ fontSize: nextSize[currentFontSize] });
+                }
                 break;
         }
     };
@@ -91,8 +107,16 @@ export default function MobileLessonBar() {
                         <span className="text-[10px] font-medium">Feedback</span>
                     </button>
 
-                    {/* Placeholder for symmetry or future use (e.g. More) */}
-                    <div className="w-8" />
+                    {/* Font Size Toggle */}
+                    <button
+                        onClick={() => handleAction('font-size')}
+                        className="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors"
+                    >
+                        <Type size={20} className={currentFontSize === 'large' ? 'text-white' : ''} />
+                        <span className="text-[10px] font-medium">
+                            {currentFontSize === 'small' ? 'Sm' : currentFontSize === 'medium' ? 'Md' : 'Lg'}
+                        </span>
+                    </button>
                 </div>
             </div>
         </motion.div>

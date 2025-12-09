@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type LessonTheme = 'default' | 'light' | 'sepia' | 'navy';
+export type LessonTheme = 'default' | 'sepia' | 'navy' | 'midnight' | 'forest' | 'amethyst';
 export type LessonFontSize = 'small' | 'medium' | 'large';
 
 export interface LessonAppearance {
@@ -33,12 +33,15 @@ export function useLessonAppearance() {
                 // But since we just deployed, maybe just reset or handle gracefully.
                 const parsed = JSON.parse(stored);
 
-                // Handle breaking change from 'focusMode' to 'showEffects' if needed, or just overwrite
+                // Migration: If 'focusMode' exists from previous version
                 if ('focusMode' in parsed) {
-                    // If user had focusMode: true (hidden), we want showEffects: false
-                    // If user had focusMode: false (shown), we want showEffects: true
                     parsed.showEffects = !parsed.focusMode;
                     delete parsed.focusMode;
+                }
+
+                // Migration: Remove 'light' theme (deprecated)
+                if (parsed.theme === 'light') {
+                    parsed.theme = 'default';
                 }
 
                 setAppearance({ ...DEFAULT_APPEARANCE, ...parsed });

@@ -70,6 +70,8 @@ export default function LessonContent({
     const currentTheme = themeStyles[appearance.theme];
     const currentFontSize = fontSizes[appearance.fontSize];
 
+    const handleMobileFontUpdate = (updates: { fontSize: any }) => updateAppearance(updates);
+
 
 
     // State for progress-aware quiz
@@ -132,12 +134,7 @@ export default function LessonContent({
                                 <h1 className={`text-3xl lg:text-4xl font-bold mb-4 tracking-tight ${currentTheme.text}`}>
                                     {lesson.title}
                                 </h1>
-                                <div className="flex-shrink-0 pt-1">
-                                    <LessonAppearanceControl
-                                        appearance={appearance}
-                                        onUpdate={updateAppearance}
-                                    />
-                                </div>
+
                             </div>
 
                             <div className="flex flex-wrap items-center gap-4 text-sm opacity-80">
@@ -277,7 +274,12 @@ export default function LessonContent({
             />
 
             {/* Mobile Bottom Action Bar */}
-            <MobileLessonBar />
+            <MobileLessonBar onUpdateAppearance={handleMobileFontUpdate} currentFontSize={appearance.fontSize} />
+
+            <LessonAppearanceControl
+                appearance={appearance}
+                onUpdate={updateAppearance}
+            />
         </div>
     );
 }

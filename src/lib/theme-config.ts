@@ -10,15 +10,7 @@ export const themeStyles = {
         skeletonBase: 'bg-white/10', // bone color
         skeletonPanel: 'glass-panel',
     },
-    light: {
-        wrapper: 'bg-white',
-        text: 'text-slate-900',
-        // Force specific colors to override any global dark mode defaults
-        prose: 'prose-slate prose-headings:text-slate-900 prose-p:text-slate-800 prose-strong:text-slate-900 prose-code:text-slate-900 prose-li:text-slate-800',
-        border: 'border-slate-200',
-        skeletonBase: 'bg-slate-200',
-        skeletonPanel: 'bg-white border border-slate-200',
-    },
+    // Light theme removed as requested
     sepia: {
         wrapper: 'bg-[#f4ecd8]',
         text: 'text-[#433422]', // Darker brown for better contrast
@@ -35,6 +27,30 @@ export const themeStyles = {
         border: 'border-blue-900/30',
         skeletonBase: 'bg-blue-900/30',
         skeletonPanel: 'bg-[#1e293b] border border-blue-900/30',
+    },
+    midnight: {
+        wrapper: 'bg-black',
+        text: 'text-gray-300',
+        prose: 'prose-invert prose-gray',
+        border: 'border-gray-800',
+        skeletonBase: 'bg-gray-900',
+        skeletonPanel: 'bg-black border border-gray-800',
+    },
+    forest: {
+        wrapper: 'bg-[#051a15]', // Deep forest green
+        text: 'text-emerald-100',
+        prose: 'prose-invert prose-emerald',
+        border: 'border-emerald-900/30',
+        skeletonBase: 'bg-emerald-900/20',
+        skeletonPanel: 'bg-[#022c22] border border-emerald-900/30',
+    },
+    amethyst: {
+        wrapper: 'bg-[#150f25]', // Deep purple
+        text: 'text-purple-100',
+        prose: 'prose-invert prose-violet',
+        border: 'border-purple-900/30',
+        skeletonBase: 'bg-purple-900/20',
+        skeletonPanel: 'bg-[#2e1065] border border-purple-900/30',
     }
 };
 
