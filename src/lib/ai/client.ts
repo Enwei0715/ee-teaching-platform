@@ -20,11 +20,12 @@ export const openai = new OpenAI({
 
 // Priority list: Groq Models (Fastest/Best first)
 // User requested: llama3-8b-8192, llama3-70b-8192, mixtral-8x7b-32768, gemma-7b-it
+// UPDATE: gemma-7b-it is decommissioned (400 Error). Swapping to modern equivalents.
 const MODELS = [
-    "llama3-70b-8192",    // Best Quality (Priority 1)
-    "mixtral-8x7b-32768", // Good Alternative
-    "llama3-8b-8192",     // Fast & Cheap
-    "gemma-7b-it"         // Backup
+    "llama-3.3-70b-versatile", // Newest Llama 3.3
+    "llama-3.1-8b-instant",    // Fast & Reliable
+    "mixtral-8x7b-32768",      // Stable Legacy
+    "gemma2-9b-it"             // Google's Open Model (Replacing decommissioned gemma-7b)
 ];
 
 export async function robustChatCompletion(params: any): Promise<{ content: string | null, model: string }> {

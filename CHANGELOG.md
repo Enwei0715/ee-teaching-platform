@@ -13,7 +13,7 @@
   * **Interaction**: 加快 Blog 與 Project 頁面的點擊漣漪效果 (Ripple Effect) 速度 (3x)，讓回饋更即時。
   * **Completion Trigger**: 恢復 v5.2.0 的 "Slide to Quiz" 觸發邏輯，滑動至測驗卡片即自動標記完成 (IntersectionObserver)。
   * **Anti-Cheat Timer**: 改進計時邏輯：首次學習需閱讀預估時間的 100%，複習模式 (`Reviewing`) 需閱讀 50% 方可完成。
-  * **Hybrid AI Client**: 支援 **Groq** (Llama 3/Mixtral) 與 **Google** (Gemini) 雙平台自動切換。若環境變數檢測到 `GROQ_API_KEY` 將優先啟用 Groq 以獲得極速體驗；若無則自動降級回 Google API，防止 401 錯誤，便於部署過渡。
+  * **Hybrid AI Client**: 升級至 **Groq** 最新模型列表 (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `gemma2-9b-it`)。若無 Groq Key 則自動降級回 Google API，並解決了舊版模型 (gemma-7b) 導致的 400 錯誤。
 
 ## v5.4.5 - Theme Overhaul & UI Refinement (2025-12-09)
 
