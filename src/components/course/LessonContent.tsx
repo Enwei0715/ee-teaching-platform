@@ -110,8 +110,8 @@ export default function LessonContent({
         if (hasTriggeredCompletion || isCompleted) return;
 
         const timeSpent = (Date.now() - startTimeRef.current) / 1000;
-        // Minimum reading time check (e.g., 10 seconds or 10% of estimated reading time)
-        const minTimeSeconds = Math.min(30, Math.max(10, readingTime * 60 * 0.1));
+        // Revert to fixed 10s timer as per v5.2.0 legacy logic (User Request)
+        const minTimeSeconds = 10;
 
         if (timeSpent < minTimeSeconds) {
             // Only warn once every 5 seconds to avoid spamming
