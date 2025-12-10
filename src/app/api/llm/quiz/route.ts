@@ -1,16 +1,7 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { robustChatCompletion } from '@/lib/ai/client';
 import { parseSections, scopeSections, scoreSections, selectBestSection } from '@/lib/ai/quiz-algorithm';
 import prisma from '@/lib/prisma';
-
-const openai = new OpenAI({
-    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    apiKey: process.env.GOOGLE_API_KEY,
-    defaultHeaders: {
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "EE Teaching Platform",
-    },
-});
 
 // Helper to extract a random section from markdown content
 function extractRandomSection(content: string): { title: string, content: string } {
@@ -52,14 +43,9 @@ export async function POST(req: Request) {
 
         // Check if we have direct section content (from frontend selection)
         if (sectionContent && sectionTitle) {
-            // ... (Existing direct section logic - keeping it as is for now if needed, or we can unify)
-            // For now, let's focus on the main flow which uses the pipeline when no specific section is forced.
-            // Actually, the user request implies we should use the pipeline for the general "Generate Quiz" case.
-            // The "direct section" case is likely for "Quiz Me on This Section" button.
-            // We will keep the direct section logic as a fast path.
             console.log(`Generating quiz for specific section: "${sectionTitle}"`);
             try {
-                const completion = await openai.chat.completions.create({
+                const { content, model: usedModel } = await robustChatCompletion({
                     messages: [
                         {
                             role: "system",
@@ -135,12 +121,10 @@ Generate a unique quiz question based on THIS section only.
 `
                         }
                     ],
-                    model: "gemini-2.5-flash",
                     response_format: { type: "json_object" },
                     temperature: 1.0,
                 });
 
-                const content = completion.choices[0].message.content;
                 if (!content) {
                     throw new Error("No content received from LLM");
                 }
@@ -152,7 +136,7 @@ Generate a unique quiz question based on THIS section only.
 
                 return NextResponse.json({
                     ...quiz,
-                    model: "gemini-2.5-flash",
+                    model: usedModel,
                     sectionTitle: sectionTitle
                 });
             } catch (aiError) {
@@ -224,7 +208,7 @@ Generate a unique quiz question based on THIS section only.
 
             console.log(`Selected section for quiz: "${selectedSection.title}"`);
 
-            const completion = await openai.chat.completions.create({
+            const { content, model: usedModel } = await robustChatCompletion({
                 messages: [
                     {
                         role: "system",
@@ -302,14 +286,12 @@ Focus on details that require understanding, not just recall.
                         `
                     }
                 ],
-                model: "gemini-2.5-flash",
                 response_format: { type: "json_object" },
                 temperature: 1.0, // High temperature for variety
             });
 
-            console.log("Google AI Response:", completion);
-            const content = completion.choices[0].message.content;
             console.log("Google AI Response Content:", content);
+            console.log("Model Used:", usedModel);
 
             if (!content) {
                 throw new Error("No content received from LLM");
@@ -343,7 +325,7 @@ Focus on details that require understanding, not just recall.
 
             return NextResponse.json({
                 ...quiz,
-                model: "gemini-2.5-flash",
+                model: usedModel,
                 sectionTitle: selectedSection.title  // Include which section was tested
             });
 

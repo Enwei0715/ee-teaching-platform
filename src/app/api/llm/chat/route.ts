@@ -1,14 +1,5 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    apiKey: process.env.GOOGLE_API_KEY,
-    defaultHeaders: {
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "EE Teaching Platform",
-    },
-});
+import { robustChatCompletion } from '@/lib/ai/client';
 
 export async function POST(request: Request) {
     try {
@@ -88,16 +79,16 @@ Focus on explaining concepts in an educational way. Use examples and analogies t
 Use clear Markdown formatting with bold for key terms and bullet points for lists.`;
         }
 
-        const completion = await openai.chat.completions.create({
+        const { content: reply, model: usedModel } = await robustChatCompletion({
             messages: [
                 { role: "system", content: systemPrompt },
                 ...messages
             ],
-            model: "gemini-2.5-flash",
         });
 
-        const reply = completion.choices[0].message.content;
         console.log("AI Tutor Reply Length:", reply?.length || 0);
+        console.log("Model Used:", usedModel);
+
         return NextResponse.json({ reply });
 
     } catch (error) {
