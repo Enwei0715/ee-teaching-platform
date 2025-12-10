@@ -15,8 +15,8 @@ const apiKey = envVars.GOOGLE_API_KEY;
 
 async function main() {
     // Test with valid model
-    console.log("Testing with gemini-1.5-flash...");
-    await testUrl("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-1.5-flash");
+    console.log("Testing with gemini-2.5-flash...");
+    await testUrl("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-2.5-flash");
 }
 
 async function testUrl(url, model) {

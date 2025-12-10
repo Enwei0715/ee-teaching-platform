@@ -93,7 +93,7 @@ Use clear Markdown formatting with bold for key terms and bullet points for list
                 { role: "system", content: systemPrompt },
                 ...messages
             ],
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
         });
 
         const reply = completion.choices[0].message.content;
