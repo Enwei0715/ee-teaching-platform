@@ -104,22 +104,32 @@ export default function LessonContent({
 
     // Scroll & Completion Logic
     // We hoist this function so it can be triggered by BOTH scroll and IntersectionObserver
-    // This restores the v5.2.0 behavior where "Sliding to QuizCard" immediately completes the lesson.
-    // However, we kept the anti-cheat timed warning as a fallback if they are impossibly fast.
     const handleCompletionCheck = () => {
-        if (hasTriggeredCompletion || isCompleted) return;
+        // Allow completion if strictly IN_PROGRESS (first time) OR REVIEWING (review session)
+        // If status is 'COMPLETED' (just viewing), we might not want to re-trigger, unless they started a review.
+        // The user implied "Review" gets 50% time.
+        const canTrigger = !hasTriggeredCompletion && (lessonStatus === 'IN_PROGRESS' || lessonStatus === 'REVIEWING');
+
+        if (!canTrigger) return;
 
         const timeSpent = (Date.now() - startTimeRef.current) / 1000;
-        // Revert to fixed 10s timer as per v5.2.0 legacy logic (User Request)
-        const minTimeSeconds = 10;
+
+        // User Logic:
+        // - "Complete state" (In Progress -> Complete): 100% of reading time.
+        // - "Review": 50% of reading time.
+        // - Reading Time is in minutes, convert to seconds.
+        const requiredPercentage = lessonStatus === 'REVIEWING' ? 0.5 : 1.0;
+        // Ensure a sanity minimum (e.g. 10s) just in case readingTime is 0 or missing
+        const minTimeSeconds = Math.max(10, (readingTime || 1) * 60 * requiredPercentage);
 
         if (timeSpent < minTimeSeconds) {
             // Only warn once every 5 seconds to avoid spamming
             const now = Date.now();
             if (now - lastWarningTimeRef.current > 5000) {
                 lastWarningTimeRef.current = now;
-                toast.warning("Whoa there! intent on speed reading?", {
-                    description: `Please take at least ${Math.round(minTimeSeconds)}s to review the material.`
+                toast.warning("Deep reading required!", {
+                    description: `Please spend at least ${Math.ceil(minTimeSeconds)}s reading ` +
+                        (lessonStatus === 'REVIEWING' ? "(50% of est. time)" : "(100% of est. time)")
                 });
             }
         } else {
@@ -130,7 +140,7 @@ export default function LessonContent({
                 spread: 70,
                 origin: { y: 0.6 }
             });
-            toast.success("Lesson Completed!", {
+            toast.success(lessonStatus === 'REVIEWING' ? "Review Completed!" : "Lesson Completed!", {
                 description: `You earned +${potentialXP} XP`
             });
         }
@@ -154,7 +164,7 @@ export default function LessonContent({
         }
 
         return () => observer.disconnect();
-    }, [hasTriggeredCompletion, isCompleted, readingTime, markAsComplete, potentialXP]); // Add dependencies used in handleCompletionCheck
+    }, [hasTriggeredCompletion, isCompleted, readingTime, markAsComplete, potentialXP, lessonStatus]); // Add dependencies used in handleCompletionCheck
 
     // Scroll Progress Logic
     useEffect(() => {
@@ -179,7 +189,7 @@ export default function LessonContent({
         handleScroll();
 
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [isCompleted, hasTriggeredCompletion, readingTime, markAsComplete, potentialXP]);
+    }, [isCompleted, hasTriggeredCompletion, readingTime, markAsComplete, potentialXP, lessonStatus]);
 
     // If not mounted yet (SSR), render a safe default or loading state to prevent mismatch
     // But for a lesson page, we want SEO to be good, so we should default to 'default' theme which matches server render usually.

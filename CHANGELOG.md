@@ -12,7 +12,7 @@
   * **Deep Blue Theme**: 將 Blog Card 與 Post Header 背景調整為深藍色 (`#0B1120`)，提升閱讀質感。
   * **Interaction**: 加快 Blog 與 Project 頁面的點擊漣漪效果 (Ripple Effect) 速度 (3x)，讓回饋更即時。
   * **Completion Trigger**: 恢復 v5.2.0 的 "Slide to Quiz" 觸發邏輯，滑動至測驗卡片即自動標記完成 (IntersectionObserver)。
-  * **Anti-Cheat Timer**: 恢復 v5.2.0 的固定 10 秒計時器，取代動態計算邏輯，解決誤判問題。
+  * **Anti-Cheat Timer**: 改進計時邏輯：首次學習需閱讀預估時間的 100%，複習模式 (`Reviewing`) 需閱讀 50% 方可完成。
   * **API Stability**: 修正 AI 模型版本錯誤 (Gemini 2.5 -> 1.5) 導致的 503 錯誤，解決 Quiz 與 Chat 無法生成的問題。
 
 ## v5.4.5 - Theme Overhaul & UI Refinement (2025-12-09)
