@@ -135,7 +135,7 @@ Generate a unique quiz question based on THIS section only.
 `
                         }
                     ],
-                    model: "gemini-2.5-flash",
+                    model: "gemini-1.5-flash",
                     response_format: { type: "json_object" },
                     temperature: 1.0,
                 });
@@ -152,7 +152,7 @@ Generate a unique quiz question based on THIS section only.
 
                 return NextResponse.json({
                     ...quiz,
-                    model: "gemini-2.5-flash",
+                    model: "gemini-1.5-flash",
                     sectionTitle: sectionTitle
                 });
             } catch (aiError) {
@@ -302,7 +302,7 @@ Focus on details that require understanding, not just recall.
                         `
                     }
                 ],
-                model: "gemini-2.5-flash",
+                model: "gemini-1.5-flash",
                 response_format: { type: "json_object" },
                 temperature: 1.0, // High temperature for variety
             });
@@ -343,7 +343,7 @@ Focus on details that require understanding, not just recall.
 
             return NextResponse.json({
                 ...quiz,
-                model: "gemini-2.5-flash",
+                model: "gemini-1.5-flash",
                 sectionTitle: selectedSection.title  // Include which section was tested
             });
 
