@@ -103,6 +103,60 @@ export default function LessonContent({
     }, [prevLesson, nextLesson, router, course.slug]);
 
     // Scroll & Completion Logic
+    // We hoist this function so it can be triggered by BOTH scroll and IntersectionObserver
+    // This restores the v5.2.0 behavior where "Sliding to QuizCard" immediately completes the lesson.
+    // However, we kept the anti-cheat timed warning as a fallback if they are impossibly fast.
+    const handleCompletionCheck = () => {
+        if (hasTriggeredCompletion || isCompleted) return;
+
+        const timeSpent = (Date.now() - startTimeRef.current) / 1000;
+        // Minimum reading time check (e.g., 10 seconds or 10% of estimated reading time)
+        const minTimeSeconds = Math.min(30, Math.max(10, readingTime * 60 * 0.1));
+
+        if (timeSpent < minTimeSeconds) {
+            // Only warn once every 5 seconds to avoid spamming
+            const now = Date.now();
+            if (now - lastWarningTimeRef.current > 5000) {
+                lastWarningTimeRef.current = now;
+                toast.warning("Whoa there! intent on speed reading?", {
+                    description: `Please take at least ${Math.round(minTimeSeconds)}s to review the material.`
+                });
+            }
+        } else {
+            setHasTriggeredCompletion(true);
+            markAsComplete('scroll');
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            toast.success("Lesson Completed!", {
+                description: `You earned +${potentialXP} XP`
+            });
+        }
+    };
+
+    // Intersection Observer for Quiz Section (The requested "Slide to QuizCard" trigger)
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !hasTriggeredCompletion) {
+                    console.log("Quiz section reached - triggering completion check");
+                    handleCompletionCheck();
+                }
+            },
+            { threshold: 0.1 } // Trigger as soon as 10% of quiz is visible
+        );
+
+        const quizElement = document.getElementById('ai-quiz');
+        if (quizElement) {
+            observer.observe(quizElement);
+        }
+
+        return () => observer.disconnect();
+    }, [hasTriggeredCompletion, isCompleted, readingTime, markAsComplete, potentialXP]); // Add dependencies used in handleCompletionCheck
+
+    // Scroll Progress Logic
     useEffect(() => {
         const handleScroll = () => {
             const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -111,45 +165,21 @@ export default function LessonContent({
             const currentProgress = Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100));
             setScrollProgress(currentProgress);
 
-            // Trigger completion when reaching the bottom (AI Quiz section)
+            // Fallback: Trigger completion when reaching the very bottom (in case Observer fails)
             const scrollBottom = window.scrollY + window.innerHeight;
-            const isAtBottom = scrollBottom >= document.documentElement.scrollHeight - 100; // 100px threshold
+            const isAtBottom = scrollBottom >= document.documentElement.scrollHeight - 50;
 
             if (isAtBottom && !isCompleted && !hasTriggeredCompletion) {
-                const timeSpent = (Date.now() - startTimeRef.current) / 1000;
-                // Minimum reading time check (e.g., 10 seconds or 10% of estimated reading time)
-                const minTimeSeconds = Math.min(30, Math.max(10, readingTime * 60 * 0.1));
-
-                if (timeSpent < minTimeSeconds) {
-                    // Only warn once every 5 seconds to avoid spamming
-                    const now = Date.now();
-                    if (now - lastWarningTimeRef.current > 5000) {
-                        lastWarningTimeRef.current = now;
-                        toast.warning("Whoa there! intent on speed reading?", {
-                            description: `Please take at least ${Math.round(minTimeSeconds)}s to review the material.`
-                        });
-                    }
-                } else {
-                    setHasTriggeredCompletion(true);
-                    markAsComplete('scroll');
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                    toast.success("Lesson Completed!", {
-                        description: `You earned +${potentialXP} XP`
-                    });
-                }
+                handleCompletionCheck();
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
-        // Initial check in case page is short
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        // Initial check
         handleScroll();
 
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [isCompleted, hasTriggeredCompletion, markAsComplete, potentialXP, readingTime]);
+    }, [isCompleted, hasTriggeredCompletion, readingTime, markAsComplete, potentialXP]);
 
     // If not mounted yet (SSR), render a safe default or loading state to prevent mismatch
     // But for a lesson page, we want SEO to be good, so we should default to 'default' theme which matches server render usually.

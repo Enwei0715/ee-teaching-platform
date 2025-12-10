@@ -6,10 +6,12 @@
   * **Context-Aware Panel**:
     * **Review Mode**: 解除 Context Panel 在複習模式下的限制，現在即使課程已完成，AI 也能針對目前閱讀的章節出題。
     * **Chinese Heading Support**: 修正後端 Quiz 演算法的 normalization 邏輯，現在能正確辨識中文標題，解決 "總是抓到第一章" 的問題。
+    * **Reverted Logic**: 恢復 v5.2.0 的 "In-Progress" 模式邏輯，確保學習中僅測試當前標題以前的內容；複習模式則測試全課程。
 
 * **ui**:
   * **Deep Blue Theme**: 將 Blog Card 與 Post Header 背景調整為深藍色 (`#0B1120`)，提升閱讀質感。
   * **Interaction**: 加快 Blog 與 Project 頁面的點擊漣漪效果 (Ripple Effect) 速度 (3x)，讓回饋更即時。
+  * **Completion Trigger**: 恢復 v5.2.0 的 "Slide to Quiz" 觸發邏輯，滑動至測驗卡片即自動標記完成 (IntersectionObserver)。
 
 ## v5.4.5 - Theme Overhaul & UI Refinement (2025-12-09)
 
