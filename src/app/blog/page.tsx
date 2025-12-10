@@ -101,7 +101,7 @@ export default function BlogPage() {
                 {blogPosts.length > 0 ? (
                     <div className="space-y-8">
                         {blogPosts.map((post) => (
-                            <article key={post.slug} className="glass-panel shadow-xl rounded-lg p-8 hover:border-accent-primary transition-colors">
+                            <article key={post.slug} className="bg-[#0B1120]/90 border border-slate-800/50 backdrop-blur-md shadow-xl rounded-lg p-8 hover:border-accent-primary transition-colors">
                                 <div className="flex items-center gap-4 text-sm text-text-secondary mb-4">
                                     <span className="text-accent-primary font-medium">{post.meta.category}</span>
                                     <span>•</span>

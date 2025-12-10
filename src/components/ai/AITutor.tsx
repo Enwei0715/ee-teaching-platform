@@ -330,8 +330,8 @@ export default function AITutor({ lessonTitle, lessonContent, lessonContext, act
                     ) : (
                         <QuizTab
                             lessonContent={lessonContent}
-                            // Only pass activeHeadingId if lesson is IN_PROGRESS
-                            activeHeadingId={currentStatus === 'IN_PROGRESS' ? activeHeadingId : undefined}
+                            // Pass activeHeadingId regardless of status to enable context-aware review
+                            activeHeadingId={activeHeadingId}
                             courseSlug={courseSlug}
                             lessonSlug={lessonSlug}
                             lessonStatus={currentStatus}

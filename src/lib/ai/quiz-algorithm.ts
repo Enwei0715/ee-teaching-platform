@@ -81,7 +81,7 @@ export function parseSections(markdown: string): Section[] {
  * If currentHeadingId is null, returns ALL sections (Review Mode).
  * If provided, returns sections up to (and including) the current heading.
  */
-// Helper for fuzzy comparison (strips punctuation)
+// Helper for fuzzy comparison (strips punctuation but keeps Chinese)
 const fuzzyNormalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
 
 export function scopeSections(sections: Section[], currentHeadingId: string | null): Section[] {

@@ -103,7 +103,7 @@ const HexagonalBackground = () => {
 
             // Update ripples
             for (let i = ripples.length - 1; i >= 0; i--) {
-                ripples[i].time += 0.02;
+                ripples[i].time += 0.06;
                 if (ripples[i].time > 1) {
                     ripples.splice(i, 1);
                 }

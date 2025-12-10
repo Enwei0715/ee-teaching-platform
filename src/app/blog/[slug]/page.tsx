@@ -54,7 +54,7 @@ export default async function BlogPost({ params }: Props) {
         <article className="min-h-screen bg-transparent relative z-0">
             <InteractiveDotGrid />
             {/* Hero Section */}
-            <header className="glass-panel border-b border-white/10">
+            <header className="bg-[#0B1120]/90 border-b border-white/10 backdrop-blur-md shadow-xl">
                 <div className="max-w-3xl mx-auto px-6 py-20 relative z-10">
                     <div className="flex items-center justify-between mb-8">
                         <Link href="/blog" className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm font-medium group">

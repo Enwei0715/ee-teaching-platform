@@ -192,7 +192,8 @@ Generate a unique quiz question based on THIS section only.
             console.log("2. Parsed Sections Count:", sections.length);
             console.log("3. First 3 Section IDs:", sections.slice(0, 3).map(s => s.id));
 
-            const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+            // Normalize: Lowercase, remove whitespace and specific punctuation, but PRESERVE UNICODE (Chinese)
+            const normalize = (s: string) => s.toLowerCase().replace(/[\s\-_.,!?;:'"()\[\]]/g, '');
             const targetNormalized = normalize(limitToHeadingId || '');
 
             const matchIndex = sections.findIndex(s =>

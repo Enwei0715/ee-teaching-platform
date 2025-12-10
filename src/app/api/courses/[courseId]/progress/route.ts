@@ -110,7 +110,16 @@ export async function POST(
             }
         });
 
-        let newStatus = existingProgress?.status || 'IN_PROGRESS';
+        // Prioritize explicit status from body (REVIEWING, etc.), fallback to existing, then IN_PROGRESS
+        let newStatus = body.status || existingProgress?.status || 'IN_PROGRESS';
+
+        // SAFETY: Don't regress from COMPLETED/REVIEWING to IN_PROGRESS unless explicitly forced (rare)
+        if (existingProgress?.status === 'COMPLETED' && newStatus === 'IN_PROGRESS') {
+            newStatus = 'COMPLETED';
+        }
+        if (existingProgress?.status === 'REVIEWING' && newStatus === 'IN_PROGRESS') {
+            newStatus = 'REVIEWING';
+        }
 
         // Gamification: Update Streak
         const streakResult = await updateStreak(session.user.id);

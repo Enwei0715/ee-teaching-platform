@@ -13,7 +13,7 @@ export default function BlogCard({ title, description, slug, date, tags }: BlogC
     return (
         <Link
             href={`/blog/${slug}`}
-            className="group flex flex-col h-full glass-panel rounded-xl overflow-hidden shadow-lg transition-all hover:border-gray-700"
+            className="group flex flex-col h-full bg-[#0B1120]/90 border border-slate-800/50 backdrop-blur-md rounded-xl overflow-hidden shadow-lg transition-all hover:border-accent-primary/50"
         >
             <div className="p-6 flex-1 flex flex-col">
                 <span className="text-sm text-gray-400 mb-2">{date}</span>

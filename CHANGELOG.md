@@ -1,3 +1,16 @@
+## v5.5.0 - Lesson Completion & Context Awareness Fixes (2025-12-10)
+
+* **fix**:
+  * **Lesson Completion**: 修正課程完成觸發機制 (`useEffect` missing)，現在捲動到底部能正確觸發完成狀態與 confetti 特效，並修復了 "Reading too fast" 的防刷機制。
+  * **Status Persistence**: 修正 `REVIEWING` 與 `COMPLETED` 狀態無法正確儲存至資料庫的 API 問題，確保學習進度不會因重新整理而回溯。
+  * **Context-Aware Panel**:
+    * **Review Mode**: 解除 Context Panel 在複習模式下的限制，現在即使課程已完成，AI 也能針對目前閱讀的章節出題。
+    * **Chinese Heading Support**: 修正後端 Quiz 演算法的 normalization 邏輯，現在能正確辨識中文標題，解決 "總是抓到第一章" 的問題。
+
+* **ui**:
+  * **Deep Blue Theme**: 將 Blog Card 與 Post Header 背景調整為深藍色 (`#0B1120`)，提升閱讀質感。
+  * **Interaction**: 加快 Blog 與 Project 頁面的點擊漣漪效果 (Ripple Effect) 速度 (3x)，讓回饋更即時。
+
 ## v5.4.5 - Theme Overhaul & UI Refinement (2025-12-09)
 
 * **refactor(ui)**: 

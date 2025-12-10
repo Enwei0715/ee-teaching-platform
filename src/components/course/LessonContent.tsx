@@ -78,8 +78,78 @@ export default function LessonContent({
     const [activeHeadingId, setActiveHeadingId] = useState<string>('');
     const [scrollProgress, setScrollProgress] = useState(0);
 
+    const { markAsComplete } = useLessonProgress();
+
+    // State to track if we've already triggered completion to avoid double-firing
+    const [hasTriggeredCompletion, setHasTriggeredCompletion] = useState(false);
+    // Track start time for reading speed check
+    const startTimeRef = useRef<number>(Date.now());
+    const lastWarningTimeRef = useRef<number>(0);
+
     // Navigation Hotkeys Listener
-    // ... (skip unchanged)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            if (e.key === 'ArrowLeft' && prevLesson) {
+                router.push(`/courses/${course.slug}/${prevLesson.id}`);
+            } else if (e.key === 'ArrowRight' && nextLesson) {
+                router.push(`/courses/${course.slug}/${nextLesson.id}`);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [prevLesson, nextLesson, router, course.slug]);
+
+    // Scroll & Completion Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (totalHeight <= 0) return;
+
+            const currentProgress = Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100));
+            setScrollProgress(currentProgress);
+
+            // Trigger completion when reaching the bottom (AI Quiz section)
+            const scrollBottom = window.scrollY + window.innerHeight;
+            const isAtBottom = scrollBottom >= document.documentElement.scrollHeight - 100; // 100px threshold
+
+            if (isAtBottom && !isCompleted && !hasTriggeredCompletion) {
+                const timeSpent = (Date.now() - startTimeRef.current) / 1000;
+                // Minimum reading time check (e.g., 10 seconds or 10% of estimated reading time)
+                const minTimeSeconds = Math.min(30, Math.max(10, readingTime * 60 * 0.1));
+
+                if (timeSpent < minTimeSeconds) {
+                    // Only warn once every 5 seconds to avoid spamming
+                    const now = Date.now();
+                    if (now - lastWarningTimeRef.current > 5000) {
+                        lastWarningTimeRef.current = now;
+                        toast.warning("Whoa there! intent on speed reading?", {
+                            description: `Please take at least ${Math.round(minTimeSeconds)}s to review the material.`
+                        });
+                    }
+                } else {
+                    setHasTriggeredCompletion(true);
+                    markAsComplete('scroll');
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                    toast.success("Lesson Completed!", {
+                        description: `You earned +${potentialXP} XP`
+                    });
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        // Initial check in case page is short
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isCompleted, hasTriggeredCompletion, markAsComplete, potentialXP, readingTime]);
 
     // If not mounted yet (SSR), render a safe default or loading state to prevent mismatch
     // But for a lesson page, we want SEO to be good, so we should default to 'default' theme which matches server render usually.
