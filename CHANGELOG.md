@@ -13,7 +13,7 @@
   * **Interaction**: 加快 Blog 與 Project 頁面的點擊漣漪效果 (Ripple Effect) 速度 (3x)，讓回饋更即時。
   * **Completion Trigger**: 恢復 v5.2.0 的 "Slide to Quiz" 觸發邏輯，滑動至測驗卡片即自動標記完成 (IntersectionObserver)。
   * **Anti-Cheat Timer**: 改進計時邏輯：首次學習需閱讀預估時間的 100%，複習模式 (`Reviewing`) 需閱讀 50% 方可完成。
-  * **Smart API Client**: 新增「自動模型切換」機制 (Auto-Fallback)。系統優先使用 `gemini-2.5-flash`，若遇 Rate Limit (503/429) 則自動切換至 `gemini-1.5-flash`，徹底解決 API 配額導致的錯誤。
+  * **AI Configuration**: 遷移至 **Groq API**。優先使用 `llama3-70b-8192` 提供高品質回答，並配置多層備援模型 (`mixtral-8x7b`, `llama3-8b`, `gemma-7b`) 以確保穩定性與速度。
 
 ## v5.4.5 - Theme Overhaul & UI Refinement (2025-12-09)
 

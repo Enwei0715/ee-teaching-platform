@@ -1,10 +1,12 @@
 import OpenAI from 'openai';
 
-const baseURL = "https://generativelanguage.googleapis.com/v1beta/openai/";
-const apiKey = process.env.GOOGLE_API_KEY;
+const baseURL = "https://api.groq.com/openai/v1";
+// Prefer GROQ_API_KEY, fallback to GOOGLE_API_KEY if not set (legacy implicit support, though URL is changed)
+// Actually, let's be strict: we switched to Groq.
+const apiKey = process.env.GROQ_API_KEY || process.env.GOOGLE_API_KEY;
 
 if (!apiKey) {
-    console.error("CRITICAL: GOOGLE_API_KEY is missing from environment variables.");
+    console.error("CRITICAL: GROQ_API_KEY is missing from environment variables.");
 }
 
 export const openai = new OpenAI({
@@ -16,8 +18,14 @@ export const openai = new OpenAI({
     },
 });
 
-// Priority list: Primary -> Fallback
-const MODELS = ["gemini-2.5-flash", "gemini-1.5-flash"];
+// Priority list: Groq Models (Fastest/Best first)
+// User requested: llama3-8b-8192, llama3-70b-8192, mixtral-8x7b-32768, gemma-7b-it
+const MODELS = [
+    "llama3-70b-8192",    // Best Quality (Priority 1)
+    "mixtral-8x7b-32768", // Good Alternative
+    "llama3-8b-8192",     // Fast & Cheap
+    "gemma-7b-it"         // Backup
+];
 
 export async function robustChatCompletion(params: any): Promise<{ content: string | null, model: string }> {
     let lastError: any = null;
