@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { Camera, Loader2, Send, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -22,20 +22,15 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
     const handleCapture = async () => {
         setIsCapturing(true);
         try {
-            const canvas = await html2canvas(document.body, {
-                x: window.scrollX,
-                y: window.scrollY,
-                width: window.innerWidth,
-                height: window.innerHeight,
-                scrollX: 0,
-                scrollY: 0,
-                useCORS: true,
-                ignoreElements: (element) => element.id === 'feedback-widget'
+            const dataUrl = await toPng(document.body, {
+                filter: (node) => {
+                    return node.id !== 'feedback-widget';
+                }
             });
-            const image = canvas.toDataURL('image/png');
-            setScreenshot(image);
+            setScreenshot(dataUrl);
         } catch (error) {
             console.error('Screenshot failed:', error);
+            toast.error('Failed to capture screenshot');
         } finally {
             setIsCapturing(false);
         }

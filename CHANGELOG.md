@@ -6,7 +6,7 @@
   
 * **fix**:
   * **Profile Avatar**: 修正個人頁面頭像路徑錯誤的問題，將 GitHub 與 Google 圖片網域加入白名單。
-  * **Feedback Screenshot**: 修正回饋截圖時文字與圖片偏移的問題 (html2canvas scroll offset fix)。
+  * **Feedback Screenshot**: 徹底解決截圖偏移與渲染問題，將截圖核心庫由 `html2canvas` 替換為更穩定的 `html-to-image`。
 
 ## v5.5.0 - Lesson Completion & Context Awareness Fixes (2025-12-10)
 
