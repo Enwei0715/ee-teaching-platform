@@ -27,6 +27,8 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
                 y: window.scrollY,
                 width: window.innerWidth,
                 height: window.innerHeight,
+                scrollX: 0,
+                scrollY: 0,
                 useCORS: true,
                 ignoreElements: (element) => element.id === 'feedback-widget'
             });
@@ -43,18 +45,28 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type,
+                    message,
+                    screenshot,
+                    pageUrl: window.location.href
+                }),
+            });
 
-        console.log('Feedback Submitted:', {
-            type,
-            message,
-            screenshot: screenshot ? 'Captured' : 'None'
-        });
+            if (!res.ok) throw new Error('Failed to submit');
 
-        setIsSubmitting(false);
-        onClose();
-        toast.success('Thanks for your feedback!');
+            toast.success('Thanks for your feedback!');
+            onClose();
+        } catch (error) {
+            console.error('Feedback error:', error);
+            toast.error('Failed to submit feedback. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (

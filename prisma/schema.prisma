@@ -34,6 +34,7 @@ model User {
   badges        UserBadge[]
   certificates  Certificate[]
   userProjects  UserProject[]
+  feedback      Feedback[]
 }
 
 model Certificate {
@@ -250,9 +251,24 @@ model FooterLink {
   updatedAt  DateTime @updatedAt
 }
 
+
 model SiteContent {
   id        String   @id @default(cuid())
   key       String   @unique
   content   String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  type      String   // 'bug' | 'feature' | 'other'
+  message   String   @db.Text
+  screenshot String? @db.Text
+  pageUrl   String
+  userAgent String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  status    String   @default("OPEN") // 'OPEN', 'RESOLVED', 'DISMISSED'
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

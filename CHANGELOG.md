@@ -1,3 +1,13 @@
+## v5.5.1 - Feedback System & Avatar Fixes (2025-12-11)
+
+* **feat**:
+  * **Feedback System**: 實作完整的意見回饋系統。使用者可透過右下角 FAB 傳送包含截圖的回報，並自動儲存至資料庫。
+  * **Admin Feedback**: 新增 Admin Feedback 頁面 (`/admin/feedback`)，管理員可查看、篩選並處理使用者的回報內容。
+  
+* **fix**:
+  * **Profile Avatar**: 修正個人頁面頭像路徑錯誤的問題，將 GitHub 與 Google 圖片網域加入白名單。
+  * **Feedback Screenshot**: 修正回饋截圖時文字與圖片偏移的問題 (html2canvas scroll offset fix)。
+
 ## v5.5.0 - Lesson Completion & Context Awareness Fixes (2025-12-10)
 
 * **fix**:
