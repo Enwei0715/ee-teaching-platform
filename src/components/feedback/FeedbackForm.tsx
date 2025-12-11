@@ -23,6 +23,11 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
         setIsCapturing(true);
         try {
             const dataUrl = await toPng(document.body, {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                style: {
+                    transform: `translate(-${window.scrollX}px, -${window.scrollY}px)`,
+                },
                 filter: (node) => {
                     return node.id !== 'feedback-widget';
                 }
