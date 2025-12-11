@@ -2,7 +2,7 @@
 
 * **feat**:
   * **Feedback System**: 實作完整的意見回饋系統。使用者可透過右下角 FAB 傳送包含截圖的回報，並自動儲存至資料庫。
-  * **Admin Feedback**: 新增 Admin Feedback 頁面 (`/admin/feedback`)，管理員可查看、篩選並處理使用者的回報內容。
+  * **Admin Feedback**: 新增 Admin Feedback 頁面 (`/admin/feedback`)，管理員可查看、篩選並處理使用者的回報內容，並支援狀態更新 (Open/Resolved/Dismissed)。
   
 * **fix**:
   * **Profile Avatar**: 修正個人頁面頭像路徑錯誤的問題，將 GitHub 與 Google 圖片網域加入白名單。
